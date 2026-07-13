@@ -1,0 +1,349 @@
+{%- liquid 
+  capture slide_direction
+    if settings.typography_rtl
+      echo 'rtl'
+    else
+      echo 'ltr'
+    endif
+  endcapture
+
+  capture splide
+    if section.settings.enable_slider
+      echo 'splide mb-4'
+    else
+      echo ''
+    endif
+  endcapture
+
+  capture splide_track
+    if section.settings.enable_slider
+      echo 'splide__track'
+    else
+      echo ''
+    endif
+  endcapture
+
+  capture splide_list
+    if section.settings.enable_slider
+      echo 'splide__list'
+    else
+      echo 'grid gap-4 md:gap-7 grid-cols-'
+      echo section.settings.testimonials_mobile_columns
+      echo ' md:grid-cols-'
+      echo section.settings.testimonials_columns
+    endif
+  endcapture
+
+  capture splide_slide
+    if section.settings.enable_slider
+      echo 'splide__slide'
+    else
+      echo 'text-center mb-4'
+    endif
+  endcapture
+
+  capture testimonial_image_class
+    if section.settings.image_shape == 'square'
+      echo 'object-cover w-24 h-24'
+    else
+      echo 'object-cover w-24 h-24 rounded-full'
+    endif
+  endcapture
+-%}
+
+{%- liquid
+  render 'asset-tag', asset: 'testimonials-component.css'
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --section-text-color: {{ section.settings.color_text }};
+    --section-background-color: {{ section.settings.color_background }};
+    --section-accent-color: {{ section.settings.color_accent }};
+    --section-accent-hover-color: {{ section.settings.color_hover }};
+  }
+  testimonials-component .splide:not(.is-active) .splide__slide {
+    width: calc(((100% + 1rem) / {{ section.settings.testimonials_mobile_columns }}) - 1rem);
+  }
+  testimonials-component .splide:not(.is-active) .splide__slide:nth-child(4) {
+    margin-right: 0;
+  }
+  @media (min-width: 786px) {
+    testimonials-component .splide:not(.is-active) .splide__slide {
+      width: calc(((100% + 1.75rem) / {{ section.settings.testimonials_columns }}) - 1.75rem);
+    }
+  }
+</style>
+
+<div class="testimonials bg-section-background text-section-text px-rail py-section space-y-7 border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="testimonials">
+  
+  <div class="testimonials__header mx-auto max-w-screen flex justify-center text-center flex-col md:flex-row md:items-end space-y-3">
+    <h2 class="testimonials__title text-section-text text-2xl md:text-3xl">{{ section.settings.title | escape }}</h2>
+  </div>
+
+  <testimonials-component id="Testimonials-{{ section.id }}" class="block">
+    <div class="{{ splide }} mx-auto max-w-screen"
+      data-options='{
+        "type": "loop",
+        "size": {{ section.blocks.size }},
+        "direction": "{{ slide_direction }}",
+        "autoplay": {{ section.settings.autoplay }},
+        "interval": "{{ section.settings.autoplay_speed_range | times: 1000 }}",
+        "keyboard": "focused",
+        "arrows": true,
+        "pagination": true,
+        "autoHeight": true,
+        "perPage": {{ section.settings.testimonials_columns }},
+        "gap": "1.75rem",
+        "breakpoints": {
+          "786": {
+            "perPage": {{ section.settings.testimonials_mobile_columns }},
+            "gap": "1rem"
+          }
+        }
+      }'>
+      <div class="{{ splide_track }}">
+        <ul class="{{ splide_list }} testimonials__grid">
+
+          {%- for block in section.blocks -%}
+            <li class="{{ splide_slide }} testimonials__grid-item flex items-center">
+              <div class="testimonial flex flex-col space-y-2 px-2">
+                {%- if block.settings.image -%}
+                  <div class="testimonial__image-container mx-auto">
+                    {{ block.settings.image | image_url: width: 192 | image_tag: 
+                      class: testimonial_image_class,
+                      widths: '192, 96',
+                      sizes: '96',
+                      loading: 'lazy' }}
+                  </div>
+
+                {%- endif -%}
+
+                {%- if block.settings.title != blank -%}
+                  <h3 class="testimonial__title text-section-text text-lg md:text-xl">{{ block.settings.title }}</h3>
+                {%- endif -%}
+
+                {%- if block.settings.show_stars -%}
+                  {%- liquid
+                    assign rating = block.settings.review_stars | floor
+                    assign rating_decimal = 0
+                    assign decimal = block.settings.review_stars | modulo: 1
+                    if decimal >= 0.3 and decimal <= 0.7
+                      assign rating_decimal = 0.5
+                    elsif decimal > 0.7
+                      assign rating_decimal = 1
+                    endif
+                    assign rating_value = block.settings.review_stars
+                    assign rating_max = 5
+                  -%}
+
+                  <div class="testimonial__rating rating text-section-accent flex justify-center" role="img"
+                    aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating_value, rating_max: rating_max }}">
+                    <div aria-hidden="true" class="rating-star">
+                      {%- for i in (1..rating_max) -%}
+                        {%- if rating >= i -%}
+                          <span class="rating-star__full">{%- render 'icon-ui-star' -%}</span>
+                        {%- elsif rating_decimal == 1 -%}
+                          {%- assign rating_decimal = 0 -%}
+                          <span class="rating-star__full">{%- render 'icon-ui-star' -%}</span>
+                        {%- elsif rating_decimal > 0 -%}
+                          {%- assign rating_decimal = 0 -%}
+                          <span class="rating-star__half">{%- render 'icon-ui-star-half' -%}</span>
+                        {%- else -%}
+                          <span class="rating-star__empty">{%- render 'icon-ui-star-empty' -%}</span>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+
+                {%- if block.settings.text != blank -%}
+                  <div class="testimonial__text rte rte-sm">{{ block.settings.text }}</div>
+                {%- endif -%}
+                {%- if block.settings.author != blank -%}
+                  <div class="testimonial__author text-section-text-80 text-xs md:text-sm font-navigation">
+                    {{ block.settings.author }}
+                  </div>
+                {%- endif -%}
+              </div>
+            </li>
+          {%- endfor -%}
+
+        </ul>
+      </div>
+    </div>
+  </testimonials-component>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.testimonials.name",
+  "class": "testimonials-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.testimonials.settings.title.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_slider",
+      "label": "t:sections.testimonials.settings.enable_slider.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:sections.slideshow.settings.autoplay.label",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed_range",
+      "label": "t:sections.slideshow.settings.autoplay_speed.label",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "sec",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "testimonials_columns",
+      "label": "t:sections.general.testimonials_per_row",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "radio",
+      "id": "testimonials_mobile_columns",
+      "label": "t:sections.general.testimonials_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "image_shape",
+      "label": "t:sections.general.image_shape.label",
+      "options": [
+        {
+          "value": "circle",
+          "label": "t:sections.general.image_shape.option_circle.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.image_shape.option_square.label"
+        }
+      ],
+      "default": "circle"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "t:sections.general.colors.color_text",
+      "default": "#4f4f4f"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "t:sections.general.colors.color_accent",
+      "default": "#008080"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "t:sections.general.colors.color_background",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "t:sections.testimonials.blocks.testimonial.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.testimonials.blocks.testimonial.settings.image.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_stars",
+          "label": "t:sections.testimonials.blocks.testimonial.settings.show_stars.label",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "review_stars",
+          "label": "t:sections.testimonials.blocks.testimonial.settings.stars.label",
+          "min": 0,
+          "max": 5,
+          "step": 0.5,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.testimonials.blocks.testimonial.settings.title.label",
+          "default": "Testimonial"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:sections.testimonials.blocks.testimonial.settings.richtext.label",
+          "default": "<p>A brief testimonial for your store's product, services or experience from one of your customers.</p>"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "t:sections.testimonials.blocks.testimonial.settings.author.label",
+          "default": "Author Name"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.testimonials.presets.name",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

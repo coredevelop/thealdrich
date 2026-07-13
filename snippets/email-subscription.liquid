@@ -1,0 +1,70 @@
+{%- liquid 
+  assign form_id = 'EmailSubscription-' | append: id | append: '-' | append: source
+  assign input_id = 'Email-' | append: id | append: '-' | append: source
+  assign button_id = 'Subscribe-' | append: id | append: '-' | append: source
+
+  assign contact_tags = 'prospect, newsletter, email subscribe'
+  if source != blank
+    assign contact_tags = contact_tags | append: ', ' | append: source
+  endif
+
+  assign discount_code = settings.newsletter_discount_code
+  assign redirect_link = settings.newsletter_redirect_link
+
+  if discount_code != blank
+    assign code = discount_code | url_encode
+    assign discount_url = '/discount/' | append: code
+
+    if redirect_link != blank
+      assign discount_url = discount_url | append: '?redirect=' | append: redirect_link
+    endif
+
+    assign discount_url = discount_url | append: '#' | append: code
+  endif
+-%}
+
+{%- form 'customer', id: form_id, class: 'email-subscription' -%}
+  {{ form.errors | default_errors }}
+
+  {%- if form.posted_successfully? -%}
+
+    <p>{{ 'newsletter.success' | t }}</p>
+
+    {%- if discount_code != blank -%}
+      <script>
+      window.location = '{{ discount_url }}';
+      </script>
+    {%- elsif redirect_link != blank -%}
+      <script>
+      window.location = '{{ redirect_link }}';
+      </script>
+    {%- endif -%}
+
+  {%- else -%}
+    <input type="hidden" name="contact[tags]" value="{{ contact_tags }}">
+    
+    <div class="email-subscription__row flex space-x-2 rtl:space-x-reverse">
+      <input type="email" 
+        class="flex-auto bg-transparent border-section-text placeholder-section-text-75"
+        id="{{ input_id }}"
+        name="contact[email]"
+        placeholder="{{ 'newsletter.label' | t }}"
+        aria-label="{{ 'newsletter.label' | t }}"
+        aria-required="true"
+        autocorrect="off"
+        autocapitalize="off"
+        {% if form.errors %}
+          aria-invalid="true"
+          aria-describedby="{{ formId }}-email-error"
+          data-form-status
+        {% endif %}
+        required>
+      <button type="submit"
+        class="button button--minimal button--solid px-2 bg-section-accent text-section-accent-text focus:ring-section-accent"
+        id="{{ button_id }}"><span class="sr-only">{{ 'newsletter.button_label' | t }}</span>
+        <span class="inline-block w-3.5">{%- render 'icon-ui-envelope' -%}</span>
+      </button>
+    </div>
+
+  {%- endif -%}
+{%- endform -%}

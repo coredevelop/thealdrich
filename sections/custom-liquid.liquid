@@ -1,0 +1,53 @@
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+    {%- if section.settings.section_padding == false -%}
+      --spacing-section: 0;
+      border-bottom: 0px;
+    {%- endif -%}
+  }
+  
+</style>
+
+<div class="custom-liquid px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="liquid">
+  <div class="mx-auto max-w-screen">
+    {{ section.settings.custom_liquid }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.custom_liquid.name",
+  "class": "custom-liquid-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "section_padding",
+      "label": "t:sections.general.section_padding",
+      "default": false
+    },
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:sections.custom_liquid.settings.custom_liquid.label",
+      "info": "t:sections.custom_liquid.settings.custom_liquid.info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.custom_liquid.presets.name"
+    }
+  ]
+}
+{% endschema %}

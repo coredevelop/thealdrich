@@ -1,0 +1,253 @@
+{%- comment -%}
+    Renders a product card
+
+    Accepts:
+    - product: {Object} Product Liquid object (optional)
+    - collection: {Object} For passing the collection for context product URLs
+    - media_size: {String} Size of the product image card. Values are "adapt", "square", "landscape" and "portrait". Default is "adapt" (optional)
+    - media_crop: {Boolean} Determins if the media should be cropped or contained in the aspect ratio
+    - product_columns: {Number} 2-6
+    - product_mobile_columns: {String} 1 or 2
+    - show_secondary_image: {Boolean} Show the secondary image on hover. Default: false (optional)
+    - show_vendor: {Boolean} Show the product vendor. Default: false
+    - show_rating: {Boolean} Show the product rating. Default: false
+    - badge_placement: {String} Controls placement of the product badges, "on sale"
+    - show_swatches: {Boolean} Show the product color swatch. Default: false
+    - swatch_shape: {String} "circle" or "square"
+    - class: {String} Additional class (optional)
+    - attributes: {String} Data attributes (optional)
+
+    Usage:
+    {% render 'product-card', show_vendor: section.settings.show_vendor %}
+{%- endcomment -%}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+  assign price = current_variant.price
+  assign compare_at_price = current_variant.compare_at_price
+
+  if compare_at_price > price
+    assign on_sale = true
+  else
+    assign on_sale = false
+  endif
+
+  assign available = product.available 
+
+  assign product_url = product.url | within: collection
+
+  if media_size == 'adapt' or media_size == nil
+    assign aspect_classes = ''
+  elsif media_size == 'square'
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif media_size == 'portrait'
+    assign aspect_classes = 'aspect-w-2 aspect-h-3'
+  elsif media_size == 'landscape'
+    assign aspect_classes = 'aspect-w-4 aspect-h-3'
+  endif
+
+  if media_crop
+    assign media_image_crop_class = 'object-cover'
+  else
+    assign media_image_crop_class = 'object-contain'
+  endif
+
+  if badge_placement == 'top-left'
+    assign badges_class = 'top-1 left-1'
+  elsif badge_placement == 'top-right'
+    assign badges_class = 'top-1 right-1'
+  elsif badge_placement == 'bottom-left'
+    assign badges_class = 'bottom-1 left-1'
+  elsif badge_placement == 'bottom-right' or badge_placement == nil
+    assign badges_class = 'bottom-1 right-1'
+  endif
+
+  capture product_card_id
+    echo 'ProductCard-'
+    if block_id
+      echo block_id
+    else
+      echo section.id
+    endif
+    echo '-'
+    echo product.id
+  endcapture
+
+  unless product_columns
+    assign product_columns = 4
+  endunless
+
+  capture image_sizes
+    case product_columns
+      when 2
+        echo '(min-width: 1280px) calc((1280px - 1.75rem) / 2), (min-width: 768px) calc((100vw - 4.25rem) / 2), '
+      when 3
+        echo '(min-width: 1280px) calc((1280px - 3.5rem) / 3), (min-width: 768px) calc((100vw - 6rem) / 3), '
+      when 4
+        echo '(min-width: 1280px) calc((1280px - 5.25rem) / 4), (min-width: 768px) calc((100vw - 7.75rem) / 4), '
+      when 5
+        echo '(min-width: 1280px) calc((1280px - 7rem) / 5), (min-width: 768px) calc((100vw - 9.5rem) / 5), '
+      when 6
+        echo '(min-width: 1280px) calc((1280px - 8.75rem) / 6), (min-width: 768px) calc((100vw - 11.25rem) / 6), '
+    endcase
+    if product_mobile_columns == '2'
+      echo 'calc((100vw - 3.5rem) / 2)'
+    else
+      echo 'calc((100vw - 2.25rem))'
+    endif
+  endcapture
+-%}
+
+<product-card class="grid-item block relative h-full group">
+  <div id="{{ product_card_id }}"
+    class="product-card relative flex flex-col flex-wrap items-stretch space-y-3 h-full {% if class %}{{ class }}{% endif %}"
+    data-product-url="{{ product.url }}"
+    data-product-available="{{ available }}"
+    data-product-on-sale="{{ on_sale }}"
+    data-product-card="{{ product.id }}" {{ attributes }}>
+
+    {%- if product.featured_media -%}
+
+      {%- liquid 
+        capture image_class
+          echo 'product-card__featured-image bg-primary-background sm:transition-transform sm:duration-300 z-10 sm:group-hover:scale-[103%] '
+          if product.media[1] != nil and show_secondary_image
+            echo 'product-card__featured-image--secondary sm:group-hover:opacity-0 '
+          endif
+          echo media_image_crop_class
+        endcapture
+
+        capture image_secondary_class
+          echo 'w-full h-full sm:transition-transform sm:duration-300 sm:group-hover:scale-[103%] '
+          echo media_image_crop_class
+        endcapture
+        -%}
+
+      <div
+        class="product-card__media relative flex justify-center overflow-hidden {{ aspect_classes }}"
+      >
+        {{ product.featured_media | image_url: width: 1280 | image_tag: 
+          class: image_class,
+          widths: '160, 220, 300, 420, 640, 960, 1280',
+          sizes: image_sizes,
+          loading: 'lazy' }}
+
+        {%- if product.media[1] != nil and show_secondary_image -%}
+          <div class="product-card__secondary-image absolute inset-0">
+            {{ product.media[1] | image_url: width: 1280 | image_tag: 
+              class: image_secondary_class,
+              widths: '160, 220, 300, 420, 640, 960, 1280',
+              sizes: image_sizes,
+              loading: 'lazy' }}
+          </div>
+        {%- endif -%}
+
+        <div class="product-card__labels-container pointer-events-none inset-0 absolute z-20">
+          <div class="product-card__labels absolute {{ badges_class }} space-x-2 text-2xs uppercase font-navigation font-weight-navigation-bolder tracking-tight">
+            {%- if on_sale == true and available == true -%}
+              {%- if shop.metafields.theme.badge_on_sale and shop.metafields.theme.badge_on_sale.type == 'file_reference' -%}
+                {{ shop.metafields.theme.badge_on_sale.value | image_url: width: 160 | image_tag: 
+                  class: 'w-20 inline-block',
+                  widths: '80, 160',
+                  sizes: '80px',
+                  loading: 'lazy' }}
+              {%- else -%}
+                <span class="label label--accent rounded-sm py-0.5 px-2 bg-primary-accent text-primary-accent-text">
+                  {{ 'products.product.on_sale' | t }}
+                </span>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if available == false -%}
+              {%- if shop.metafields.theme.badge_sold_out and shop.metafields.theme.badge_sold_out.type == 'file_reference' -%}
+                {{ shop.metafields.theme.badge_sold_out.value | image_url: width: 160 | image_tag: 
+                  class: 'w-20 inline-block',
+                  widths: '80, 160',
+                  sizes: '80px',
+                  loading: 'lazy' }}
+              {%- else -%}
+                <span class="label label--basic rounded-sm py-0.5 px-2 bg-primary-background text-primary-accent">
+                  {{ 'products.product.sold_out' | t }}
+                </span>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if product.metafields.theme.label -%}
+              <span class="label label--accent label--custom rounded-sm py-0.5 px-2 bg-primary-accent text-primary-accent-text">
+                {{ product.metafields.theme.label.value }}
+              </span>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- else -%}
+         <div class="product-card__media relative flex justify-center overflow-hidden aspect-w-1 aspect-h-1"><div class="product-card__labels-container pointer-events-none inset-0 absolute z-20">
+          <div class="product-card__labels absolute bottom-1 right-1 space-x-2 text-2xs uppercase font-navigation font-weight-navigation-bolder tracking-tight"></div>
+          </div>
+        </div>
+    {%- endif -%}
+    <div class="product-card__content leading-tight">
+      <a class="product-card__title hover:text-primary-accent block after:absolute after:content-[''] after:inset-0 after:z-10" href="{{ product_url }}">
+        {{ product.title }}
+      </a>
+      {%- if show_vendor -%}
+        <div class="product-card__vendor relative text-sm text-primary-text-80">
+          {{ product.vendor | link_to_vendor }}
+        </div>
+      {%- endif -%}
+      <div class="product-card__price pt-0.5">
+        {% render 'price', product: product %}
+      </div>
+
+      {%- if show_rating and product.metafields.reviews.rating.value != blank -%}
+        <div class="product-card__rating rating-component">
+          {%- liquid
+            assign rating = product.metafields.reviews.rating.value.rating | floor
+            assign rating_decimal = 0
+            assign decimal = product.metafields.reviews.rating.value.rating | modulo: 1
+            if decimal >= 0.3 and decimal <= 0.7
+              assign rating_decimal = 0.5
+            elsif decimal > 0.7
+              assign rating_decimal = 1
+            endif
+            assign rating_value = product.metafields.reviews.rating.value
+            assign rating_max = product.metafields.reviews.rating.value.scale_max
+          -%}
+          <div class="rating" role="img"
+            aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating_value, rating_max: rating_max }}">
+            <div aria-hidden="true" class="rating-star">
+              {%- for i in (1..rating_max) -%}
+                {%- if rating >= i -%}
+                  <span class="rating-star__full">{%- render 'icon-ui-star' -%}</span>
+                {%- elsif rating_decimal == 1 -%}
+                  {%- assign rating_decimal = 0 -%}
+                  <span class="rating-star__full">{%- render 'icon-ui-star' -%}</span>
+                {%- elsif rating_decimal > 0 -%}
+                  {%- assign rating_decimal = 0 -%}
+                  <span class="rating-star__half">{%- render 'icon-ui-star-half' -%}</span>
+                {%- else -%}
+                  <span class="rating-star__empty">{%- render 'icon-ui-star-empty' -%}</span>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+          <p class="rating-text caption">
+            <span aria-hidden="true">{{ rating_value }} / {{ rating_max }}</span>
+          </p>
+          <p class="rating-count caption">
+            <span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span>
+            <span class="sr-only">{{ product.metafields.reviews.rating_count }} {{ "accessibility.total_reviews" | t }}</span>
+          </p>
+        </div>
+      {%- endif -%}
+
+      {%- if show_swatches -%}
+        <div class="product-card__swatches pt-1">
+          {%- render 'swatches', product: product,
+            swatch_shape: swatch_shape,
+            collection: collection
+          -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</product-card>

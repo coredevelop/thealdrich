@@ -1,0 +1,391 @@
+<style>
+  .article > div:not(.article-block__image) {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  .article > div:first-child:not(.article-block__image) {
+    padding-top: 4rem;
+  }
+  .article > div.article-block__footer {
+    padding-top: 0;
+    padding-bottom: 0.5rem;
+  }
+  
+</style>
+
+<article id="main-article" class="main-article" 
+  itemscope itemtype="http://schema.org/BlogPosting"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-article">
+
+  <div class="article">
+    {%- for block in section.blocks -%}
+
+      {%- case block.type -%}
+        {%- when '@app' -%}
+          <div class="article-block__app mx-auto px-rail max-w-screen">
+            {% render block %}
+          </div>
+
+        {%- when 'custom_liquid' -%}
+          <div class="article-block__liquid mx-auto px-rail max-w-screen">
+            {{ block.settings.custom_liquid }}
+          </div>
+
+        {%- when 'image'-%}
+          {%- if article.image -%}
+            {%- liquid
+              capture image_sizes
+                if block.settings.full_width
+                  echo '100vw'
+                else
+                  echo '(min-width: 1280px) 1280px, 100vw'
+                endif
+              endcapture
+
+              if block.settings.image_ratio == 'adapt'
+                assign aspect_classes = ''
+              elsif block.settings.image_ratio == 'square'
+                assign aspect_classes = 'aspect-w-1 aspect-h-1'
+              elsif block.settings.image_ratio == 'portrait'
+                assign aspect_classes = 'aspect-w-2 aspect-h-3'
+              elsif block.settings.image_ratio == 'landscape'
+              assign aspect_classes = 'aspect-w-4 aspect-h-3'
+              elsif block.settings.image_ratio == 'letterbox'
+                assign aspect_classes = 'aspect-w-16 aspect-h-9'
+              elsif block.settings.image_ratio == 'narrow'
+                assign aspect_classes = 'aspect-w-4 aspect-h-1'
+              endif
+
+              capture image_class
+                echo 'block mx-auto object-cover'
+                if block.settings.full_width
+                  echo ' w-full'
+                endif
+              endcapture
+            -%}
+            <div class="article-block__image mx-auto{% unless block.settings.full_width %} max-w-screen{% endunless %}">
+              <div class="block overflow-hidden relative {{ aspect_classes }}">
+                {{ article.image | image_url: width: 1920 | image_tag: 
+                  class: image_class,
+                  widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                  sizes: image_sizes,
+                  preload: true }}
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- when 'title'-%}
+            <div class="article-block__title mx-auto max-w-screen px-rail text-center pb-4 border-b border-primary-section-border" {{ block.shopify_attributes }}>
+              <h1 class="text-3xl md:text-4xl text-center">{{ article.title }}</h1>
+              <div class=" mt-2 text-xs uppercase font-navigation text-primary-text-90">
+                {%- if block.settings.show_date -%}
+                  <span class="article-block__date" itemprop="dateCreated pubdate datePublished">{{ article.published_at | time_tag: format: 'date' }}</span>
+                {%- endif -%}
+                {%- if block.settings.show_date and block.settings.show_author -%}
+                  <span> &bull; </span>
+                {%- endif -%}
+                {%- if block.settings.show_author -%}
+                  <span class="article-block__author font-weight-navigation-bolder" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <span itemprop="name">{{ article.author }}</span>
+                  </span>
+                {%- endif -%}
+              </div>
+            </div>
+
+          {%- when 'content'-%}
+          <div class="article-block__content mx-auto px-rail rte" {{ block.shopify_attributes }}>
+            {{ article.content }}
+          </div>
+
+          {%- when 'footer'-%}
+          <div class="article-block__footer px-rail flex justify-between items-end mx-auto max-w-[100ch] pt-0 border-b border-primary-section-border" {{ block.shopify_attributes }}>
+            {%- if blog.comments_enabled? and block.settings.show_comments -%}
+              <a href="{{ article.url }}#Comments" class="flex-none text-xs uppercase font-navigation text-primary-text-90">{{ 'blogs.article.comments' | t: count: article.comments_count }}</a>
+            {%- endif -%}
+
+            {%- if article.tags.size > 0 and block.settings.show_tags -%}
+              <ul class="text-xs uppercase font-navigation text-primary-text-90 flex flex-wrap justify-end">
+                {%- if article.tags.size == 1 -%}
+                  <li class="mt-2.5">{{ 'blogs.article.tags.one' | t }}:</li>
+                {%- else -%}
+                  <li class="mt-2.5">{{ 'blogs.article.tags.other' | t }}:</li>
+                {%- endif -%}
+                {%- for tag in article.tags -%}
+                  <li class="mt-2.5 ml-1 last-child:ml-0 text-primary-text tracking-tight font-weight-navigation-bolder"><a class="bg-primary-secondary-background py-1 px-2" href="{{ blog.url }}/tagged/{{ tag | handle }}">{{ tag }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+
+          {%- when 'share' -%}
+            <div class="article-block__share px-rail mx-auto max-w-[100ch]" {{ block.shopify_attributes }}>
+              <span class="article__share-label label">{{ 'blogs.article.share' | t }}</span>
+              {%- assign share_url = article.url | prepend: shop.url -%}
+              {%- assign share_text = article.title | url_encode -%}
+              {%- render 'social-share', share_url: share_url, share_text: share_text, color: block.settings.color -%}
+            </div>
+      {%- endcase -%}
+    {%- endfor -%}
+
+    <div class="article__buttons px-rail mx-auto max-w-[100ch] text-center">
+      <div class="flex justify-center space-x-4">
+        {%- if blog.next_article -%}
+          <a href="{{ blog.next_article }}" class="button button--outline">
+            <div class="flex justify-center items-baseline space-x-1">
+              <span class="inline-block w-1.5">{%- render 'icon-ui-chevron-left' -%}</span>
+              <span>{{ 'blogs.article.newer_post' | t }}</span>
+            </div>
+          </a>
+        {%- endif -%}
+        {%- if blog.previous_article -%}
+          <a href="{{ blog.previous_article }}" class="button button--outline">
+            <div class="flex justify-center items-baseline space-x-1">
+              <span>{{ 'blogs.article.older_post' | t }}</span>
+              <span class="inline-block w-1.5">{%- render 'icon-ui-chevron-right' -%}</span>
+            </div>
+          </a>
+        {%- endif -%}
+      </div>
+      <a href="{{ blog.url }}" class="text-primary-text-70 hover:text-primary-accent underline text-sm mt-4 inline-block">{{ 'blogs.article.back_to_blog' | t }}</a>
+    </div>   
+  </div>
+
+  {%- if blog.comments_enabled? -%}
+    <div class="comments px-rail py-section bg-primary-secondary-background-50">
+      <div class="comments__contain mx-auto max-w-[42rem]">
+
+        {%- if article.comments_count > 0 -%}
+          <div class="border-b border-primary-text-30 pb-8 mb-8">
+            {%- assign anchor_id = '#Comments-' | append: article.id -%}
+            <h2 id="Comments-{{ article.id }}" class="comment-form__count text-center mx-auto max-w-screen mb-2 text-xl md:text-2xl outline-none" tabindex="-1">{{ 'blogs.article.comments' | t: count: article.comments_count }}</h2>
+            
+            {%- paginate article.comments by 5 -%}
+              <div id="Comments" class="comments__list space-y-6">
+                {%- if comment.status == 'pending' and comment.content -%}
+                  <article id="{{ comment.id }}" class="comment__item bg-primary-background p-5 rte">
+                    {{ comment.content }}
+                    <footer class="flex justify-end font-navigation font-weight-navigation text-xs text-primary-text-80">
+                      <span class="font-weight-navigation-bolder pr-1.5 mr-1.5 border-r border-primary-text-50">{{ comment.author }}</span><span>{{ comment.created_at | time_tag: format: 'date' }}</span>
+                    </footer>
+                  </article>
+                {%- endif -%}
+                
+                {% for comment in article.comments %}
+                  <article id="{{ comment.id }}" class="comment__item bg-primary-background p-5 rte">
+                    {{ comment.content }}
+                    <footer class="flex justify-end font-navigation font-weight-navigation text-xs text-primary-text-80">
+                      <span class="font-weight-navigation-bolder pr-1.5 mr-1.5 border-r border-primary-text-50">{{ comment.author }}</span><span>{{ comment.created_at | time_tag: format: 'date' }}</span>
+                    </footer>
+                  </article>
+                {% endfor %}
+                {% render 'pagination', paginate: paginate, anchor: anchor_id %}
+              </div>
+            {%- endpaginate -%}
+
+          </div>
+          
+        {%- endif -%}
+
+        {%- form 'new_comment', article -%}
+          {%- liquid
+            assign post_message = 'blogs.article.success'
+            if blog.moderated? and comment.status == 'unapproved'
+              assign post_message = 'blogs.article.success_moderated'
+            endif
+          -%}
+
+          <h3 class="comment-form__title text-center mx-auto max-w-screen mb-2 text-2xl md:text-3xl">{{ 'blogs.article.comment_form_title' | t }}</h3>
+          {%- if form.posted_successfully? -%}
+            <div class="comment-form__message outline-none px-4 py-2 bg-primary-secondary-background mb-4" tabindex="-1" autofocus>
+              <span class="inline-block w-3 mr-1 text-primary-accent">{% render 'icon-ui-check-circle' %}</span> {{ post_message | t }}
+            </div>
+          {%- elsif form.errors -%}
+            <div class="comment-form__message px-4 py-2 bg-primary-secondary-background mb-4 rte">
+              <div class="outline-none mb-1" role="alert" tabindex="-1" autofocus>
+                <span class="inline-block w-3 mr-1 text-red-600">{% render 'icon-ui-error' %}</span> {{ 'templates.contact.form.error_heading' | t }}
+              </div>
+              <ul class="list-disc" role="list">
+                {%- for field in form.errors -%}
+                  <li>
+                    <a href="#CommentForm-{{ field }}" class="link">
+                      {%- if form.errors.translated_fields[field] contains 'author' -%}
+                        {{ 'blogs.article.name' | t }}
+                      {%- elsif form.errors.translated_fields[field] contains 'body'-%}
+                       {{ 'blogs.article.message' | t }}
+                      {%- else -%}
+                        {{ form.errors.translated_fields[field] }}
+                      {%- endif -%}
+                      {{ form.errors.messages[field] }}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+
+          <div class="comments-form__contain space-y-4">
+            <div class="contact-form__fields grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="contact-form__field">
+                <label for="CommentForm-author">{{ 'blogs.article.name' | t }}*</label>
+                <input type="text" id="CommentForm-author"
+                  autocomplete="name"
+                  name="comment[author]"
+                  value="{{ form.author }}"
+                  aria-required="true">
+              </div>
+              <div class="contact-form__field">
+                <label for="CommentForm-email">{{ 'blogs.article.email' | t }}*</label>
+                <input type="email" id="CommentForm-email"
+                  autocomplete="email"
+                  name="comment[email]"
+                  value="{{ form.email }}"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  aria-required="true">
+              </div>
+            </div>
+            <div class="contact-form__field">
+              <label for="CommentForm-body">{{ 'blogs.article.message' | t }}*</label>
+              <textarea id="CommentForm-body"
+                rows="5"
+                name="comment[body]"
+                aria-required="true">{{ form.body }}</textarea>
+            </div>
+            {%- if blog.moderated? -%}
+              <p class="text-sm">{{ 'blogs.article.moderated' | t }}</p>
+            {%- endif -%}
+            <input type="submit" class="button button--solid button--cta" value="{{ 'blogs.article.post' | t }}">
+          </div>
+          
+        {%- endform -%}
+      </div>
+    </div>
+  {%- endif -%}
+</article>
+
+<script type="application/ld+json">
+  {{ article | structured_data }}
+</script>
+{% schema %}
+{
+  "name": "t:sections.main_article.name",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "image",
+      "name": "t:sections.main_article.blocks.image.name",
+      "settings": [
+        {
+          "type": "select",
+          "id": "image_ratio",
+          "label": "t:sections.general.image_ratio.label",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.general.image_ratio.option_auto.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.general.image_ratio.option_square.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.general.image_ratio.option_portrait.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.general.image_ratio.option_landscape.label"
+            },
+            {
+              "value": "letterbox",
+              "label": "t:sections.general.image_ratio.option_letterbox.label"
+            },
+            {
+              "value": "narrow",
+              "label": "t:sections.general.image_ratio.option_narrow.label"
+            }
+          ],
+          "default": "letterbox"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "t:sections.general.full_width",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "t:sections.main_article.blocks.title.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_date",
+          "label": "t:sections.main_article.blocks.title.settings.show_date.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_author",
+          "label": "t:sections.main_article.blocks.title.settings.show_author.label",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "content",
+      "name": "t:sections.main_article.blocks.content.name",
+      "limit": 1
+    },
+    {
+      "type": "footer",
+      "name": "t:sections.main_article.blocks.footer.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_comments",
+          "default": true,
+          "label": "t:sections.main_article.blocks.footer.settings.show_comments.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tags",
+          "default": true,
+          "label": "t:sections.main_article.blocks.footer.settings.show_tags.label"
+        }
+      ]
+    },
+    {
+      "type": "share",
+      "name": "t:sections.main_article.blocks.share.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "color",
+          "default": false,
+          "label": "t:sections.main_article.blocks.share.settings.show_social_brand_colors.label"
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:sections.main_article.blocks.custom_liquid.name",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:sections.main_article.blocks.custom_liquid.settings.custom_liquid.label",
+          "info": "t:sections.main_article.blocks.custom_liquid.settings.custom_liquid.info"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

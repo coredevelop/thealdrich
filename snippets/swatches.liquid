@@ -1,0 +1,112 @@
+{% comment %}
+    Renders product swatches
+
+    Accepts:
+    - product: {Object} Product Liquid object (optional)
+    - swatch_shape: {String} "circle" or "square"
+
+    Usage:
+    {% render 'swatches', swatch_shape: section.settings.swatch_shape %}
+{% endcomment %}
+
+{%- liquid
+  assign swatch_option = nil
+  assign color_language_options = 'products.product.color_option' | t | downcase
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    assign has_swatch = false
+    for value in option.values
+      if value.swatch != blank
+        assign has_swatch = true
+        break
+      endif
+    endfor
+
+    if has_swatch
+      assign swatch_option = option
+      assign swatch_option_position = 'option' | append: option.position
+      break
+    elsif option_name contains color_language_options
+      assign swatch_option = option
+      assign swatch_option_position = 'option' | append: option.position
+      break
+    endif
+  endfor
+-%}
+
+{%- if swatch_option -%}
+  <swatch-radios>
+    <fieldset class="swatches flex flex-wrap justify-center space-x-1 z-20 relative">
+      {%- for value in swatch_option.values -%}
+        {%- liquid
+          assign swatch_color_metafield_styles = ''
+          assign color_variant_id = ''
+          assign color_variant_url = ''
+          assign color_variant_image = ''
+
+          # Find the matching variant
+          for variant in product.variants
+            if variant[swatch_option_position] == value
+              assign color_variant_id = variant.id
+              assign color_variant_url = variant.url
+              if variant.image
+                assign color_variant_image = variant.image | image_url: width: 640
+              endif
+              break
+            endif
+          endfor
+
+          if value.swatch
+            if value.swatch.image
+              assign image_url = value.swatch.image | image_url: width: 44
+              assign swatch_color_metafield_styles = 'background-image: url(' | append: image_url | append: ');'
+            elsif value.swatch.color
+              assign swatch_color_metafield_styles = 'background-color: ' | append: value.swatch.color | append: ';'
+            endif
+          else
+            assign swatch_color = value | escape
+            assign swatch_color_metafield = product.metafields.swatches[swatch_color]
+            if swatch_color_metafield == blank
+              assign swatch_color_metafield = shop.metafields.swatches[swatch_color]
+            endif
+            if swatch_color_metafield
+              if swatch_color_metafield.type == 'file_reference'
+                assign image_url = swatch_color_metafield.value | image_url: width: 44
+                assign swatch_color_metafield_styles = 'background-image: url(' | append: image_url | append: ');'
+              elsif swatch_color_metafield.type == 'color'
+                assign swatch_color_metafield_styles = 'background-color: ' | append: swatch_color_metafield.value | append: ';'
+              endif
+            else
+              assign swatch_color_css = swatch_color | handle | replace: '-', ''
+              assign swatch_color_metafield_styles = 'background-color: ' | append: swatch_color_css | append: ';'
+            endif
+          endif
+        -%}
+
+        <style>
+          [data-swatch-id="{{ value | handle }}-{{ product.id }}"] .swatch-item__color {
+            {{ swatch_color_metafield_styles }}
+          }
+        </style>
+
+        <input type="radio" {% if forloop.first %}checked="checked"{% endif %}
+          id="{{ value | handle }}-{{ product.id }}-{{ section.id }}"
+          name="swatch-{{ product.id }}-{{ section.id }}"
+          value="{{ value | escape }}"
+          data-variant-id="{{ color_variant_id }}"
+          data-variant-url="{{ color_variant_url }}"
+          data-variant-image="{{ color_variant_image }}"
+          class="swatch-item sr-only">
+        <label for="{{ value | handle }}-{{ product.id }}-{{ section.id }}"
+          title="{{ value | escape }}"
+          data-swatch-id="{{ value | handle }}-{{ product.id }}"
+          class="swatch-item__label {% if forloop.first %}swatch-item__link--active {% endif %}block p-0 w-6 h-6 {% if swatch_shape == 'circle' %}rounded-full{% endif %} cursor-pointer border border-solid border-primary-background">
+          <div class="swatch-item__color bg-primary-text-10 border-2 border-primary-background h-full w-full {% if swatch_shape == 'circle' %}rounded-full{% endif %}" tabindex="-1">
+            <span class="swatch-item__value sr-only">{{ value | escape }}</span>
+          </div>
+        </label>
+      {%- endfor -%}
+    </fieldset>
+  </swatch-radios>
+{%- endif -%}

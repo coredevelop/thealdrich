@@ -1,0 +1,247 @@
+{%- liquid
+  assign container_class = 'mx-auto max-w-screen max-w w-full flex gap-6 justify-between flex-col'
+  assign content_class = 'text-left'
+  if section.settings.form_position == 'right'
+    assign container_class = container_class | append: ' md:flex-row-reverse'
+  elsif section.settings.form_position == 'left'
+    assign container_class = container_class | append: ' md:flex-row'
+  elsif section.settings.form_position == 'center'
+    assign container_class = container_class | append: ' flex-col items-center'
+    assign content_class = 'text-center'
+  endif
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    
+    {%- if section.settings.section_top_padding -%}
+      padding-top: var(--spacing-section);
+    {%- endif -%}
+    padding-bottom: var(--spacing-section);
+  }
+  .main-page {
+    padding-bottom: 2rem !important;
+  }
+  .main-page__content {
+    max-width: 42rem;
+  }
+  
+</style>
+<div class="contact-form px-rail border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="liquid">
+  <div class="{{ container_class }}">
+
+    <div class="space-y-2 mb-0 md:mb-8 {{ content_class }}">
+      {%- if section.settings.heading != blank -%}
+        <h3 class="contact-form__title mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.heading | escape }}</h3>
+      {%- endif -%}
+      {%- if section.settings.rich_text != blank -%}
+        <div class="custom-content__richtext-text rte">
+          {{ section.settings.rich_text }}
+        </div>
+      {%- endif -%}
+    </div>
+    
+
+    {%- form 'contact', id: 'ContactForm', class: 'w-full max-w-xl' -%}
+      {%- if form.posted_successfully? -%}
+        <div class="contact-form__message outline-none px-4 py-2 bg-primary-secondary-background mb-4" tabindex="-1" autofocus><span class="inline-block w-3 mr-1 text-primary-accent">{% render 'icon-ui-check-circle' %}</span> {{ 'templates.contact.form.post_success' | t }}</div>
+      {%- elsif form.errors -%}
+        <div class="contact-form__message px-4 py-2 bg-primary-secondary-background mb-4 rte">
+          <div class="outline-none mb-1" role="alert" tabindex="-1" autofocus><span class="inline-block w-3 mr-1 text-red-600">{% render 'icon-ui-error' %}</span> {{ 'templates.contact.form.error_heading' | t }}</div>
+          <ul class="list-disc" role="list">
+            <li>
+              <a href="#ContactForm-email" class="link">
+                {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      {%- endif -%}      
+
+      <div class="contact-form__contain space-y-4">
+        <div class="contact-form__fields grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="contact-form__field">
+            <label for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+            <input autocomplete="name" type="text" id="ContactForm-name" name="contact[{{ 'templates.contact.form.name' | t }}]" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}" required aria-required="true">
+          </div>
+          <div class="contact-form__field">
+            <label for="ContactForm-email">{{ 'templates.contact.form.email' | t }} *</label>
+            <input id="ContactForm-email" type="email"
+              autocomplete="email"
+              name="contact[email]"
+              spellcheck="false"
+              autocapitalize="off"
+              value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+              required
+              aria-required="true">
+          </div>
+        </div>
+        {%- for block in section.blocks -%}
+          <div class="contact-form__field" data-type="{{ block.type }}"
+            {{ block.shopify_attributes }}>
+            {%- case block.type -%}
+              {%- when 'text_field' -%}
+                <label for="ContactForm-{{ block.id }}">{{ block.settings.title | escape }}</label>
+                {%- if block.settings.multiline -%}
+                  <textarea id="ContactForm-{{ block.id }}"
+                    rows="6"
+                    {% if block.settings.required %}required aria-required="true"{% endif %}
+                    name="contact[{{ 'templates.contact.form.comment' | t }}]">
+                    {{- form.body -}}
+                  </textarea>
+                {%- else -%}
+                  <input 
+                    type="text"
+                    id="ContactForm-{{ block.id }}"
+                    name="contact[{{ block.settings.title | escape }}]"
+                    {% if block.settings.required %}aria-required="true" required{% endif %}
+                    {% if block.settings.multiline %}rows="4"{% endif %}
+                  >                  
+                {%- endif -%}
+              {%- when 'dropdown' -%}
+                <label for="ContactForm-{{ block.id }}">{{ block.settings.title | escape }}</label>
+                <select id="ContactForm-{{ block.id }}"
+                  name="contact[{{ block.settings.title | escape }}]"
+                  aria-required="true" required>
+                  <option value="" disabled="" selected=""></option>
+                  {%- assign values = block.settings.values | split: ', ' -%}
+                  {%- for value in values -%}
+                    <option value="{{ value }}">{{ value }}</option>
+                  {%- endfor -%}
+                </select>
+                
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+
+        <div class="contact-form__field">
+          <label for="ContactForm-body">{{ 'templates.contact.form.comment' | t }}</label>
+          <textarea id="ContactForm-body"
+            rows="6"
+            aria-required="true"
+            required
+            name="contact[{{ 'templates.contact.form.comment' | t }}]">
+            {{- form.body -}}
+          </textarea>
+        </div>
+        <div class="contact-form__button">
+          <button type="submit" class="button button--solid button--cta">
+            {{ 'templates.contact.form.send' | t }}
+          </button>
+        </div>
+      </div>
+    {%- endform -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.contact_form.name",
+  "class": "contact-form-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.contact_form.settings.heading.label",
+      "default": "Contact form"
+    },
+    {
+      "type": "richtext",
+      "id": "rich_text",
+      "label": "t:sections.contact_form.settings.rich_text.label"
+    },
+    {
+      "type": "select",
+      "id": "form_position",
+      "label": "t:sections.contact_form.settings.form_position.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.general.alignment.option_left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.alignment.option_center.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.general.alignment.option_right.label"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "section_top_padding",
+      "label": "t:sections.contact_form.settings.section_top_padding.label",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_field",
+      "name": "t:sections.contact_form.blocks.text_field.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.contact_form.blocks.text_field.settings.name.label",
+          "default": "Custom field"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "t:sections.contact_form.blocks.text_field.settings.required.label",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "multiline",
+          "label": "t:sections.contact_form.blocks.text_field.settings.multiline.label",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "name": "t:sections.contact_form.blocks.dropdown.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.contact_form.blocks.dropdown.settings.name.label",
+          "default": "Custom field"
+        },
+        {
+          "type": "text",
+          "id": "values",
+          "label": "t:sections.contact_form.blocks.dropdown.settings.values.label",
+          "default": "Option 1, Option 2, Option 3"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.contact_form.presets.name",
+      "blocks": [
+        {
+          "type": "text_field",
+          "settings": {
+            "title": "Phone Number",
+            "required": true
+          }
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

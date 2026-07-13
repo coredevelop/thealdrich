@@ -1,0 +1,109 @@
+{% comment %}
+    Renders product media
+
+    Accepts:
+    - media: {Object} Product Media object
+    - loop: {Boolean} Enable video looping (optional)
+    - image_class: {String} Additional CSS classes for images (optional)
+
+    Usage:
+    {% render 'product-media',
+      media: media,
+      loop: section.settings.enable_video_looping,
+      image_class: 'additional-classes'
+    %}
+{% endcomment %}
+{%- assign image_sizes = '(min-width: 1280px) calc(1280px * (7/12)), (min-width: 1024px) calc(100vw * (6/12)), calc(100vw - 2.5rem)' -%}
+{%- capture base_image_class -%}product__media-image{% if image_class %} {{ image_class }}{% endif %}{%- endcapture -%}
+{%- capture full_image_class -%}product__media-image w-full h-full object-cover{% if image_class %} {{ image_class }}{% endif %}{%- endcapture -%}
+{%- if media.media_type == 'image' -%}
+  {{ media.preview_image | image_url: width: 1920 | image_tag: 
+    class: base_image_class,
+    widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+    sizes: image_sizes,
+    data-width: media.width,
+    loading: image_loading,
+    preload: image_preload }}
+
+{%- elsif media.media_type == 'model' -%}
+
+  <product-model class="product-model media block w-full aspect-w-1 aspect-h-1"
+    data-media-id="{{ media.id }}"
+    data-media-type="{{ media_type }}"
+    data-media-product="true"
+    data-loaded="false">
+    <button id="ModelObject-{{ section.id }}-{{ media.id }}"
+      class="product-model__cover-button absolute group h-full w-full"  
+      type="button">
+      {{ media.preview_image | image_url: width: 1920 | image_tag: 
+        class: full_image_class,
+        widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+        sizes: image_sizes,
+        data-width: media.width,
+        loading: image_loading,
+        preload: image_preload }}
+
+      <span class="video__play-button absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 p-5 flex justify-center items-center shadow-md bg-primary-background rounded-full transition-transform duration-500 ease-in-out group-hover:scale-125 group-hover:text-primary-accent group-focus:scale-125 group-focus:text-primary-accent">
+        {% render 'icon-ui-3d-model' %}
+      </span>
+    </button>
+    <template>
+      {{ media | media_tag: image_size: "2048x", toggleable: true }}
+    </template>
+  </product-model>
+  
+
+{%- else -%}
+  {%- liquid 
+    if media.media_type == 'video'
+      assign aspect_padding = 'padding-bottom: calc(' | append: media.preview_image.height | append: ' / ' | append: media.preview_image.width | append: ' * 100%);'
+    else
+      assign aspect_padding = 'padding-bottom: calc(9 / 16 * 100%);'
+    endif
+
+    capture media_type 
+      if media.media_type == 'external_video'
+        echo media.host
+      else
+        echo media.media_type
+      endif
+    endcapture
+  -%}
+
+  <video-object class="video__video-wrapper media block mx-auto relative"
+    style="{{ aspect_padding }}"
+    data-media-id="{{ media.id }}"
+    data-media-type="{{ media_type }}"
+    data-media-product="true"
+    data-loaded="false">
+    <button id="VideoObject-{{ section.id }}-{{ media.id }}"
+      class="video__cover-button absolute group h-full w-full"  
+      type="button">
+      {{ media.preview_image | image_url: width: 1920 | image_tag: 
+        class: full_image_class,
+        widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+        sizes: image_sizes,
+        data-width: media.width,
+        loading: image_loading,
+        preload: image_preload }}
+      <span class="video__play-button absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 p-5 flex justify-center items-center shadow-md bg-primary-background rounded-full transition-transform duration-500 ease-in-out group-hover:scale-125 group-hover:text-primary-accent group-focus:scale-125 group-focus:text-primary-accent">
+        {% render 'icon-ui-play' %}
+      </span>
+    </button>
+    <template>
+      {%- case media.media_type -%}
+      {%- when 'external_video' -%}
+        {%- assign video_class = 'absolute z-10 inset-0 w-full h-full js-' | append: media.host -%}
+        {%- assign video_id = 'Video-' | append: section.id | append: '-' | append: media.external_id -%}
+        {%- if media.host == 'youtube' -%}
+          {{ media | external_video_url: autoplay: true, loop: loop, playlist: media.external_id | external_video_tag: class: video_class, id: video_id, loading: "lazy" }}
+        {%- else -%}
+          {{ media | external_video_url: autoplay: true, loop: loop | external_video_tag: class: video_class, loading: "lazy" }}
+        {%- endif -%}
+      {%- when 'video' -%}
+        {{ media | media_tag: image_size: "2048x", autoplay: true, class: 'absolute z-10 inset-0 w-full h-full js-video', loop: loop, controls: true, preload: "none" }}
+      {%- endcase -%}
+    </template>
+  </video-object>
+  
+{%- endif -%}

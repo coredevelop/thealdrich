@@ -1,0 +1,50 @@
+{%- liquid
+  render 'asset-tag', asset: 'cart-drawer.css', preload_stylesheet: true
+-%}
+<style>
+  cart-drawer {
+    --section-background-color: {{ settings.general_background_color }};
+  }
+</style>
+<cart-drawer id="cart-drawer" class="no-js-hidden invisible" client:idle>
+  <div class="cart-drawer__container fixed right-0 top-0 h-full w-full md:w-[calc(100%-3rem)] md:max-w-[24rem] bg-primary-background transform translate-x-full flex flex-col z-[1001] shadow-2xl">
+    <div class="cart-drawer__header relative flex items-center justify-between px-4 py-4 border-b border-primary-section-border">
+      <h2 class="text-xl font-heading font-weight-heading flex items-center gap-2">
+        {{ 'templates.cart.cart' | t }}
+        <span class="cart-drawer__count text-sm font-body text-primary-text-70" data-cart-count>
+          {%- if cart.item_count > 0 -%}
+            ({{ cart.item_count }})
+          {%- endif -%}
+        </span>
+      </h2>
+    </div>
+    
+    <div class="cart-drawer__content flex-1 overflow-y-auto">
+      <div class="cart-drawer__loading hidden justify-center items-center h-32">
+        <span class="loading-spinner">{%- render 'icon-ui-spinner' -%}</span>
+      </div>
+      
+      <div class="cart-drawer__empty hidden text-center px-4 py-8">
+        <p class="mb-4">{{ 'sections.cart.empty' | t }}</p>
+        <button type="button" class="button button--outline cart-drawer__continue">
+          {{ 'general.continue_shopping' | t }}
+        </button>
+      </div>
+      
+      <div id="cart-drawer-items" class="cart-drawer__items">
+        {%- comment -%}Cart items will be loaded here via section rendering API{%- endcomment -%}
+      </div>
+    </div>
+    
+    <div id="cart-drawer-footer" class="cart-drawer__footer border-t border-primary-section-border">
+      {%- comment -%}Cart footer will be loaded here via section rendering API{%- endcomment -%}
+    </div>
+  </div>
+  <div class="cart-drawer__modal-background modal__background"
+    title="{{ 'accessibility.close' | t }}">
+    <span class="sr-only">{{ 'accessibility.close' | t }}</span>
+  </div>
+  <button id="CartDrawerModalClose" type="button"
+    class="cart-drawer__modal-close modal__close"
+    aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+</cart-drawer>

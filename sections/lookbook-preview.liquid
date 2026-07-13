@@ -1,0 +1,229 @@
+<div class="custom-content py-section space-y-6 text-align-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="custom-content">
+
+  {%- if section.settings.title != blank -%}
+    <h3 class="custom-content__title mx-auto max-w-screen text-center text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <div class="custom-content__container space-y-8">
+    {%- for block in section.blocks -%}
+
+      <div id="LoobookPreviewItem-{{ block.id }}"
+        class="custom-content__item px-rail"
+        data-type="{{ block.type }}"
+        {{ block.shopify_attributes }}>
+
+        <div class="custom-content__item-contain mx-auto max-w-screen">
+
+          {%- case block.type -%}
+            {%- when 'icon_image' -%}
+
+              {%- liquid
+                if block.settings.image != blank
+                  if block.settings.image.width >= 240
+                    assign max_width = '240px'
+                  else
+                    assign max_width = block.ettings.image.width | append: 'px'
+                  endif
+                else
+                  assign max_width = '240px'
+                endif
+              -%}
+              <style>
+                #LoobookPreviewItem-{{ block.id }} { --max-width-screen: {{ max_width }}; }
+              </style>
+
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="custom-content__item-image-link">
+              {%- else -%}
+                <div class="custom-content__item-image-link">
+              {%- endif -%}
+
+              {%- if block.settings.image != blank -%}
+
+                {%- liquid
+                  capture image_sizes
+                    echo '(min-width: '
+                    echo max_width
+                    echo ') '
+                    echo max_width
+                    echo ', 100vw'
+                  endcapture
+                -%}
+                {{ block.settings.image | image_url: width: 640 | image_tag: 
+                  class: 'custom-content__item-image',
+                  widths: '160, 220, 300, 420, 640',
+                  sizes: image_sizes,
+                  loading: 'lazy' }}
+              {%- else -%}
+                <div class="w-48 h-48 mx-auto">
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg w-48 h-48 mx-auto' }}
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.link != blank -%}
+                </a>
+              {%- else -%}
+              </div>
+              {%- endif -%}
+
+            {%- when 'image' -%}
+
+              {%- if block.settings.full_width -%}
+                <style>
+                  #LoobookPreviewItem-{{ block.id }} {
+                    --max-width-screen: 100%;
+                    --spacing-rail: 0;
+                  }
+                </style>
+              {%- endif -%}
+
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="custom-content__item-image-link">
+              {%- else -%}
+                <div class="custom-content__item-image-link">
+              {%- endif -%}
+
+              {%- if block.settings.image != blank -%}
+
+                {%- liquid
+                  
+                  capture image_sizes
+                    if block.settings.full_width
+                      echo '100vw'
+                    else
+                      echo '(min-width: 1280px) calc(1280px - 2.5rem), calc(100vw - 2.5rem)'
+                    endif
+                  endcapture
+
+                  capture image_class
+                    echo 'custom-content__item-image display mx-auto'
+                    if block.settings.full_width
+                      echo ' w-full'
+                    endif
+                  endcapture
+                -%}  
+                {{ block.settings.image | image_url: width: 1920 | image_tag: 
+                  class: image_class,
+                  widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                  sizes: image_sizes,
+                  loading: 'lazy' }}
+              {%- else -%}
+                {%- capture current -%}{% cycle 1, 2 %}{%- endcapture -%}
+                {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+
+              {%- if block.settings.link != blank -%}
+                </a>
+              {%- else -%}
+              </div>
+              {%- endif -%}
+
+          {%- endcase -%}
+
+        </div>
+
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if section.settings.button_link != blank and section.settings.button_label != blank -%}
+    <div class="custom-content__button-contain">
+      <a href="{{ section.settings.button_link }}" class="button button--large button--outline">{{ section.settings.button_label | escape }}</a>
+    </div>
+  {%- endif -%}
+
+</div>
+{% schema %}
+{
+  "name": "t:sections.lookbook_preview.name",
+  "class": "lookbook-preview-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.lookbook_preview.settings.title.label",
+      "default": "Lookbook Preview"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.lookbook_preview.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.lookbook_preview.settings.button_link.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "icon_image",
+      "name": "t:sections.lookbook_preview.blocks.icon.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.lookbook_preview.blocks.icon.settings.image.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.lookbook_preview.blocks.icon.settings.link.label",
+          "info": "t:sections.lookbook_preview.blocks.icon.settings.link.info"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "t:sections.lookbook_preview.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.lookbook_preview.blocks.image.settings.image.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.lookbook_preview.blocks.image.settings.link.label",
+          "info": "t:sections.lookbook_preview.blocks.image.settings.link.info"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "t:sections.general.full_width",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.lookbook_preview.presets.name",
+      "settings": {
+        "title": "",
+        "button_label": "Browse the look",
+        "button_link": "shopify://collections/all"
+      },
+      "blocks": [
+        {
+          "type": "icon_image"
+        },
+        {
+          "type": "image",
+          "settings": {
+            "full_width": true
+          }
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

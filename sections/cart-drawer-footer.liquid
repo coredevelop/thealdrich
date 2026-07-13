@@ -1,0 +1,124 @@
+<div id="cart-drawer-footer-content" class="cart-drawer-footer__content px-4 py-4 {% if cart == empty %}hidden{% endif %}"
+  data-section-id="{{ section.id }}"
+  data-section-type="cart-drawer-footer">
+
+  {%- if settings.show_cart_drawer_notes -%}
+    <cart-note class="cart-drawer-footer__notes" {% if settings.typography_rtl %}dir="rtl"{% else %}dir="ltr"{% endif %}>
+      <details class="cart-drawer-details">
+        <summary class="cart-drawer-details__summary justify-between cursor-pointer">
+          <span class="text-sm font-body">{{ 'sections.cart.note' | t }}</span>
+          <span class="cart-drawer-details__icon w-4 h-4">
+            {% render 'icon-ui-chevron-down' %}
+          </span>
+        </summary>
+        <div class="cart-drawer-details__content">
+          <textarea
+            class="w-full min-h-[4rem] flex-1 text-base md:text-sm bg-primary-background px-3 py-2 border-2 border-primary-text-50 rounded-none"
+            name="note"
+            id="cart-drawer-note"
+            placeholder="{{ 'sections.cart.note_placeholder' | t }}">{{ cart.note }}</textarea>
+        </div>
+      </details>
+    </cart-note>
+  {%- endif -%}
+
+  {%- if settings.allow_cart_drawer_discounts -%}
+    <cart-discount class="cart-drawer-footer__discount">
+      <details class="cart-drawer-details">
+        <summary class="cart-drawer-details__summary justify-between cursor-pointer">
+          <span class="text-sm font-body">{{ 'sections.cart.discount_code' | t }}</span>
+          <span class="cart-drawer-details__icon w-4 h-4">
+            {% render 'icon-ui-chevron-down' %}
+          </span>
+        </summary>
+        <div class="cart-drawer-details__content space-y-2">
+          <form class="cart-drawer-discount__form flex gap-2">
+            <input
+              type="text"
+              name="discount"
+              placeholder="{{ 'sections.cart.discount_placeholder' | t }}"
+              class="flex-1 text-base md:text-sm bg-primary-background px-2 py-1.5 border border-primary-section-border rounded-none"
+              autocomplete="off">
+            <button
+              type="submit"
+              data-apply-discount
+              class="border-2 border-primary-text-70 bg-primary-text-70 text-primary-background px-3 py-1.5 text-xs font-weight-navigation uppercase whitespace-nowrap transition-colors">
+              <span data-button-text>{{ 'sections.cart.apply_discount' | t }}</span>
+              <span class="loading-spinner">{%- render 'icon-ui-spinner' -%}</span>
+            </button>
+          </form>
+
+          <div data-discount-message class="text-xs hidden"></div>
+
+          {%- comment -%}Hybrid approach: Cart-level codes rendered in Liquid (cheap), line-level codes fetched via JS{%- endcomment -%}
+          <div class="cart-drawer-discount__codes flex flex-wrap gap-2 pt-2" data-discount-codes-container>
+            {%- for discount in cart.cart_level_discount_applications -%}
+              {%- if discount.type == 'discount_code' -%}
+                <button
+                  type="button"
+                  data-remove-discount="{{ discount.title }}"
+                  class="discount-chip flex items-center gap-1.5 bg-primary-text-10 text-primary-text px-2 py-1 text-xs font-weight-navigation uppercase transition-colors cursor-pointer select-none"
+                  aria-label="{{ 'sections.cart.remove_discount_code' | t: code: discount.title }}">
+                  <span>{{ discount.title }}</span>
+                  <svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                  </svg>
+                </button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </details>
+    </cart-discount>
+  {%- endif -%}
+
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    {%- for discount in cart.cart_level_discount_applications -%}
+      <div class="cart-drawer-footer__discount-line flex items-center justify-between mb-1 text-sm">
+        <span class="text-primary-accent">{{ discount.title }}</span>
+        <span class="text-primary-accent">-{{ discount.total_allocated_amount | money }}</span>
+      </div>
+    {%- endfor -%}
+  {%- endif -%}
+
+  <div class="cart-drawer-footer__subtotal flex items-baseline justify-between mb-1">
+    <h3 class="text-base font-heading font-weight-heading">{{ 'sections.cart.subtotal' | t }}</h3>
+    <p class="text-base font-weight-body-bolder text-primary-accent flex items-baseline gap-2">
+      {%- if cart.cart_level_discount_applications.size > 0 -%}
+        <span class="line-through text-primary-text-70 text-sm font-weight-body">{{ cart.original_total_price | money_with_currency }}</span>
+      {%- endif -%}
+      {{ cart.total_price | money_with_currency }}
+    </p>
+  </div>
+  
+  <div class="cart-drawer-footer__tax-note text-xs text-primary-text-70 mb-2">
+    {%- if shop.taxes_included and shop.shipping_policy.body != blank -%}
+      {{ 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
+    {%- elsif shop.taxes_included -%}
+      {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
+    {%- elsif shop.shipping_policy.body != blank -%}
+      {{ 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
+    {%- else -%}
+      {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
+    {%- endif -%}
+  </div>
+  
+  <div class="cart-drawer-footer__buttons space-y-3">
+    <button type="submit" 
+      id="cart-drawer-checkout" 
+      class="cart-drawer-footer__checkout-button button button--cta button--solid w-full" 
+      name="checkout"
+      form="cart-drawer-form"
+      {% if cart == empty %}disabled{% endif %}>
+      {{ 'sections.cart.checkout' | t }}
+    </button>
+    
+    {%- if additional_checkout_buttons and settings.show_accelerated_checkout -%}
+      <div class="cart-drawer-footer__dynamic-buttons additional-checkout-buttons">
+        {{ content_for_additional_checkout_buttons }}
+      </div>
+    {%- endif -%}
+  </div>
+  
+  <div id="cart-drawer-errors" class="cart-drawer-footer__errors"></div>
+</div>

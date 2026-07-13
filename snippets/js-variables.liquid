@@ -1,0 +1,101 @@
+<script>
+  window.theme = {
+    shopUrl: '{{ shop.url }}',
+    routes: {
+      root_url: '{{ routes.root_url }}',
+      account_url: '{{ routes.account_url }}',
+      account_login_url: '{{ routes.account_login_url }}',
+      account_logout_url: '{{ routes.account_logout_url }}',
+      account_recover_url: '{{ routes.account_recover_url }}',
+      account_register_url: '{{ routes.account_register_url }}',
+      account_addresses_url: '{{ routes.account_addresses_url }}',
+      collections_url: '{{ routes.collections_url }}',
+      all_products_collection_url: '{{ routes.all_products_collection_url }}',
+      search_url: '{{ routes.search_url }}',
+      cart_url: '{{ routes.cart_url }}',
+      cart_update_url: '{{ routes.cart_update_url }}',
+      cart_add_url: '{{ routes.cart_add_url }}',
+      cart_change_url: '{{ routes.cart_change_url }}',
+      cart_clear_url: '{{ routes.cart_clear_url }}',
+      product_recommendations_url: '{{ routes.product_recommendations_url }}',
+      predictive_search_url: '{{ routes.predictive_search_url }}'
+    },
+    info: { name: 'District' },
+    strings: {
+      addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+      preOrder: `{{ 'products.product.preorder' | t }}`,
+      soldOut: `{{ 'products.product.sold_out' | t }}`,
+      unavailable: `{{ 'products.product.unavailable' | t }}`,
+      addressError: `{{ 'sections.map.address_error' | t }}`,
+      addressNoResults: `{{ 'sections.map.address_no_results' | t }}`,
+      addressQueryLimit: `{{ 'sections.map.address_query_limit_html' | t }}`,
+      authError: `{{ 'sections.map.auth_error_html' | t }}`,
+      unitPrice: `{{ 'products.product.price.unit_price' | t }}`,
+      unitPriceSeparator: `{{ 'accessibility.unit_price_separator' | t }}`,
+      previous: `{{ 'sections.slideshow.previous_slideshow' | t }}`,
+      next: `{{ 'sections.slideshow.next_slideshow' | t }}`,
+    },
+    cartStrings: {
+      error: `{{ 'sections.cart.cart_error' | t }}`,
+      quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`,
+      discountApplied: `{{ 'sections.cart.discount_applied' | t }}`,
+      discountRemoved: `{{ 'sections.cart.discount_removed' | t }}`,
+      discountAlreadyApplied: `{{ 'sections.cart.discount_already_applied' | t }}`,
+      discountInvalid: `{{ 'sections.cart.discount_invalid' | t }}`,
+      discountApplyError: `{{ 'sections.cart.discount_apply_error' | t }}`,
+      discountRemoveError: `{{ 'sections.cart.discount_remove_error' | t }}`,
+      discountApplyFailed: `{{ 'sections.cart.discount_apply_failed' | t }}`,
+      discountRemoveFailed: `{{ 'sections.cart.discount_remove_failed' | t }}`,
+    },
+    accessiblityStrings: {
+      giftCardRecipientExpanded: `{{ 'recipient.form.expanded' | t }}`,
+      giftCardRecipientCollapsed: `{{ 'recipient.form.collapsed' | t }}`,
+    },
+    settings: {
+      cartType: '{{ settings.cart_type }}'
+    },
+    pageType: `{{ request.page_type }}`,
+    customer: {% if customer %}true{% else %}false{% endif %},
+    moneyFormat: {{ shop.money_format | json }},
+    ajaxCartEnable: true,
+    cartData: {{ cart | json }},
+    mobileBreakpoint: 768,
+    packages: [],
+    market: {{ localization.market.handle | json }},
+  };
+  // Publish / Subscribe
+  const PUB_SUB_EVENTS = {
+    cartUpdate: 'cart-update',
+    quantityUpdate: 'quantity-update',
+    variantChange: 'variant-change',
+    cartError: 'cart-error',
+    sectionRefreshed: 'section-refreshed',
+  };
+  const SECTION_REFRESHED_RESOURCE_TYPE = {
+    product: 'product'
+  }
+  let subscribers = {};
+
+  function subscribe(eventName, callback) {
+    if (subscribers[eventName] === undefined) {
+      subscribers[eventName] = [];
+    }
+
+    subscribers[eventName] = [...subscribers[eventName], callback];
+
+    return function unsubscribe() {
+      subscribers[eventName] = subscribers[eventName].filter((cb) => {
+        return cb !== callback;
+      });
+    };
+  }
+
+  function publish(eventName, data) {
+    if (subscribers[eventName]) {
+      subscribers[eventName].forEach((callback) => {
+        callback(data);
+      });
+    }
+  }
+  document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+</script>

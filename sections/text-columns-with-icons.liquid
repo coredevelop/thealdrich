@@ -1,0 +1,414 @@
+{%- liquid 
+  assign total_blocks = section.blocks.size
+  assign target_per_row = section.settings.images_per_row_range
+  assign first_row_size = total_blocks | modulo: target_per_row
+
+  assign grid_span =  12 | divided_by: target_per_row
+  assign grid_span_first_row =  12 | divided_by: first_row_size
+  assign grid_span_mobile = 12
+  if section.settings.images_per_row_mobile == '2'
+    assign grid_span_mobile = 6
+  endif
+
+  assign textcolumns_content_class = 'textcolumns__content px-1 pt-2 pb-4 md:pb-7'
+  assign textcolumns_heading_class = 'textcolumns__heading text-section-text text-center break-words text-lg md:text-xl'
+
+  if section.settings.gutter
+    assign grid_classes = 'textcolumns__container text-center mx-auto max-w-screen grid grid-cols-12 gap-4 md:gap-7'
+  else
+    assign grid_classes = 'textcolumns__container text-center mx-auto max-w-screen grid grid-cols-12 gap-0'
+  endif
+
+  assign grid_item_first_row_classes = 'textcolumns__item textcolumns__item--first-row relative md:col-span-' | append: grid_span_first_row
+  assign grid_item_first_row_classes = grid_item_first_row_classes | append: ' col-span-' | append: grid_span_mobile
+  assign grid_item_classes = 'textcolumns__item relative md:col-span-' | append: grid_span
+  assign grid_item_classes = grid_item_classes | append: ' col-span-' | append: grid_span_mobile
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+    {%- endif -%}
+    {%- if section.settings.section_padding == false -%}
+      --spacing-section: 0;
+      border-bottom: 0px;
+    {%- endif -%}
+    --spacing-section: var(--spacing-section-half);
+    --section-text-color: {{ section.settings.color_text }};
+    --section-background-color: {{ section.settings.color_background }};
+    --section-accent-color: {{ section.settings.color_accent }};
+    --section-accent-hover-color: {{ section.settings.color_hover }};
+  }
+  [data-section-id="{{ section.id }}"] .textcolumns__icon svg {
+    height: {{ section.settings.icon_width }}px;
+    width: {{ section.settings.icon_width }}px;
+    fill: currentColor;
+  } 
+  
+</style>
+
+<div class="textcolumns space-y-5 px-rail py-section bg-section-background border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-loading="lazy-interaction"
+  data-section-type="text-columns-with-images">
+
+  {%- if section.settings.title != blank -%}
+    <h3 id="{{ section.settings.title | handle }}" class="textcolumns__title text-center mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <div class="{{ grid_classes }}">
+    {%- for block in section.blocks -%}
+      {%- liquid 
+        if forloop.index <= first_row_size
+          assign textcolumns_item_class = grid_item_first_row_classes
+
+        else
+          assign textcolumns_item_class = grid_item_classes
+        endif
+
+        capture textcolumns_title
+          if block.settings.link != blank
+            echo '<a href="'
+            echo block.settings.link
+            echo '" class="hover:text-primary-accent">'
+          endif
+          echo block.settings.title
+          if block.settings.link != blank
+            echo '</a>'
+          endif
+        endcapture
+
+      -%}
+      <div id="TextColumn-{{ block.id }}" class="{{ textcolumns_item_class }} group" {{ block.shopify_attributes }}>
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="textcolumns__link absolute inset-0 z-30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent">
+            {%- if block.settings.title != blank -%}
+              <span class="sr-only">{{ block.settings.title }}</span>
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+        <div class="textcolumns__icon flex justify-center text-section-accent group-hover:text-section-accent-hover">
+          {%- liquid 
+            case block.settings.icon
+              when 'award'
+                render 'icon-ui-award'
+              when 'badge_dollar'
+                render 'icon-ui-badge-dollar'
+              when 'badge_percent'
+                render 'icon-ui-badge-percent'
+              when 'bag'
+                render 'icon-ui-bag'
+              when 'basket'
+                render 'icon-ui-basket'
+              when 'box'
+                render 'icon-ui-box'
+              when 'calendar'
+                render 'icon-ui-calendar'
+              when 'cart'
+                render 'icon-ui-cart'
+              when 'cart_fast'
+                render 'icon-ui-cart-fast'
+              when 'chat'
+                render 'icon-ui-chat'
+              when 'circle_check'
+                render 'icon-ui-check-circle'
+              when 'circle_envelope'
+                render 'icon-ui-circle-envelope'
+              when 'circle_phone'
+                render 'icon-ui-circle-phone'
+              when 'credit_card'
+                render 'icon-ui-credit-card'
+              when 'earth'
+                render 'icon-ui-earth'
+              when 'gift'
+                render 'icon-ui-gift'
+              when 'party'
+                render 'icon-ui-party'
+              when 'search'
+                render 'icon-ui-search'
+              when 'shirt'
+                render 'icon-ui-shirt'
+              when 'truck'
+                render 'icon-ui-truck'
+              when 'user'
+                render 'icon-ui-user'
+            endcase
+          -%}
+        </div>
+        
+        <div class="{{ textcolumns_content_class }}">
+          {%- if block.settings.title != blank -%}
+            <h4 class="{{ textcolumns_heading_class }}">{{ textcolumns_title }}</h4>
+          {%- endif -%}
+          {%- if block.settings.richtext != blank -%}
+            <div class="mx-auto rte rte-sm">{{ block.settings.richtext }}</div>
+          {%- endif -%}
+          {%- if block.settings.button_label != blank -%}
+            <a href="{{ block.settings.link | default: '#' }}" class="mt-2 button button--small button--outline">{{ block.settings.button_label }}</a>
+          {%- endif -%}
+        </div>        
+        
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.text_columns_with_icons.name",
+  "class": "text-columns-with-images-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "gutter",
+      "label": "t:sections.general.image_padding",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "images_per_row_range",
+      "label": "t:sections.general.images_per_row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "radio",
+      "id": "images_per_row_mobile",
+      "label": "t:sections.general.images_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "icon_width",
+      "label": "t:sections.text_columns_with_icons.settings.icon_width.label",
+      "min": 10,
+      "max": 50,
+      "step": 1,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "t:sections.general.colors.color_text",
+      "default": "#606060"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "t:sections.general.colors.color_accent",
+      "default": "#424242"
+    },
+    {
+      "type": "color",
+      "id": "color_hover",
+      "label": "t:sections.general.colors.color_hover",
+      "default": "#424242"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "t:sections.general.colors.color_background",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "t:sections.general.alignment.label",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.general.alignment.option_left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.alignment.option_center.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.general.alignment.option_right.label"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "t:sections.text_columns_with_icons.blocks.column.name",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:sections.text_columns_with_icons.blocks.column.settings.icon.label",
+          "options": [
+            {
+              "value": "award",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_award.label"
+            },
+            {
+              "value": "badge_dollar",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_badge_dollar.label"
+            },
+            {
+              "value": "badge_percent",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_badge_percent.label"
+            },
+            {
+              "value": "bag",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_bag.label"
+            },
+            {
+              "value": "basket",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_basket.label"
+            },
+            {
+              "value": "box",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_box.label"
+            },
+            {
+              "value": "calendar",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_calendar.label"
+            },
+            {
+              "value": "cart",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_cart.label"
+            },
+            {
+              "value": "cart_fast",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_cart_fast.label"
+            },
+            {
+              "value": "chat",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_chat.label"
+            },
+            {
+              "value": "circle_check",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_circle_check.label"
+            },
+            {
+              "value": "circle_envelope",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_circle_envelope.label"
+            },
+            {
+              "value": "circle_phone",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_circle_phone.label"
+            },
+            {
+              "value": "credit_card",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_credit_card.label"
+            },
+            {
+              "value": "earth",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_earth.label"
+            },
+            {
+              "value": "gift",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_gift.label"
+            },
+            {
+              "value": "party",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_party.label"
+            },
+            {
+              "value": "search",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_search.label"
+            },
+            {
+              "value": "shirt",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_shirt.label"
+            },
+            {
+              "value": "truck",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_truck.label"
+            },
+            {
+              "value": "user",
+              "label": "t:sections.text_columns_with_icons.blocks.column.settings.option_user.label"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.text_columns_with_icons.blocks.column.settings.title.label",
+          "default": "Example title"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext",
+          "label": "t:sections.text_columns_with_icons.blocks.column.settings.richtext.label",
+          "default": "<p>Use this text to highlight product features, link to pages or showcase your brand.</p>"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.text_columns_with_icons.blocks.column.settings.link.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.text_columns_with_icons.presets.name",
+      "settings": {
+        "full_width": false,
+        "images_per_row_range": 4,
+        "images_per_row_mobile": "2",
+        "gutter": true
+      },
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "icon": "cart_fast"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "icon": "party"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "icon": "gift"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "icon": "credit_card"
+          }
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

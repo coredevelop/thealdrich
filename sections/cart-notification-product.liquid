@@ -1,0 +1,92 @@
+{%- if cart != empty -%}
+  {%- for item in cart.items -%}
+    <div id="cart-notification-product-{{ item.id }}" class="cart-notification-product">
+      <div class="cart-notification-product__primary">
+        {% if item.image %}
+          <div class="cart-notification-product__image">
+            <img src="{{ item.image | image_url: width: 100 }}"
+              alt="{{ item.image.alt | escape }}"
+              width="50"
+              height="{{ 50 | divided_by: item.image.aspect_ratio | ceil }}"
+              loading="lazy">
+          </div>
+        {% endif %}
+        <div class="cart-notification-product__details">
+          <div class="cart-notification-product__title">{{ item.product.title | escape }}</div>
+          <div class="cart-notification-product__price">
+            <div class="price">
+              {%- if item.original_price != item.final_price -%}
+                <div class="price__sale">
+                  <span class="sr-only">
+                    {{ 'products.product.price.regular_price' | t }}
+                  </span>
+                  <span class="price-item price-item--sale">
+                    {{ item.original_price | money }}
+                  </span>
+                  <span class="sr-only">
+                    {{ 'products.product.price.sale_price' | t }}
+                  </span>
+                  <s class="price-item price-item--compare">
+                    {{ item.final_price | money }}
+                  </s>
+                </div>
+              {%- else -%}
+                <div class="price__regular">
+                  <span class="price-item price-item--regular">
+                    {{ item.original_price | money }}
+                  </span>
+                </div>
+              {%- endif -%}
+            </div>
+            {%- if item.unit_price_measurement -%}
+              <div class="price__unit">
+                <span class="sr-only">{{ 'products.product.price.unit_price' | t }}</span>
+                {{ item.unit_price | money }}
+                <span aria-hidden="true">/</span>
+                <span class="sr-only">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+                {%- if item.unit_price_measurement.reference_value != 1 -%}
+                  {{- item.unit_price_measurement.reference_value -}}
+                {%- endif -%}
+                {{ item.unit_price_measurement.reference_unit }}
+              </div>
+            {%- endif -%}
+          </div>
+          {%- unless item.product.has_only_default_variant -%}
+            <dl class="cart-notification-product__options">
+              {%- for option in item.options_with_values -%}
+                <div>
+                  <dt>{{ option.name }}:</dt>
+                  <dd>{{ option.value }}</dd>
+                </div>
+              {%- endfor -%}
+            </dl>
+          {%- endunless -%}
+        </div>
+      </div>
+      {%- if item.properties != nil -%}
+        <dl class="cart-notification-product__options cart-notification-product__options--custom">
+          {%- for property in item.properties -%}
+            {%- assign property_first_char = property.first | slice: 0 -%}
+            {%- if property.last != blank and property_first_char != '_' -%}
+              <div>
+                <dt>{{ property.first }}: </dt>
+                <dd>
+                  {%- if property.last contains '/uploads/' -%}
+                    <a href="{{ property.last }}" class="link" target="_blank">
+                      {{ property.last | split: '/' | last }}
+                    </a>
+                  {%- else -%}
+                    {{ property.last }}
+                  {%- endif -%}
+                </dd>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </dl>
+      {%- endif -%}
+      {%- if item.selling_plan_allocation != nil -%}
+        <p class="cart-notification-product__selling-plan">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+{%- endif -%}

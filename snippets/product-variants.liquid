@@ -1,0 +1,222 @@
+{%- unless product.has_only_default_variant -%}              
+  {%- if block.settings.variants_style == 'dropdowns' -%}
+    <variant-selects class="product__block--border-{{ block.settings.border }} no-js-hidden"
+      data-section="{{ section.id }}"
+      data-section-text="{{ product.title | escape }}"
+      data-disable-soldout="{{ block.settings.disable_soldout }}"
+      data-update-url="true"
+      data-url="{{ product.url }}"
+      {{ block.shopify_attributes }}>
+      <div class="product__variants product__variants--dropdown">
+        {%- for option in product.options_with_values -%}
+          {%- liquid
+            assign swatch_count = option.values | map: 'swatch' | compact | size
+
+            comment 
+              FALLBACK: For the legacy metafield swatches 
+            endcomment
+            if swatch_count == 0 and block.settings.enable_swatches
+              assign color_language_options = 'products.product.color_option' | t | downcase
+              assign option_name = option.name | downcase
+              if option_name contains color_language_options
+                assign swatch_count = 1
+              endif
+            endif
+          -%}
+          <div class="product-form__input product-form__input--dropdown">
+            <label for="Option-{{ section.id }}-{{ forloop.index0 }}">{{ option.name }}</label>
+            <div class="group relative">
+              {%- if swatch_count > 0 and block.settings.enable_swatches -%}
+                {%- liquid 
+                  assign swatch_value = null
+                  if option.selected_value.swatch.image
+                    assign image_url = option.selected_value.swatch.image | image_url: width: 50
+                    assign swatch_value = 'url(' | append: image_url | append: ')'
+                    assign swatch_focal_point = option.selected_value.swatch.image.presentation.focal_point
+                  elsif option.selected_value.swatch.color
+                    assign swatch_value = 'rgb(' | append: option.selected_value.swatch.color.rgb | append: ')'
+                  endif
+                -%}
+                <span class="select-swatch block absolute top-1/2 left-2 -translate-y-1/2 w-5 h-5 {% if block.settings.swatch_shape == 'circle' %}rounded-full{% endif %}"
+                  style="background: {{ swatch_value }}; background-position: {{ swatch_focal_point }};"
+                ></span>
+              {%- endif -%}
+              <select id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                class="group-has-[.select-swatch]:pl-8"
+                name="options[{{ option.name | escape }}]"
+                form="{{ product_form_id }}">
+                {%- for value in option.values -%}
+                  {%- liquid
+                    assign swatch_focal_point = null
+                    if value.swatch.image
+                      assign image_url = value.swatch.image | image_url: width: 50
+                      assign swatch_value = 'url(' | append: image_url | append: ')'
+                      assign swatch_focal_point = value.swatch.image.presentation.focal_point
+                    elsif value.swatch.color
+                      assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+                    else
+                      assign swatch_value = value | escape
+                    endif
+
+                    assign option_disabled = true
+                    if value.available
+                      assign option_disabled = false
+                    endif
+                  -%}
+                  <option
+                    id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 -}}"
+                    value="{{ value | escape }}"
+                    {% if value.selected %}selected="selected"{% endif %}
+                    data-product-url="{{ value.product_url }}"
+                    data-option-value-id="{{ value.id }}"
+                    {% if block.settings.enable_swatches %}
+                      data-option-swatch-value="{{ swatch_value }}"
+                      {% if swatch_focal_point %}
+                        data-option-swatch-focal-point="{{ swatch_focal_point }}"
+                      {% endif %}
+                    {% endif %}
+                  >
+                    {{ value }}{% if option_disabled %} - {{ 'products.product.unavailable' | t }}{% endif %}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+      <script type="application/json">
+        {{ product.variants | json }}
+      </script>
+    </variant-selects>
+  {%- elsif block.settings.variants_style == 'buttons' -%}
+    <variant-radios class="product__block--border-{{ block.settings.border }} no-js-hidden"
+      data-section="{{ section.id }}"
+      data-section-text="{{ product.title | escape }}"
+      data-disable-soldout="{{ block.settings.disable_soldout }}"
+      data-update-url="true"
+      data-url="{{ product.url }}"
+      {{ block.shopify_attributes }}>
+      <div class="product__variants product__variants--radio">
+        {%- for option in product.options_with_values -%}
+          {%- liquid
+            assign swatch_count = option.values | map: 'swatch' | compact | size
+
+            comment 
+              FALLBACK: For the legacy metafield swatches 
+            endcomment
+            if swatch_count == 0 and block.settings.enable_swatches
+              assign color_language_options = 'products.product.color_option' | t | downcase
+              assign option_name = option.name | downcase
+              if option_name contains color_language_options
+                assign swatch_count = 1
+              endif
+            endif
+          -%}
+          {%- if block.settings.enable_swatches and swatch_count > 0 -%}
+            <fieldset class="swatches product-form__input product-form__input--radio product-form__input--swatch">
+              <legend>
+                <span class="product-form__option-name">{{ option.name }}</span>
+                <span class="product-form__swatch-name">{{ option.selected_value }}</span>
+              </legend>
+              {%- for value in option.values -%}
+                {%- liquid
+                  if value.swatch
+                    if value.swatch.image
+                      assign image_url = value.swatch.image | image_url: width: 64
+                      assign swatch_color_metafield_styles = 'background-image: url(' | append: image_url | append: ')'
+                    elsif value.swatch.color
+                      assign swatch_color_metafield_styles = 'background-color: rgb(' | append: value.swatch.color.rgb | append: ');'
+                    endif
+                  else
+                    assign swatch_color = value | escape
+                    assign swatch_color_metafield = product.metafields.swatches[swatch_color]
+                    if swatch_color_metafield == nil
+                      assign swatch_color_metafield = shop.metafields.swatches[swatch_color]
+                    endif
+                    if swatch_color_metafield
+                      capture swatch_color_metafield_styles
+                        if swatch_color_metafield.type == 'color'
+                          echo 'background-color: '
+                          echo swatch_color_metafield.value
+                        elsif swatch_color_metafield.type == 'file_reference'
+                          echo 'background-image: url("'
+                          echo swatch_color_metafield.value | remove_first: 'files/' | file_img_url
+                          echo '");'
+                        endif
+                      endcapture
+                    else
+                      assign swatch_color_css = swatch_color | handle | replace: '-', ''
+                      capture swatch_color_metafield_styles
+                        echo 'background-color: '
+                        echo swatch_color_css
+                        echo ';'
+                      endcapture
+                    endif
+                  endif
+                -%}
+                <style>
+                  [data-swatch-id="{{ value | handle }}-{{ product.id }}"] .swatch-item__color {
+                    {{ swatch_color_metafield_styles }}
+                  }
+                </style>
+                <input class="swatch-item product-form__radio-swatch {% unless value.available %}product-form__radio--disabled{% endunless %}" type="radio" 
+                  id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                  name="{{ option.name }}"
+                  value="{{ value | escape }}"
+                  {% if option.selected_value == value %}checked{% endif %}
+                  {% comment %} {% unless value.available %}disabled{% endunless %} {% endcomment %}
+                  data-product-url="{{ value.product_url }}"
+                  data-option-value-id="{{ value.id }}"
+                  form="{{ product_form_id }}"
+                >
+                <label class="swatch-item__label product-form__radio-swatch-label"
+                  for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                  data-swatch-id="{{ value | handle }}-{{ product.id }}">
+                  <div class="swatch-item__color {% if block.settings.swatch_shape == 'circle' %}rounded-full{% endif %}" tabindex="-1">
+                    <span class="swatch-item__value sr-only">{{ value | escape }}</span>
+                  </div>
+                  <div aria-hidden="true" class="product-form__radio-label--cross-out overflow-hidden m-1 {% if block.settings.swatch_shape == 'circle' %}rounded-full{% endif %} hidden absolute inset-0 pointer-events-none">
+                    <svg class="absolute inset-0 w-full h-full text-primary-text-70 opacity-50 stroke-2" viewBox="0 0 100 100" preserveAspectRatio="none" stroke="currentColor">
+                      <line x1="0" y1="100" x2="100" y2="0" vector-effect="non-scaling-stroke"></line>
+                    </svg>
+                  </div>
+                </label>
+              {%- endfor -%}
+            </fieldset>
+          {%- else -%}
+            <fieldset class="product-form__input product-form__input--radio">
+              <legend>
+                <span class="product-form__option-name">{{ option.name }}</span>
+              </legend>
+              {%- for value in option.values -%}
+                <input class="product-form__radio {% unless value.available %}product-form__radio--disabled{% endunless %}" type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                      name="{{ option.name }}"
+                      value="{{ value | escape }}"
+                      form="{{ product_form_id }}"
+                      {% if option.selected_value == value %}checked{% endif %}
+                      {% comment %} {% unless value.available %}disabled{% endunless %} {% endcomment %}
+                      data-product-url="{{ value.product_url }}"
+                      data-option-value-id="{{ value.id }}"
+                >
+                <label class="product-form__radio-label relative" for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
+                  {{- value -}}
+                  <div aria-hidden="true" class="product-form__radio-label--cross-out hidden absolute -inset-px pointer-events-none">
+                    <svg class="absolute inset-0 w-full h-full text-primary-text-70 opacity-50 stroke-2" viewBox="0 0 100 100" preserveAspectRatio="none" stroke="currentColor">
+                      <line x1="0" y1="100" x2="100" y2="0" vector-effect="non-scaling-stroke"></line>
+                    </svg>
+                  </div>
+                </label>
+              {%- endfor -%}
+            </fieldset>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      <script type="application/json">
+        {{ product.variants | json }}
+      </script>
+    </variant-radios>
+  {%- endif -%}
+{%- endunless -%}
+<script type="application/json" data-selected-variant>
+  {{ product.selected_or_first_available_variant | json }}
+</script>

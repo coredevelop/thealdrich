@@ -1,0 +1,19 @@
+<div class="main-page py-section px-rail space-y-6"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-page">
+
+  <div class="main-page__container mx-auto max-w-screen">
+    <div class="main-page__header mb-6 pb-4 border-b border-primary-section-border">
+      <h1 class="text-3xl md:text-4xl text-center">{{ page.title }}</h1>
+    </div>
+
+    <div class="main-page__content rte mx-auto">
+      {{ page.content }}
+    </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "t:sections.main_page.name"
+}
+{% endschema %}

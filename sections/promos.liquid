@@ -1,0 +1,559 @@
+{%- liquid 
+  assign bottom_bars = ''
+-%}
+
+<style>
+  {%- if section.settings.scroll_lock -%}
+  .section__promos {
+    position: sticky;
+    z-index: 650;
+    top: 0px;
+  }
+  {%- else -%}
+  .section__promos {
+    position: relative;
+    z-index: 500;
+  }
+  {%- endif -%}
+</style>
+
+<promo-section class="block"
+  data-section-type="promos"
+  {% if section.settings.scroll_lock %}data-height-css-var="--promo-section-height"{% endif %}
+  data-section-id="{{ section.id }}"
+  data-sticky="{%- if section.settings.scroll_lock -%}true{%- else -%}false{%- endif -%}"
+  client:idle
+>
+    
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+      {%- when 'announcement-bar' -%}
+
+        {%- capture announcement_bar -%}
+          {%- unless block.settings.homepage_limit and request.page_type != 'index' -%}
+            {%- liquid 
+              capture data_attributes
+                if block.settings.autohide
+                  echo 'data-hide-delay="'
+                  echo block.settings.autohide_delay_range | times: 1000
+                  echo '"'
+                else
+                  echo 'data-hide-delay="false"'
+                endif
+              endcapture
+
+              capture bar_display_classes
+                if block.settings.show_for == 'mobile'
+                  echo 'md:hidden'
+                elsif block.settings.show_for == 'desktop'
+                  echo 'hidden md:block'
+                endif
+              endcapture
+
+              capture bar_size_classes
+                if block.settings.bar_size == 'large'
+                  echo 'py-4 px-5 text-base'
+                else
+                  echo 'py-3 px-5 text-sm'
+                endif
+              endcapture
+            -%}
+            <style>
+              [data-block-id="{{ block.id }}"] {
+                --section-text-color: {{ block.settings.color_text }};
+                --section-background-color: {{ block.settings.color_background }};
+              }
+            </style>
+            <div class="promos__announcement-bar announcement-bar {{ bar_display_classes }}"
+              data-block-type="{{ block.type }}"
+              data-block-id="{{ block.id }}"
+              data-bar-placement="{{ block.settings.bar_placement }}"
+              data-show-for="{{ block.settings.show_for }}"
+              data-homepage-limit="{{ block.settings.homepage_limit }}"
+              {{ data_attributes }}
+              {{ block.shopify_attributes }}>
+
+              {%- if block.settings.link != blank -%}
+                <a class="block text-section-text hover:underline focus:underline" href="{{ block.settings.link }}">
+              {%- endif -%}
+
+                  <span class="announcement-bar__text block text-center text-section-text bg-section-background {{ bar_size_classes }}">{{ block.settings.title | escape }}</span>
+
+              {%- if block.settings.link != blank -%}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endunless -%}
+        {%- endcapture -%}
+        
+        {%- liquid 
+          if block.settings.bar_placement == 'top'
+            echo announcement_bar
+          else
+            assign bottom_bars = bottom_bars | append: announcement_bar
+          endif
+        -%}
+
+      {%- when 'signup-bar' -%}
+        
+        {%- capture signup_bar -%}
+          {%- unless block.settings.homepage_limit and request.page_type != 'index' -%}
+            <style>
+              [data-block-id="{{ block.id }}"] {
+                --section-text-color: {{ block.settings.color_text }};
+                --section-background-color: {{ block.settings.color_background }};
+                --section-accent-color: {{ block.settings.color_accent }};
+                --section-accent-hover-color: {{ block.settings.color_accent | color_mix: block.settings.color_text, 40 }};
+                --section-accent-text-color: {% render 'color-contrast', color: block.settings.color_accent %};
+                --section-text-color-75: {{ block.settings.color_text | color_mix: block.settings.color_background, 75 }};
+                --section-text-color-50: {{ block.settings.color_text | color_mix: block.settings.color_background, 50 }};
+                --section-text-color-25: {{ block.settings.color_text | color_mix: block.settings.color_background, 25 }};
+                --section-text-color-20: {{ block.settings.color_text | color_mix: block.settings.color_background, 20 }};
+                --section-primary-border-color: {{ block.settings.color_text }};
+              }
+            </style>
+            <div class="promos__signup-bar signup-bar hidden px-5 py-3 text-section-text bg-section-background space-y-2"
+              data-block-type="{{ block.type }}"
+              data-block-id="{{ block.id }}"
+              data-show-for="{{ block.settings.show_for }}"
+              data-delay="{{ block.settings.show_delay_range | times: 1000 }}"
+              data-homepage-limit="{{ block.settings.homepage_limit }}"
+              data-visitor-limit="{{ block.settings.visitor_limit }}"
+              data-hide-delay="false"
+              {{ block.shopify_attributes }}>
+
+              <div class="flex justify-between items-center mx-auto max-w-2xl">
+                <span class="signup-bar__text rte rte-sm pr-3">{{ block.settings.title_richtext }}</span>
+                <button id="SignupClose-{{ block.id }}" type="button"
+                  class="signup-bar__close w-3.5 flex-none text-section-text-75 hover:text-section-text"
+                  aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+              </div>
+
+              {%- if block.settings.newsletter -%}
+                <div class="signup-bar__newsletter md:text-sm mx-auto max-w-2xl">
+                  {%- render 'email-subscription',
+                    id: block.id,
+                    source: 'promotional-signup-bar' -%}
+                </div>
+              {%- endif -%}
+
+            </div>
+          {%- endunless -%}
+        {%- endcapture -%}
+
+        {%- liquid 
+          if block.settings.bar_placement == 'top'
+            echo signup_bar
+          else
+            assign bottom_bars = bottom_bars | append: signup_bar
+          endif
+        -%}
+        
+      {%- when 'popup' -%}
+        
+        {%- unless block.settings.homepage_limit and request.page_type != 'index' -%}
+          <style>
+            [data-block-id="{{ block.id }}"] {
+              --section-text-color: {{ block.settings.color_text }};
+              --section-background-color: {{ block.settings.color_background }};
+              --section-accent-color: {{ block.settings.color_accent }};
+
+
+              --section-accent-hover-color: {{ block.settings.color_accent | color_mix: block.settings.color_text, 40 }};
+              --section-accent-text-color: {% render 'color-contrast', color: block.settings.color_accent %};
+
+
+              --section-text-color-75: {{ block.settings.color_text | color_mix: block.settings.color_background, 75 }};
+              --section-text-color-50: {{ block.settings.color_text | color_mix: block.settings.color_background, 50 }};
+              --section-text-color-25: {{ block.settings.color_text | color_mix: block.settings.color_background, 25 }};
+              --section-text-color-20: {{ block.settings.color_text | color_mix: block.settings.color_background, 20 }};
+              --section-primary-border-color: {{ block.settings.color_text }};
+            }
+          </style>
+          <popup-modal class="popup__modal modal"
+            {% if block.settings.title != blank %}aria-labelledby="PopupModal-Title-{{ block.id }}"{% endif %}
+            {% if block.settings.subheading_richtext != blank %}aria-describedby="PopupModal-Description-{{ block.id }}"{% endif %}
+            role="dialog"
+            aria-modal="true"
+            data-block-type="{{ block.type }}"
+            data-block-id="{{ block.id }}"
+            data-show-for="{{ block.settings.show_for }}"
+            data-delay="{{ block.settings.show_delay_range | times: 1000 }}"
+            data-homepage-limit="{{ block.settings.homepage_limit }}"
+            data-visitor-limit="{{ block.settings.visitor_limit }}"
+            client:idle
+            {{ block.shopify_attributes }}>
+            <button id="PopupModalClose-{{ block.id }}" type="button"
+              class="popup__modal-close modal__close"
+              aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+            
+            <div class="popup__modal-container modal__container text-section-text bg-section-background">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 960 | image_tag: 
+                  class: 'popup__modal-image',
+                  widths: '160, 220, 300, 420, 640, 960',
+                  sizes: '(min-width: 32rem) 32rem, calc(100vw - 2rem)',
+                  loading: 'lazy' }}
+              {%- endif -%}
+              <div class="popup__modal-content text-center m-5">
+                {%- if block.settings.title -%}
+                  <div id="PopupModal-Title-{{ block.id }}"
+                    class="font-heading font-weight-heading text-xl md:text-2xl">
+                    {{ block.settings.title }}
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.subheading_richtext -%}
+                  <div id="PopupModal-Description-{{ block.id }}"
+                    class="rte rte-sm md:rte-base">
+                    {{ block.settings.subheading_richtext }}
+                  </div>
+                {%- endif -%}
+              </div>
+              {%- if block.settings.newsletter -%}
+                <div class="popup__modal-newsletter text-center m-5">
+                  {%- render 'email-subscription',
+                    id: block.id,
+                    source: 'promotional-signup-bar' -%}
+                </div>
+              {%- endif -%}
+              
+            </div>
+
+            <div class="popup__modal-background modal__background"
+              title="{{ 'accessibility.close' | t }}">
+              <span class="sr-only">{{ 'accessibility.close' | t }}</span>
+            </div>
+          </popup-modal>
+        {%- endunless -%}
+        
+    {%- endcase -%}
+  {%- endfor -%}
+
+  <div class="promos__bottom-container fixed inset-x-0 bottom-0">{{ bottom_bars }}</div>
+
+</promo-section>
+
+{% schema %}
+{
+  "name": "t:sections.promos.name",
+  "class": "section__promos",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "scroll_lock",
+      "label": "t:sections.promos.settings.scroll_lock.label",
+      "info": "t:sections.promos.settings.scroll_lock.info",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement-bar",
+      "name": "t:sections.promos.blocks.announcement_bar.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.title.label",
+          "default": "Promote free shipping, an upcoming sale, or an announcement."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.link.label",
+          "info": "t:sections.promos.blocks.announcement_bar.settings.link.info"
+        },
+        {
+          "type": "color",
+          "id": "color_background",
+          "label": "t:sections.general.colors.color_background",
+          "default": "#4f4f4f"
+        },
+        {
+          "type": "color",
+          "id": "color_text",
+          "label": "t:sections.general.colors.color_text",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "checkbox",
+          "id": "homepage_limit",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.homepage_limit.label",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "show_for",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.show_for.label",
+          "options": [
+            {
+              "value": "both",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.show_for.option_both.label"
+            },
+            {
+              "value": "desktop",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.show_for.option_desktop.label"
+            },
+            {
+              "value": "mobile",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.show_for.option_mobile.label"
+            }
+          ],
+          "default": "both"
+        },
+        {
+          "type": "select",
+          "id": "bar_size",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.bar_size.label",
+          "options": [
+            {
+              "value": "default",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.bar_size.option_default.label"
+            },
+            {
+              "value": "large",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.bar_size.option_large.label"
+            }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "select",
+          "id": "bar_placement",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.bar_placement.label",
+          "options": [
+            {
+              "value": "top",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.bar_placement.option_top.label"
+            },
+            {
+              "value": "bottom",
+              "label": "t:sections.promos.blocks.announcement_bar.settings.bar_placement.option_bottom.label"
+            }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "checkbox",
+          "id": "autohide",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.autohide.label",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "autohide_delay_range",
+          "min": 5,
+          "max": 30,
+          "step": 1,
+          "unit": "sec",
+          "label": "t:sections.promos.blocks.announcement_bar.settings.autohide_delay.label",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "signup-bar",
+      "name": "t:sections.promos.blocks.signup_bar.name",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "title_richtext",
+          "label": "t:sections.promos.blocks.signup_bar.settings.title.label",
+          "default": "<p>Build an email list, promote new products, or announce a sale.</p>"
+        },
+        {
+          "type": "color",
+          "id": "color_text",
+          "label": "t:sections.general.colors.color_text",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "color_accent",
+          "label": "t:sections.general.colors.color_accent",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "color_background",
+          "label": "t:sections.general.colors.color_background",
+          "default": "#4f4f4f"
+        },
+        {
+          "type": "checkbox",
+          "id": "homepage_limit",
+          "label": "t:sections.promos.blocks.signup_bar.settings.homepage_limit.label",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "show_for",
+          "label": "t:sections.promos.blocks.signup_bar.settings.show_for.label",
+          "options": [
+            {
+              "value": "both",
+              "label": "t:sections.promos.blocks.signup_bar.settings.show_for.option_both.label"
+            },
+            {
+              "value": "desktop",
+              "label": "t:sections.promos.blocks.signup_bar.settings.show_for.option_desktop.label"
+            },
+            {
+              "value": "mobile",
+              "label": "t:sections.promos.blocks.signup_bar.settings.show_for.option_mobile.label"
+            }
+          ],
+          "default": "both"
+        },
+        {
+          "type": "select",
+          "id": "bar_size",
+          "label": "t:sections.promos.blocks.signup_bar.settings.bar_size.label",
+          "options": [
+            {
+              "value": "default",
+              "label": "t:sections.promos.blocks.signup_bar.settings.bar_size.option_default.label"
+            },
+            {
+              "value": "large",
+              "label": "t:sections.promos.blocks.signup_bar.settings.bar_size.option_large.label"
+            }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "select",
+          "id": "bar_placement",
+          "label": "t:sections.promos.blocks.signup_bar.settings.bar_placement.label",
+          "options": [
+            {
+              "value": "top",
+              "label": "t:sections.promos.blocks.signup_bar.settings.bar_placement.option_top.label"
+            },
+            {
+              "value": "bottom",
+              "label": "t:sections.promos.blocks.signup_bar.settings.bar_placement.option_bottom.label"
+            }
+          ],
+          "default": "bottom"
+        },
+        {
+          "type": "checkbox",
+          "id": "newsletter",
+          "label": "t:sections.promos.blocks.signup_bar.settings.newsletter.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "visitor_limit",
+          "label": "t:sections.promos.blocks.signup_bar.settings.visitor_limit.label",
+          "default": true,
+          "info": "t:sections.promos.blocks.signup_bar.settings.visitor_limit.info"
+        },
+        {
+          "type": "range",
+          "id": "show_delay_range",
+          "label": "t:sections.promos.blocks.signup_bar.settings.show_delay.label",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "sec",
+          "default": 5
+        }
+      ]
+    },
+    {
+      "type": "popup",
+      "name": "t:sections.promos.blocks.popup.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.promos.blocks.popup.settings.title.label",
+          "default": "Promotional popup"
+        },
+        {
+          "type": "richtext",
+          "id": "subheading_richtext",
+          "label": "t:sections.promos.blocks.popup.settings.subheading.label",
+          "default": "<p>Build an email list, promote new products, or announce a sale.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.promos.blocks.popup.settings.image.label"
+        },
+        {
+          "type": "color",
+          "id": "color_text",
+          "label": "t:sections.general.colors.color_text",
+          "default": "#4f4f4f"
+        },
+        {
+          "type": "color",
+          "id": "color_accent",
+          "label": "t:sections.general.colors.color_accent",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "color_background",
+          "label": "t:sections.general.colors.color_background",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "checkbox",
+          "id": "homepage_limit",
+          "label": "t:sections.promos.blocks.popup.settings.homepage_limit.label",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "show_for",
+          "label": "t:sections.promos.blocks.popup.settings.show_for.label",
+          "options": [
+            {
+              "value": "both",
+              "label": "t:sections.promos.blocks.popup.settings.show_for.option_both.label"
+            },
+            {
+              "value": "desktop",
+              "label": "t:sections.promos.blocks.popup.settings.show_for.option_desktop.label"
+            },
+            {
+              "value": "mobile",
+              "label": "t:sections.promos.blocks.popup.settings.show_for.option_mobile.label"
+            }
+          ],
+          "default": "both"
+        },
+        {
+          "type": "checkbox",
+          "id": "newsletter",
+          "label": "t:sections.promos.blocks.popup.settings.newsletter.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "visitor_limit",
+          "label": "t:sections.promos.blocks.popup.settings.visitor_limit.label",
+          "default": true,
+          "info": "t:sections.promos.blocks.popup.settings.visitor_limit.info"
+        },
+        {
+          "type": "range",
+          "id": "show_delay_range",
+          "label": "t:sections.promos.blocks.popup.settings.show_delay.label",
+          "min": 0,
+          "max": 10,
+          "step": 1,
+          "unit": "sec",
+          "default": 5
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

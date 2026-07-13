@@ -1,0 +1,12 @@
+{%- liquid
+  if settings.cart_icon == 'bag'
+    render 'icon-ui-bag'
+  elsif settings.cart_icon == 'basket'
+    render 'icon-ui-basket'
+  else
+    render 'icon-ui-cart'
+  endif
+-%}
+<span class="cart-button__count" data-cart-button-count>{{ cart.item_count }}</span>
+<span class="cart-button__label" data-cart-button-label>{{ 'templates.cart.cart' | t }}</span>
+<span class="cart-button__total money" data-cart-button-total>{% if cart.item_count >= 1 %}{{ cart.total_price | money }}{% endif %}</span>

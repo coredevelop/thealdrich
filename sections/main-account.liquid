@@ -1,0 +1,86 @@
+{%- liquid
+  render 'asset-tag', asset: 'customer.css'
+-%}
+<div class="account customer py-section px-rail space-y-6"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-account">
+  <div class="account__container mx-auto max-w-screen">
+
+    <div class="account__header mb-6 pb-4 border-b border-primary-section-border">
+      <h1 class="text-3xl md:text-4xl text-center">{{ 'customer.account.title' | t }}</h1>
+    </div>
+    
+    <div class="account__grid flex flex-col md:flex-row">
+      <div class="account__orders p-5 text-left bg-primary-secondary-background flex-grow">
+        <h4 class="text-2xl md:text-3xl">{{ 'customer.orders.title' | t }}</h4>
+
+        {% paginate customer.orders by 20 %}
+          {%- if customer.orders.size > 0 -%}
+            <table role="table" class="order-history table-auto">
+              <caption class="sr-only">{{ 'customer.orders.title' | t }}</caption>
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th id="ColumnOrder" scope="col" role="columnheader">{{ 'customer.orders.order_number' | t }}</th>
+                  <th id="ColumnDate" scope="col" role="columnheader">{{ 'customer.orders.date' | t }}</th>
+                  <th id="ColumnPayment" scope="col" role="columnheader">{{ 'customer.orders.payment_status' | t }}</th>
+                  <th id="ColumnFulfillment" scope="col" role="columnheader">{{ 'customer.orders.fulfillment_status' | t }}</th>
+                  <th id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.orders.total' | t }}</th>
+                </tr>
+              </thead>
+              <tbody role="rowgroup">
+                {%- for order in customer.orders -%}
+                  <tr role="row">
+                    <td
+                      id="RowOrder"
+                      role="cell"
+                      headers="ColumnOrder"
+                      data-label="{{ 'customer.orders.order_number' | t }}"
+                    >
+                      <a href="{{ order.customer_url }}" class="button button--outline" aria-label="{{ 'customer.orders.order_number_link' | t: number: order.name }}">
+                        {{ order.name }}
+                      </a>
+                    </td>
+                    <td headers="RowOrder ColumnDate" role="cell" data-label="{{ 'customer.orders.date' | t }}">
+                      {{ order.created_at | time_tag: format: 'date' }}
+                    </td>
+                    <td headers="RowOrder ColumnPayment" role="cell" data-label="{{ 'customer.orders.payment_status' | t }}">
+                      {{ order.financial_status_label }}
+                    </td>
+                    <td headers="RowOrder ColumnFulfillment" role="cell" data-label="{{ 'customer.orders.fulfillment_status' | t }}">
+                      {{ order.fulfillment_status_label }}
+                    </td>
+                    <td headers="RowOrder ColumnTotal" role="cell" data-label="{{ 'customer.orders.total' | t }}">
+                      {{ order.total_price | money_with_currency }}</td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          {%- else -%}
+            <p>{{ 'customer.orders.none' | t }}</p>
+          {%- endif -%}
+
+          {%- if paginate.pages > 1 -%}
+            <div class="mt-6">
+              {% render 'pagination', paginate: paginate %}
+            </div>
+          {%- endif -%}
+        {% endpaginate %}
+      </div>
+      <div class="ltr:ml-4 ltr:md:ml-7 rtl:mr-4 rtl:md:mr-7 py-5">
+        <div class="mb-7">
+          <h2 class="text-xl md:text-2xl">{{ 'customer.account.details' | t }}</h2>
+
+          <div class="my-2">
+            {{ customer.default_address | format_address }}
+          </div>
+
+          <a href="{{ routes.account_addresses_url }}" class="button button--outline">
+            {{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
+          </a>
+        </div>
+
+        <a class="text-sm underline hover:text-primary-accent" href="{{ routes.account_logout_url }}">{{ 'customer.log_out' | t }}</a>
+      </div>
+    </div>
+  </div>
+</div>

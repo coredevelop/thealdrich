@@ -1,0 +1,17 @@
+<div class="main-page py-section px-rail space-y-6"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-page">
+
+  <div class="main-page__container mx-auto max-w-screen">
+    <div class="main-page__header mb-6 pb-4 border-b border-primary-section-border">
+      <h1 class="text-3xl md:text-4xl text-center">{{ 'templates.404.title' | t }}</h1>
+    </div>
+
+    <div class="main-page__content text-center rte mx-auto">
+      {{ 'templates.404.subtext' | t }}<br>
+      <a href="{{ routes.all_products_collection_url }}" class="block my-4 button button--outline button--cta">
+        {{ 'general.continue_shopping' | t }}
+      </a>
+    </div>
+  </div>
+</div>

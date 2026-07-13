@@ -1,0 +1,137 @@
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --text-align-section: {{ section.settings.alignment }};
+    --section-width: {{ section.settings.width }}px;
+  }
+  
+</style>
+<div class="rich-text px-rail py-section border-b border-primary-section-border text-align-section"
+  data-section-id="{{ section.id }}"
+  data-section-type="rich-text">
+  <div class="rich-text__contain mx-auto max-w-[var(--section-width)] space-y-6">
+    {%- if section.settings.title != blank -%}
+      <h3 class="rich-text__title text-center text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+    {%- endif -%}
+    {% if section.settings.text != blank %}
+      <div class="rich-text__content mx-auto rte">
+        {{ section.settings.text }}
+      </div>
+    {% endif %}
+    
+    {%- for block in section.blocks -%}
+      <div class="rich-text__{{ block.type }} mx-auto rte">
+        {%- case block.type -%}
+          {%- when 'page' -%}
+            {%- assign page = pages[block.settings.page] -%}
+            {%- if block.settings.show_title -%}
+              <h4 class="rich-text__item-title pb-4 text-xl md:text-2xl">{{ page.title }}</h4>
+            {%- endif -%}
+            {{ page.content }}
+          {%- when 'richtext' -%}
+            {%- if block.settings.title != blank -%}
+              <h4 class="rich-text__item-title pb-4 text-xl md:text-2xl">{{ block.settings.title | escape }}</h4>
+            {%- endif -%}
+            {{ block.settings.text }}
+        {%- endcase -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.rich_text.name",
+  "class": "featured-text-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.rich_text.settings.title.label",
+      "default": "Rich text"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:sections.rich_text.settings.text.label",
+      "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "t:sections.general.section_width.label",
+      "min": 520,
+      "max": 1280,
+      "step": 20,
+      "unit": "px",
+      "default": 960
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.general.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.general.alignment.option_left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.alignment.option_center.label"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.general.alignment.option_right.label"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "page",
+      "name": "t:sections.rich_text.blocks.page.name",
+      "settings": [
+        {
+          "type": "page",
+          "id": "page",
+          "label": "t:sections.rich_text.blocks.page.settings.page.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_title",
+          "label": "t:sections.rich_text.blocks.page.settings.show_title.label",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "richtext",
+      "name": "t:sections.rich_text.blocks.richtext.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.rich_text.blocks.richtext.settings.title.label",
+          "default": "Rich text"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:sections.rich_text.blocks.richtext.settings.text.label",
+          "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.rich_text.presets.name"
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

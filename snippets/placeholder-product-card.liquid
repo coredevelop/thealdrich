@@ -1,0 +1,47 @@
+{%- liquid
+  if current == blank
+    assign current = '1'
+  endif
+
+  if show_vendor == blank
+    assign show_vendor = false
+  endif
+
+  if media_size == 'adapt' or media_size == nil
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif media_size == 'square'
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif media_size == 'portrait'
+    assign aspect_classes = 'aspect-w-2 aspect-h-3'
+  elsif media_size == 'landscape'
+    assign aspect_classes = 'aspect-w-4 aspect-h-3'
+  endif
+-%}
+
+<div class="product-grid-item group relative">
+  <a href="#" class="product-grid-item__link absolute inset-0 z-10">
+    <span class="sr-only">{{ 'onboarding.product_title' | t }}</span>
+  </a>
+
+  <div class="product-grid-item__contain flex flex-col space-y-3">
+    <div class="product-grid-item__image relative {{ aspect_classes }}">
+      {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+    </div>
+    <div class="product-grid-item__details leading-tight">
+      <div class="product-grid-item__title group-hover:text-primary-accent">{{ 'onboarding.product_title' | t }}</div>
+      {%- if show_vendor -%}
+        <div class="product-grid-item__vendor text-sm text-primary-text-80">
+          <dt>
+            <span class="sr-only">{{ 'products.product.vendor' | t }}</span>
+          </dt>
+          <dd>{{ 'products.product.vendor' | t }}</dd>
+        </div>
+      {%- endif -%}
+      <div class="product-grid-item__price">
+        {%- assign price = 1999 -%}
+        <div class="price-item price-item--regular font-navigation font-weight-navigation-bolder text-sm">{{ price | money }}</div>
+      </div>
+    </div>
+  </div>
+  
+</div>

@@ -1,0 +1,447 @@
+{%- liquid 
+  assign total_blocks = section.blocks.size
+  assign target_per_row = section.settings.images_per_row_range
+  assign first_row_size = total_blocks | modulo: target_per_row
+
+  assign grid_span =  12 | divided_by: target_per_row
+  assign grid_span_first_row =  12 | divided_by: first_row_size
+  assign grid_span_mobile = 12
+  if section.settings.images_per_row_mobile == '2'
+    assign grid_span_mobile = 6
+  endif
+
+  if section.settings.image_ratio == 'adapt'
+    assign aspect_classes = ''
+  elsif section.settings.image_ratio == 'square'
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif section.settings.image_ratio == 'portrait'
+    assign aspect_classes = 'aspect-w-2 aspect-h-3'
+  elsif section.settings.image_ratio == 'landscape'
+    assign aspect_classes = 'aspect-w-4 aspect-h-3'
+  endif
+
+  assign overlay_alpha = section.settings.color_overlay_alpha_range | times: 0.01
+
+  assign gallery_content_class = 'gallery__content'
+  if section.settings.text_placement == 'over'
+    assign gallery_content_class = gallery_content_class | append: ' gallery__content--overlay absolute flex flex-col justify-center space-y-2 items-center inset-0 z-20 text-section-text'
+  endif
+  if section.settings.text_placement == 'below'
+    assign gallery_content_class = gallery_content_class | append: ' py-2'
+  endif
+  if section.settings.zoom 
+    assign gallery_content_class = gallery_content_class | append: ' gallery__content--zoom'
+  endif
+
+  assign gallery_heading_class = 'gallery__heading text-section text-center break-words text-lg md:text-2xl'
+  if section.settings.text_placement == 'over'
+    assign gallery_heading_class = gallery_heading_class | append: ' text-section-text px-5 py-2 border-2 border-section-primary'
+  endif
+  if section.settings.text_placement == 'over' and section.settings.zoom
+    assign gallery_heading_class = gallery_heading_class | append: ' transform-gpu duration-1000 group-hover:scale-110'
+  endif
+
+  if section.settings.gutter
+    assign grid_classes = 'gallery__container text-center mx-auto max-w-screen grid grid-cols-12 gap-4 md:gap-7'
+  else
+    assign grid_classes = 'gallery__container text-center mx-auto max-w-screen grid grid-cols-12 gap-0'
+  endif
+
+  assign grid_item_first_row_classes = 'gallery__item gallery__item--first-row relative md:col-span-' | append: grid_span_first_row
+  assign grid_item_first_row_classes = grid_item_first_row_classes | append: ' col-span-' | append: grid_span_mobile
+
+  assign grid_item_classes = 'gallery__item relative md:col-span-' | append: grid_span
+  assign grid_item_classes = grid_item_classes | append: ' col-span-' | append: grid_span_mobile
+
+  assign gallery_image_class = 'gallery__image z-10 w-full mx-auto bg-cover object-cover bg-no-repeat bg-center'
+  assign gallery_image_rollover_class = 'gallery__image-rollover z-20 absolute inset-0 w-full h-full object-cover opacity-0 transition-all group-hover:opacity-100'
+  if section.settings.zoom
+    assign gallery_image_class = gallery_image_class | append: ' gallery__image--zoom transform-gpu transition-transform ease-out duration-2000 group-hover:scale-105'
+    assign gallery_image_rollover_class = gallery_image_rollover_class | append: ' gallery__image-rollover--zoom transform-gpu ease-out duration-2000 group-hover:scale-105'
+  endif
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+    {%- if section.settings.section_padding == false -%}
+      --spacing-section: 0;
+      border-bottom: 0px;
+    {%- endif -%}
+    --section-text-color: {{ section.settings.color_overlay_text }};
+    --section-overlay-color: {{ section.settings.color_overlay | color_modify: 'alpha', overlay_alpha }};
+    --section-overlay-hover-color: {{ section.settings.color_overlay_hover | color_modify: 'alpha', overlay_alpha }};
+    --section-primary-border-color: {{ section.settings.color_overlay_text }};
+  }
+  [data-section-id="{{ section.id }}"] .gallery__link:focus + .gallery__image-contain .gallery__image--zoom,
+  [data-section-id="{{ section.id }}"] .gallery__link:focus-visible + .gallery__image-contain .gallery__image--zoom {
+    transform: scale(1.05, 1.05);
+  }
+  [data-section-id="{{ section.id }}"] .gallery__link:focus + .gallery__image-contain .gallery__image[data-bgimg] img,
+  [data-section-id="{{ section.id }}"] .gallery__link:focus-visible + .gallery__image-contain .gallery__image[data-bgimg] img {
+    opacity: 0;
+  }
+  
+</style>
+
+<div class="gallery space-y-5 px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-loading="lazy-interaction"
+  data-section-type="gallery">
+
+  {%- if section.settings.title != blank -%}
+    <h3 id="{{ section.settings.title | handle }}" class="gallery__title text-center mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <div class="{{ grid_classes }}">
+    {%- for block in section.blocks -%}
+      {%- liquid 
+        if forloop.index <= first_row_size
+          assign gallery_item_class = grid_item_first_row_classes
+          assign columns = 12 | divided_by: grid_span_first_row
+
+          capture image_sizes
+            if section.settings.full_width == false
+              echo '(min-width: 1280px) calc(1280px / '
+              echo columns
+              echo '), '
+            endif
+
+            echo '(min-width: 768px) calc(100vw / '
+            echo columns
+            echo '), '
+
+            if section.settings.images_per_row_mobile == '2'
+              echo 'calc(100vw / 2)'
+            else
+              echo 'calc(100vw)'
+            endif
+          endcapture
+
+        else
+          assign gallery_item_class = grid_item_classes
+          assign columns = 12 | divided_by: grid_span
+
+          capture image_sizes
+            if section.settings.full_width == false
+              echo '(min-width: 1280px) calc(1280px / '
+              echo columns
+              echo '), '
+            endif
+
+            echo '(min-width: 768px) calc(100vw / '
+            echo columns
+            echo '), '
+
+            if section.settings.images_per_row_mobile == '2'
+              echo 'calc(100vw / 2)'
+            else
+              echo 'calc(100vw)'
+            endif
+          endcapture
+        endif
+      -%}
+      <div id="GalleryItem-{{ block.id }}" class="{{ gallery_item_class }} group" {{ block.shopify_attributes }}>
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="gallery__link absolute inset-0 z-30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent">
+            {%- if block.settings.title != blank -%}
+              <span class="sr-only">{{ block.settings.title }}</span>
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+
+        <div class="gallery__image-contain overflow-hidden relative {{ aspect_classes }}">
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1920 | image_tag: 
+              class: gallery_image_class,
+              widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+              sizes: image_sizes,
+              loading: 'lazy' }}
+
+            {%- if block.settings.image_rollover -%}
+              {{ block.settings.image_rollover | image_url: width: 1920 | image_tag: 
+                class: gallery_image_rollover_class,
+                widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                sizes: image_sizes,
+                loading: 'lazy' }}
+            {%- endif -%}
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+          <div class="absolute inset-0 z-10 bg-section-overlay group-hover:bg-section-overlay-hover"></div>
+        </div>        
+
+        {%- if block.settings.title != blank -%}
+          <div class="{{ gallery_content_class }}">
+            <h4 class="{{ gallery_heading_class }}">{{ block.settings.title }}</h4>
+            {%- if block.settings.richtext != blank -%}
+              <div class="mx-auto md:rte rte-sm">{{ block.settings.richtext }}</div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.gallery.name",
+  "class": "gallery-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.gallery.settings.title.label",
+      "default": "Image Gallery"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "section_padding",
+      "label": "t:sections.general.section_padding",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "gutter",
+      "label": "t:sections.general.image_padding",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "images_per_row_range",
+      "label": "t:sections.general.images_per_row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "radio",
+      "id": "images_per_row_mobile",
+      "label": "t:sections.general.images_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "t:sections.general.image_ratio.label",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.general.image_ratio.option_auto.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.image_ratio.option_square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.general.image_ratio.option_portrait.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.general.image_ratio.option_landscape.label"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "radio",
+      "id": "text_placement",
+      "label": "t:sections.general.text_placement.label",
+      "default": "below",
+      "options": [
+        {
+          "value": "below",
+          "label": "t:sections.general.text_placement.option_below.label"
+        },
+        {
+          "value": "over",
+          "label": "t:sections.general.text_placement.option_over.label"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "t:sections.general.colors.color_overlay",
+      "default": "#4f4f4f"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay_hover",
+      "label": "t:sections.general.colors.color_overlay_hover",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay_text",
+      "label": "t:sections.general.colors.color_overlay_text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "color_overlay_alpha_range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.general.image_overlay_opacity",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "zoom",
+      "label": "t:sections.general.enable_rollover_zoom",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.gallery.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.gallery.blocks.image.settings.image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_rollover",
+          "label": "t:sections.gallery.blocks.image.settings.image_rollover.label",
+          "info": "t:sections.gallery.blocks.image.settings.image_rollover.info"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.gallery.blocks.image.settings.link.label",
+          "info": "t:sections.gallery.blocks.image.settings.link.info"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.gallery.blocks.image.settings.title.label",
+          "default": "Image title",
+          "info": "t:sections.gallery.blocks.image.settings.title.info"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext",
+          "label": "t:sections.gallery.blocks.image.settings.richtext.label",
+          "info": "t:sections.gallery.blocks.image.settings.richtext.info"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.gallery.presets.featured_grid.name",
+      "settings": {
+        "title": "Featured grid",
+        "full_width": false,
+        "section_padding": true,
+        "images_per_row_range": 3,
+        "gutter": true,
+        "text_placement": "below"
+      },
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "title": "Image title"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": "Image title"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": "Image title"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": "Image title"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": "Image title"
+          }
+        }
+      ]
+    },
+    {
+      "name": "t:sections.gallery.presets.gallery.name",
+      "settings": {
+        "title": "",
+        "full_width": true,
+        "section_padding": false,
+        "images_per_row_range": 4,
+        "gutter": false,
+        "text_placement": "over"
+      },
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "title": ""
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": ""
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": ""
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "title": ""
+          }
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

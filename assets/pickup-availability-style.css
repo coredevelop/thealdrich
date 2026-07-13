@@ -1,0 +1,109 @@
+pickup-availability {
+  display: block;
+}
+
+pickup-availability-drawer {
+  visibility: hidden;
+
+  position: fixed;
+
+  top: 0px;
+
+  right: 0px;
+
+  bottom: 0px;
+
+  left: 0px;
+
+  z-index: 3141592;
+
+  display: block;
+
+  width: 100%;
+
+  max-width: none;
+}
+
+pickup-availability-drawer .modal__sidebar {
+  right: 0px;
+
+  --tw-translate-x: 24rem;
+
+  transform: translate(24rem, var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+    skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+    skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+
+  transition-property: transform;
+
+  transition-duration: 300ms;
+
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+pickup-availability-drawer .modal__background,
+pickup-availability-drawer .modal__close {
+  display: none;
+}
+
+pickup-availability-drawer[open] {
+  visibility: visible;
+
+  position: fixed;
+
+  top: 0px;
+
+  right: 0px;
+
+  bottom: 0px;
+
+  left: 0px;
+
+  z-index: 3141592;
+
+  display: block;
+
+  width: 100%;
+
+  max-width: none;
+}
+
+pickup-availability-drawer[open] .modal__sidebar {
+  position: absolute;
+
+  top: 0px;
+
+  bottom: 0px;
+
+  right: 0px;
+
+  z-index: 20;
+
+  height: 100%;
+
+  width: 24rem;
+
+  --tw-translate-x: 0px;
+
+  transform: translate(0px, var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+    skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+    skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+
+  overflow-y: auto;
+
+  background-color: var(--primary-secondary-background-color);
+}
+
+pickup-availability-drawer[open] .modal__close {
+  left: 0px;
+
+  right: auto;
+}
+
+pickup-availability-drawer[open] .modal__background,
+pickup-availability-drawer[open] .modal__close {
+  display: block;
+}

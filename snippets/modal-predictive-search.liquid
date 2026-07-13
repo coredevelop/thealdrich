@@ -1,0 +1,73 @@
+<style>
+.predictive-search__search-results {
+  max-height: calc(100vh - 8rem);
+}
+@media (min-width: 640px) {
+  .predictive-search__search-results {
+    max-height: calc(100vh - 9rem);
+  }
+}
+@media (min-width: 768px) {
+  .predictive-search__search-results {
+    max-height: calc(100vh - 12rem);
+  }
+}
+.predictive-search__results-list mark {
+  background-color: transparent;
+  color: var(--color-primary-text-80);
+}
+.predictive-search__results-list span {
+  font-weight: var(--navigation-weight-bolder);
+}
+</style>
+
+{% comment %} 
+Predictive Search
+{% endcomment %}
+<modal-predictive-search id="ModalPredictiveSearch" class="predictive__container group relative z-[700] aria-[modal=false]:pointer-events-none" role="dialog" aria-modal="false" client:idle>
+  <div class="predictive__overlay fixed inset-0 bg-black bg-opacity-25 transition-opacity duration-300 ease-out group-aria-[modal=false]:opacity-0 group-aria-[modal=true]:opacity-100"></div>
+  <div class="fixed inset-0 z-[700] overflow-y-auto p-4 sm:p-6 md:p-20 pointer-events-none">
+    
+    <predictive-search data-enabled="{{ settings.search_predictive_enabled }}" data-loading-text="{{ 'accessibility.loading' | t }}" client:idle>
+      <form 
+        class="predictive__form pointer-events-auto group-aria-[modal=false]:pointer-events-none mx-auto max-w-4xl transform overflow-hidden bg-primary-background shadow-2xl ring-1 ring-black ring-opacity-5 transition-all group-aria-[modal=false]:translate-y-1/4 group-aria-[modal=false]:scale-95 group-aria-[modal=false]:opacity-0 group-aria-[modal=true]:translate-y-0 group-aria-[modal=true]:scale-100 group-aria-[modal=true]:opacity-100"
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+      >
+        <div class="relative">
+          <div class="absolute pointer-events-none text-primary-text-50 w-6 h-6 top-3 left-3">
+            {% render 'icon-ui-search' %}
+          </div>
+          <label for="PredictiveSearch" class="sr-only">{{- 'general.search.search' -}}</label>
+          <input
+            id="PredictiveSearch"
+            class="predictive__input text-primary-text h-12 w-full border-0 bg-transparent pl-10 pr-4 focus:ring-0"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            role="combobox"
+            aria-expanded="false"
+            aria-owns="predictive-search-results"
+            aria-controls="predictive-search-results"
+            aria-haspopup="listbox"
+            aria-autocomplete="list"
+          >
+          <button 
+            type="button"
+            class="search-bar__close absolute text-primary-text-50 w-8 h-8 p-2 top-2 right-2 rounded-full ring-primary-text opacity-70 focus:opacity-100 focus:ring-primary-text-60 focus:ring-inset"
+            aria-label="{{ 'accessibility.close' | t }}"
+          >
+            {% render 'icon-ui-close' %}
+          </button>
+          <input name="options[prefix]" type="hidden" value="last">
+        </div>
+
+        <div id="predictive-search" tabindex="-1"></div>
+
+        <span class="predictive-search-status sr-only" role="status" aria-hidden="true"></span>
+      </form>
+    </predictive-search>
+    
+  </div>
+</modal-predictive-search>

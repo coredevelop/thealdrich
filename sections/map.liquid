@@ -1,0 +1,216 @@
+{%- liquid 
+  assign bg_image = section.settings.background_image
+  assign overlay_alpha = section.settings.color_overlay_alpha_range | times: 0.01
+
+  assign display_map = false
+  if section.settings.api_key != blank and section.settings.map_address
+    assign display_map = true
+  endif
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+    --section-overlay-color: {{ section.settings.color_overlay | color_modify: 'alpha', overlay_alpha }};
+    --section-object-position: {{ section.settings.alignment }};
+  }
+  [data-section-id="{{ section.id }}"] .map__image {
+    object-position: var(--section-object-position);
+  }
+  
+</style>
+
+<div class="map px-rail"
+  data-section-id="{{ section.id }}"
+  data-loading="lazy-interaction"
+  data-display-map="{{ display_map }}"
+  data-section-type="map">
+
+  <div class="map__wrapper mx-auto max-w-screen text-center relative overflow-hidden flex items-start md:items-center justify-center md:justify-start h-halfscreen md:h-auto px-5 md:p-32">
+    
+    <div class="map__content relative z-30 bg-primary-background space-y-4 p-7 w-full md:w-5/12 max-w-sm md:max-w-md" data-map-content>
+      {% if section.settings.heading != blank %}
+        <h2 class="map__content-title text-xl md:text-2xl">{{ section.settings.heading | escape }}</h2>
+      {% endif %}
+      {% if section.settings.address != blank %}
+        <div class="map__content-text rte">{{ section.settings.address }}</div>
+      {% endif %}
+      {% if section.settings.map_address != blank and section.settings.button_text != blank %}
+        <a href="https://maps.google.com?daddr={{ section.settings.map_address | escape }}" target="_blank" class="button button--outline">{{ section.settings.button_text | escape }}</a>
+      {% endif %}
+    </div>
+
+    <div class="map__background absolute inset-0 w-full h-halfscreen md:h-full">
+      <div class="map__overlay absolute inset-0 z-20 bg-section-overlay"></div>
+
+      {%- if display_map -%}
+        <map-object class="map__container absolute inset-0 z-10"
+          id="Map-{{ section.id }}"
+          data-map
+          data-address-setting="{{ section.settings.map_address | escape }}"
+          data-api-key="{{ section.settings.api_key }}"
+          data-map-style="{{ section.settings.map_style }}"
+          client:visible
+        ></map-object>
+      {%- endif -%}
+
+      <div class="map__background-image absolute inset-0 w-full h-full">
+        {%- if bg_image != blank -%}
+          {{ bg_image | image_url: width: 1920 | image_tag: 
+            class: 'map__image object-cover w-full h-full',
+            widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+            sizes: '100vw',
+            loading: 'lazy' }}
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'responsive-fill-image placeholder-svg' }}
+        {%- endif -%}
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.map.name",
+  "class": "index-section map-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.map.settings.header_text.content"
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "label": "t:sections.map.settings.heading.label",
+      "default": "Our store"
+    },
+    {
+      "id": "address",
+      "type": "richtext",
+      "label": "t:sections.map.settings.address.label",
+      "default": "<p>200 Fake St.<br>Irvine, California</p><p>Mon - Fri, 10am - 9pm<br>Saturday, 11am - 9pm<br>Sunday, 11am - 5pm</p>"
+    },
+    {
+      "id": "map_address",
+      "type": "text",
+      "label": "t:sections.map.settings.map_address.label",
+      "info": "t:sections.map.settings.map_address.info",
+      "default": "200 Spectrum Center Dr, Irvine CA"
+    },
+    {
+      "id": "button_text",
+      "type": "text",
+      "label": "t:sections.map.settings.button_text.label",
+      "default": "Get directions"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.map.settings.header_background.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": true
+    },
+    {
+      "id": "api_key",
+      "type": "text",
+      "label": "t:sections.map.settings.api_key.label",
+      "info": "t:sections.map.settings.api_key.info"
+    },
+    {
+      "type": "select",
+      "id": "map_style",
+      "label": "t:sections.map.settings.map_style.label",
+      "default": "standard",
+      "options": [
+        {
+          "label": "t:sections.map.settings.map_style.option_standard.label",
+          "value": "standard"
+        },
+        {
+          "label": "t:sections.map.settings.map_style.option_silver.label",
+          "value": "silver"
+        },
+        {
+          "label": "t:sections.map.settings.map_style.option_retro.label",
+          "value": "retro"
+        },
+        {
+          "label": "t:sections.map.settings.map_style.option_dark.label",
+          "value": "dark"
+        },
+        {
+          "label": "t:sections.map.settings.map_style.option_night.label",
+          "value": "night"
+        },
+        {
+          "label": "t:sections.map.settings.map_style.option_aubergine.label",
+          "value": "aubergine"
+        }
+      ]
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:sections.map.settings.background_image.label",
+      "info": "t:sections.map.settings.background_image.info"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.general.image_alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.general.image_alignment.option_top.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.image_alignment.option_middle.label"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.general.image_alignment.option_bottom.label"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.map.settings.header_overlay.content"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "t:sections.general.colors.color_overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "color_overlay_alpha_range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.general.background_overlay_opacity",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.map.presets.name"
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

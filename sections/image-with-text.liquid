@@ -1,0 +1,177 @@
+{%- liquid 
+  assign sizes_width = section.settings.image_width | divided_by: 100.0
+  capture image_sizes
+    if section.settings.full_width == false
+      echo '(min-width: 1280px) calc(1280px * '
+      echo sizes_width
+      echo '), '
+    endif
+
+    echo '(min-width: 768px) calc((100vw - 2.5rem) * '
+    echo sizes_width
+    echo '), calc((100vw - 2.5rem) / 2)'
+  endcapture  
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+    {%- if section.settings.layout == 'left' -%}
+      --section-direction: row;
+    {%- else -%}
+      --section-direction: row-reverse;
+    {%- endif -%}
+    {%- if section.settings.section_padding == false -%}
+      --spacing-section: 0;
+      --spacing-rail: 0;
+      border-bottom: 0px;
+    {%- endif -%}
+    --text-align-section: {{ section.settings.text_align }};
+  }
+  .image-with-text__contain {
+    flex-direction: var(--section-direction);
+  }
+  
+</style>
+
+<div class="image-with-text px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="image-with-text">
+  <div class="image-with-text__contain flex flex-wrap items-center mx-auto max-w-screen">
+    <div class="image-with-text__image-contain flex-initial md:w-{{ section.settings.image_width | divided_by: 10 }}/10 w-full">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1280 | image_tag: 
+          class: 'image-with-text__image',
+          widths: '160, 220, 300, 420, 640, 960, 1280',
+          sizes: image_sizes,
+          loading: 'lazy' }}
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+    <div class="image-with-text__content flex-1 space-y-4 py-5 px-5 md:py-7 text-align-section">
+      {%- if section.settings.title != blank -%}
+        <h3 class="image-with-text__title pb-2 text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="image-with-text__text rte space-y-2">
+          {{ section.settings.text }}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+        <a href="{{ section.settings.button_link }}" class="image-with-text__button button button--outline">
+          {{ section.settings.button_label | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+
+{% schema %}
+{
+  "name": "t:sections.image_with_text.name",
+  "class": "image-with-text-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "section_padding",
+      "label": "t:sections.general.section_padding",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.image_with_text.settings.image.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.image_with_text.settings.layout.label",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.image_with_text.settings.layout.option_image_on_left.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.image_with_text.settings.layout.option_image_on_right.label"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "t:sections.image_with_text.settings.image_width.label",
+      "min": 20,
+      "max": 80,
+      "step": 10,
+      "default": 50,
+      "unit": "%"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "t:sections.general.alignment.label",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.general.alignment.option_left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.alignment.option_center.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.general.alignment.option_right.label"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.image_with_text.settings.title.label",
+      "default": "Image with text"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:sections.image_with_text.settings.text.label",
+      "default": "<p>Pair large text with an image to give focus to your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.image_with_text.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.image_with_text.settings.button_link.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.image_with_text.presets.name"
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

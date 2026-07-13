@@ -1,0 +1,34 @@
+{%- liquid
+  capture search_bar_id
+    if id
+      echo id
+    else
+      echo 'SearchBar-'
+      echo section.id
+    endif
+  endcapture
+-%}
+
+<search-bar id="{{ search_bar_id }}" class="search-bar"
+  role="dialog"
+  aria-label="{{ 'general.search.search' | t }}"
+  data-search-bar>
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-bar__form w-full flex justify-center items-center">
+    <div class="search-bar__input-group relative flex-1 group">
+      <input class="search__input search-bar__input focus:appearance-none appearance-none w-full bg-primary-background text-primary-text border-primary-text focus:ring-0 placeholder-section-text-75"
+        id="SearchBarInput-{{ section.id }}"
+        type="search"
+        name="q"
+        value="{{ value }}"
+        placeholder="{{ 'general.search.search' | t }}">
+      <div class="search-bar__icon absolute cursor-pointer ltr:right-0 rtl:left-0 inset-y-0 w-6 ltr:mr-4 rtl:ml-4 z-10 group-focus-within:text-primary-accent">
+        {% render 'icon-ui-search' %}
+      </div>
+    </div>
+    {%- if close_button != false -%}
+      <button type="button"
+        class="search-bar__close flex-none w-12 h-12 p-3 opacity-50 hover:opacity-100 focus:opacity-100 focus:ring-inset"
+        aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+    {%- endif -%}
+  </form>
+</search-bar>

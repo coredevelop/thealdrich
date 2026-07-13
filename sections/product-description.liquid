@@ -1,0 +1,51 @@
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --text-align-section: {{ section.settings.alignment }};
+  }
+  
+</style>
+<div class="product-description px-rail py-section border-b border-primary-section-border text-align-section"
+  data-section-id="{{ section.id }}"
+  data-section-type="product-description">
+  <div class="rte mx-auto">
+    {%- if section.settings.show_title -%}
+      <h2>{{ product.title }}</h2>
+    {%- endif -%}
+    {{ product.description }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.product_description.name",
+  "class": "product-description-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "t:sections.product_description.settings.show_title.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.general.alignment.label",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.general.alignment.option_left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.alignment.option_center.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.general.alignment.option_right.label"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

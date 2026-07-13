@@ -1,0 +1,242 @@
+{%- comment -%}
+  image-banner section
+  - Previously the image with text overlay section (hero.liquid)
+{%- endcomment -%}
+{%- liquid 
+  case section.settings.banner_size
+    when 'x-small'
+      assign min_height = 160
+    when 'small'
+      assign min_height = 240
+    when 'medium'
+      assign min_height = 340
+    when 'large'
+      assign min_height = 440
+    when 'x-large'
+      assign min_height = 580
+  endcase
+
+  assign overlay_alpha = section.settings.color_overlay_alpha_range | times: 0.01
+  assign image_alpha = 1 | minus: overlay_alpha
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+    --section-min-height: {{ min_height | append: 'px' }};
+    --section-min-height-md: {{ min_height | times: 1.2 | append: 'px' }};
+    --section-object-position: {{ section.settings.alignment }};
+    --section-overlay-color: {{ section.settings.color_overlay | color_modify: 'alpha', overlay_alpha }};
+    --section-opacity: {{ image_alpha }};
+    --section-text-color: {{ section.settings.color_overlay_text }};
+    --section-accent-color: {{ section.settings.color_accent }};
+    --section-primary-border-color: {{ section.settings.color_overlay_text }};
+  }
+  [data-section-id="{{ section.id }}"] .image-banner__wrapper {
+    min-height: var(--section-min-height);
+  }
+  @media screen (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] .image-banner__wrapper {
+      min-height: var(--section-min-height-md);
+    }
+  }
+  [data-section-id="{{ section.id }}"] .image-banner__image {
+    object-position: var(--section-object-position);
+  }
+  
+</style>
+<div class="image-banner px-rail text-center"
+  data-section-id="{{ section.id }}"
+  data-section-type="image-banner">
+  <div class="image-banner__wrapper mx-auto max-w-screen relative overflow-hidden flex items-center justify-center">
+
+    <div class="image-banner__content relative space-y-4 text-section-text z-30 py-5 px-5 md:py-7">
+      {%- if section.settings.title != blank -%}
+        <h3 class="image-banner__title text-section-text text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="image-banner__text space-y-2 rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+      <div class="image-banner__button-container space-x-4">
+        {%- if section.settings.button_label_1 != blank -%}
+          <a href="{{ section.settings.button_link_1 }}"
+            class="image-banner__button button button--{{ section.settings.button_style }} border-section-primary">
+            {{ section.settings.button_label_1 | escape }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.button_label_2 != blank -%}
+          <a href="{{ section.settings.button_link_2 }}"
+            class="image-banner__button button button--{{ section.settings.button_style }} border-section-primary">
+            {{ section.settings.button_label_2 | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="image-banner__overlay absolute inset-0 z-20 bg-section-overlay"></div>
+    <div class="image-banner__image-contain absolute inset-0 w-full h-full bg-section-overlay">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1920 | image_tag: 
+          class: 'image-banner__image object-cover w-full h-full',
+          widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+          sizes: '100vw',
+          loading: 'lazy' }}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'responsive-fill-image placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.image_banner.name",
+  "class": "image-banner-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.image_banner.settings.image.label"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.general.image_alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.general.image_alignment.option_top.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.image_alignment.option_middle.label"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.general.image_alignment.option_bottom.label"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.image_banner.settings.title.label",
+      "default": "Image banner"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:sections.image_banner.settings.text.label",
+      "default": "<p>Use banner text to give your customers insight into your brand. Select imagery and text that relates to your style and story.</p>"
+    },
+    {
+      "type": "select",
+      "id": "banner_size",
+      "label": "t:sections.general.section_height.label",
+      "default": "medium",
+      "options": [
+        {
+          "label": "t:sections.general.section_height.option_extra_small.label",
+          "value": "x-small"
+        },
+        {
+          "label": "t:sections.general.section_height.option_small.label",
+          "value": "small"
+        },
+        {
+          "label": "t:sections.general.section_height.option_medium.label",
+          "value": "medium"
+        },
+        {
+          "label": "t:sections.general.section_height.option_large.label",
+          "value": "large"
+        },
+        {
+          "label": "t:sections.general.section_height.option_extra_large.label",
+          "value": "x-large"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label_1",
+      "label": "t:sections.image_banner.settings.button_label_1.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link_1",
+      "label": "t:sections.image_banner.settings.button_link_1.label"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "t:sections.image_banner.settings.button_label_2.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "t:sections.image_banner.settings.button_link_2.label"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:sections.general.button_style.label",
+      "default": "outline",
+      "options": [
+        {
+          "value": "outline",
+          "label": "t:sections.general.button_style.option_outline.label"
+        },
+        {
+          "value": "solid",
+          "label": "t:sections.general.button_style.option_solid.label"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "color_overlay_text",
+      "label": "t:sections.general.colors.color_text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "t:sections.general.colors.color_accent",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "t:sections.general.colors.color_overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "color_overlay_alpha_range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.general.image_overlay_opacity",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.image_banner.presets.name"
+    }
+  ]
+}
+{% endschema %}

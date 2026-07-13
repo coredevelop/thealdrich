@@ -1,0 +1,209 @@
+<style>
+  [data-section-id="{{ section.id }}"] {}
+</style>
+<product-recommendations
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.product_count_range }}"
+  client:visible
+>
+  
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    {%- liquid 
+      assign product_limit = section.settings.product_count_range
+
+      if recommendations.products_count < product_limit
+        assign product_limit = recommendations.products_count
+      endif
+
+      capture grid_cols_class
+        echo 'grid-cols-'
+        echo section.settings.product_mobile_columns
+        echo ' md:grid-cols-'
+        echo section.settings.product_columns
+      endcapture
+    -%}
+
+    <div class="product-recommendations__container px-rail py-section space-y-7 border-b border-primary-section-border">
+      {%- if section.settings.title != blank -%}
+        <div class="product-recommendations__header mx-auto max-w-screen flex flex-col md:flex-row md:items-end space-y-3">
+          <h2 class="product-recommendations__title text-2xl md:text-3xl">{{ section.settings.title | escape }}</h2>
+        </div>
+      {%- endif -%}
+
+      <ul class="product-recommendations__grid mx-auto max-w-screen grid {{ grid_cols_class }} gap-4 md:gap-7 text-center">
+        {%- for recommendation in recommendations.products -%}
+          <li class="product-recommendations__grid-item">
+            {% render 'product-card',
+              product: recommendation,
+              media_size: section.settings.product_image_ratio,
+              media_crop: section.settings.product_image_crop,
+              product_columns: section.settings.product_columns,
+              product_mobile_columns: section.settings.product_mobile_columns,
+              show_secondary_image: section.settings.product_image_hover,
+              show_vendor: section.settings.show_vendor,
+              show_rating: section.settings.show_rating,
+              badge_placement: section.settings.product_badge_placement,
+              show_swatches: section.settings.product_swatches,
+              swatch_shape: section.settings.collection_swatches_shape %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+</product-recommendations>
+
+{% schema %}
+{
+  "name": "t:sections.product_recommendations.name",
+  "class": "product-recommendations-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.product_recommendations.settings.title.label",
+      "default": "You may also like"
+    },
+    {
+      "type": "range",
+      "id": "product_count_range",
+      "label": "t:sections.general.number_of_products",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "product_columns",
+      "label": "t:sections.general.products_per_row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "radio",
+      "id": "product_mobile_columns",
+      "label": "t:sections.general.products_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.general.header_product_card"
+    },
+    {
+      "type": "select",
+      "id": "product_image_ratio",
+      "label": "t:sections.general.image_ratio.label",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.general.image_ratio.option_auto.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.image_ratio.option_square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.general.image_ratio.option_portrait.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.general.image_ratio.option_landscape.label"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_image_crop",
+      "label": "t:sections.general.crop_product_image",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "product_image_hover",
+      "label": "t:sections.general.show_second_image_on_hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:sections.general.show_vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "default": false,
+      "label": "t:sections.general.show_rating.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.general.header_product_badges"
+    },
+    {
+      "type": "select",
+      "id": "product_badge_placement",
+      "label": "t:sections.general.product_badge_placement.label",
+      "default": "bottom-right",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "t:sections.general.product_badge_placement.option_top_left.label"
+        },
+        {
+          "value": "top-right",
+          "label": "t:sections.general.product_badge_placement.option_top_right.label"
+        },
+        {
+          "value": "bottom-left",
+          "label": "t:sections.general.product_badge_placement.option_bottom_left.label"
+        },
+        {
+          "value": "bottom-right",
+          "label": "t:sections.general.product_badge_placement.option_bottom_right.label"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.general.header_color_swatch"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_swatches",
+      "label": "t:sections.general.show_color_swatches.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collection_swatches_shape",
+      "label": "t:sections.general.swatch_shape.label",
+      "options": [
+        {
+          "value": "circle",
+          "label": "t:sections.general.swatch_shape.option_circle.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.swatch_shape.option_square.label"
+        }
+      ],
+      "default": "circle"
+    }
+  ]
+}
+{% endschema %}

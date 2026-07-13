@@ -1,0 +1,65 @@
+{%- liquid
+  render 'asset-tag', asset: 'customer.css'
+-%}
+<div
+  class="customer activate-account space-y-6 px-rail py-section"
+  data-section-type="activate-account"
+>
+  <div class="activate-account__container mx-auto max-w-screen text-center">
+    <div class="activate-account__header mb-6 border-b border-primary-section-border pb-4">
+      <h1 class="text-center text-3xl md:text-4xl">{{ 'customer.activate_account.title' | t }}</h1>
+    </div>
+
+    <div class="activate-account__content mx-auto">
+      <p>{{ 'customer.activate_account.subtext' }}</p>
+
+      {%- form 'activate_customer_password' -%}
+        {%- if form.errors -%}
+          <div class="activate-account__message rte mb-4 bg-primary-secondary-background px-4 py-2">
+            <div class="mb-1 outline-none" role="alert" tabindex="-1" autofocus>
+              <span class="mr-1 inline-block w-3 text-red-600">
+                {%- render 'icon-ui-error' -%}
+              </span>
+              {{ form.errors | default_errors }}
+            </div>
+          </div>
+        {%- endif -%}
+
+        <div class="activate-account__contain mx-auto max-w-[28rem] space-y-4 text-left">
+          <div class="activate-account__field">
+            <label for="ActivateAccount-password">{{ 'customer.activate_account.password' | t }}</label>
+            <input
+              id="ActivateAccount-password"
+              type="password"
+              autocomplete="new-password"
+              name="customer[password]"
+              aria-required="true"
+            >
+          </div>
+
+          <div class="activate-account__field">
+            <label for="ActivateAccount-passwordconfirmation">
+              {{- 'customer.activate_account.password_confirm' | t -}}
+            </label>
+            <input
+              id="ActivateAccount-passwordconfirmation"
+              type="password"
+              autocomplete="new-password"
+              name="customer[password_confirmation]"
+              aria-required="true"
+            >
+          </div>
+
+          <div class="flex flex-col items-center justify-center">
+            <button class="button button--cta button--solid">
+              {{ 'customer.activate_account.submit' | t }}
+            </button>
+            <button name="decline" class="button button--cta button--outline">
+              {{ 'customer.activate_account.cancel' | t }}
+            </button>
+          </div>
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+</div>

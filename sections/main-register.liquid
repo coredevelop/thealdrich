@@ -1,0 +1,70 @@
+{%- liquid
+  render 'asset-tag', asset: 'customer.css'
+-%}
+<div class="main-register py-section px-rail space-y-6"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-register">
+  <div class="main-register__container text-center mx-auto max-w-screen">
+
+
+    <div class="main-register__header mb-6 pb-4 border-b border-primary-section-border">
+      <h1 class="text-3xl md:text-4xl text-center">{{ 'customer.register.title' | t }}</h1>
+    </div>
+    <div class="main-register__content mx-auto">
+
+      {%- form 'create_customer', novalidate: 'novalidate' -%}
+        {%- if form.errors -%}
+          <div class="register-form__message px-4 py-2 bg-primary-secondary-background mb-4 rte">
+            <div class="outline-none mb-1" role="alert" tabindex="-1" autofocus>
+              <span class="inline-block w-3 mr-1 text-red-600">
+                {%- render 'icon-ui-error' -%}
+              </span> {{ form.errors | default_errors }}</div>
+          </div>
+        {%- endif -%}
+
+        <div class="register-form__contain text-left max-w-[28rem] mx-auto space-y-4">
+
+          <div class="register-form__field">
+            <label for="CreateCustomerForm-firstname">{{ 'customer.register.first_name' | t }}</label>
+            <input id="CreateCustomerForm-firstname" type="text"
+              autocomplete="given-name"
+              name="customer[first_name]">
+          </div>
+
+          <div class="register-form__field">
+            <label for="CreateCustomerForm-lastname">{{ 'customer.register.last_name' | t }}</label>
+            <input id="CreateCustomerForm-lastname" type="text"
+              autocomplete="family-name"
+              name="customer[last_name]">
+          </div>
+
+          <div class="register-form__field">
+            <label for="CreateCustomerForm-email">{{ 'customer.register.email' | t }}</label>
+            <input id="CreateCustomerForm-email" type="email"
+              autocomplete="email"
+              name="customer[email]"
+              spellcheck="false"
+              autocapitalize="off"
+              aria-required="true">
+          </div>
+
+          <div class="register-form__field">
+            <label for="CreateCustomerForm-password">{{ 'customer.register.password' | t }}</label>
+            <input id="CreateCustomerForm-password" type="password"
+              autocomplete="current-password"
+              name="customer[password]"
+              aria-required="true">
+          </div>
+
+          <div class="flex items-center flex-col justify-center">
+            <button class="button button--cta button--solid">
+              {{ 'customer.register.submit' | t }}
+            </button>
+          </div>
+        </div>
+        
+      {%- endform -%}
+    </div>
+
+  </div>
+</div>

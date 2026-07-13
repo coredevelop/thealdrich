@@ -1,0 +1,208 @@
+
+{%- liquid
+  # Context detection for structured data - determines if FAQ is on product/collection page
+  assign faq_context_url = ''
+  assign faq_context_type = ''
+
+  if template contains 'product' and product
+    assign faq_context_url = product.url | prepend: request.origin
+    assign faq_context_type = 'Product'
+  elsif template contains 'collection' and collection
+    assign faq_context_url = collection.url | prepend: request.origin
+    assign faq_context_type = 'CollectionPage'
+  endif
+
+  # FAQ unique identifier for structured data
+  if faq_context_url != blank
+    assign faq_id = faq_context_url | append: '#faq'
+  else
+    assign faq_id = request.origin | append: request.path | append: '#faq'
+  endif
+
+  # Create contextual FAQ name
+  assign faq_name = section.settings.title
+  if template contains 'product' and product.title
+    assign faq_name = product.title | append: ' - ' | append: section.settings.title
+  elsif template contains 'collection' and collection.title
+    assign faq_name = collection.title | append: ' - ' | append: section.settings.title
+  elsif page.title
+    assign faq_name = page.title | append: ' - ' | append: section.settings.title
+  endif
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] .faq__content {
+    --max-width-screen: {{ section.settings.max_width_range }}px;
+  }
+
+</style>
+
+{%- comment -%} Structured Data for Google Rich Results {%- endcomment -%}
+{%- assign question_blocks = section.blocks | where: 'type', 'question' -%}
+{%- if question_blocks.size > 0 -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "@id": {{ faq_id | json }},
+      {%- if faq_name != blank -%}
+      "name": {{ faq_name | json }},
+      {%- endif -%}
+      {%- if faq_context_url != blank -%}
+      "isPartOf": {
+        "@type": "{{ faq_context_type }}",
+        "@id": {{ faq_context_url | json }}
+      },
+      {%- endif -%}
+      "mainEntity": [
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'question' -%}
+            {%- assign answer_content = '' -%}
+            {%- if block.settings.richtext != blank -%}
+              {%- assign answer_content = block.settings.richtext -%}
+            {%- endif -%}
+            {%- if block.settings.page != blank -%}
+              {%- assign answer_content = answer_content | append: block.settings.page.content -%}
+            {%- endif -%}
+            {
+              "@type": "Question",
+              "name": {{ block.settings.title | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ answer_content | strip_html | json }}
+              }
+            }{% unless forloop.last %},{% endunless %}
+          {%- endif -%}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+
+<div class="faq space-y-5 px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="faq">
+
+  {%- if section.settings.title != blank -%}
+    <h3 id="{{ section.settings.title | handle }}" class="faq_title text-center mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <div class="faq__content mx-auto max-w-screen">
+
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+
+        {%- when 'heading' -%}
+          {%- if block.settings.title != blank -%}
+            <h4 class="faq__heading pt-6 mb-4 text-section text-xl md:text-2xl">{{ block.settings.title }}</h4>
+          {%- endif -%}
+        {%- when 'question' -%}
+          <details class="question" {% if block.settings.expand_answer %}open{% endif %}>
+            <summary class="question__title">
+              <h3>{{ block.settings.title }}</h3>
+              {% render 'icon-ui-chevron-down' %}
+            </summary>
+            <div class="question__content rte">
+              {%- if block.settings.richtext != blank -%}
+                {{ block.settings.richtext }}
+              {%- endif -%}
+              {%- if block.settings.page != blank -%}
+                {{ block.settings.page.content }}
+              {%- endif -%}
+            </div>
+          </details>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.faq.name",
+  "class": "faq-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.faq.settings.title.label"
+    },
+    {
+      "type": "range",
+      "id": "max_width_range",
+      "label": "t:sections.faq.settings.max_width.label",
+      "min": 672,
+      "max": 1280,
+      "step": 16,
+      "default": 768
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "t:sections.faq.blocks.question.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.faq.blocks.question.settings.title.label",
+          "default": "What is a question customers frequently have?"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext",
+          "label": "t:sections.faq.blocks.question.settings.richtext.label",
+          "default": "<p>Use this text to answer common question or provide organized content about product features or details.</p>"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "t:sections.faq.blocks.question.settings.page.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "expand_answer",
+          "label": "t:sections.faq.blocks.question.settings.expand_answer.label",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "t:sections.faq.blocks.heading.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.faq.blocks.heading.settings.title.label",
+          "default": "Frequently Asked Questions"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.faq.presets.name",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

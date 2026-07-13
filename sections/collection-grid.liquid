@@ -1,0 +1,329 @@
+{%- liquid 
+  if section.settings.image_ratio == 'auto'
+    assign aspect_classes = ''
+  elsif section.settings.image_ratio == '100%'
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif section.settings.image_ratio == '150%'
+    assign aspect_classes = 'aspect-w-2 aspect-h-3'
+  elsif section.settings.image_ratio == '75%'
+    assign aspect_classes = 'aspect-w-4 aspect-h-3'
+  endif
+
+  if section.settings.text_placement == 'over'
+    assign title_contain_classes = 'absolute inset-0 flex items-center justify-center'
+
+    if section.settings.zoom
+      assign title_classes = 'text-section-text px-5 py-2 border-2 border-section-primary transform-gpu transition-transform ease-out duration-1000 group-hover:scale-110'
+    else
+      assign title_classes = 'text-section-text px-5 py-2 border-2 border-section-primary'
+    endif
+  else
+    assign title_contain_classes = ''
+    assign title_classes = 'px-1'
+  endif
+
+  if section.settings.zoom
+    assign image_zoom_classes = 'responsive-fill-image transform-gpu transition-transform ease-out duration-2000 group-hover:scale-110'
+  else
+    assign image_zoom_classes = 'responsive-fill-image'
+  endif
+  
+  if section.settings.gutter 
+    assign grid_gap = 'gap-4 md:gap-7'
+  else
+    assign grid_gap = 'gap-0'
+  endif
+
+  assign overlay_alpha = section.settings.color_overlay_alpha_range | times: 0.01
+
+  capture image_sizes
+    if section.settings.full_width == false
+      echo '(min-width: 1280px) calc(1280px / '
+      echo section.settings.columns_range
+      echo '), '
+    endif
+
+    echo '(min-width: 768px) calc(100vw / '
+    echo section.settings.columns_range
+    echo '), '
+
+    if section.settings.columns_mobile == '2'
+      echo 'calc(100vw / 2)'
+    else
+      echo 'calc(100vw)'
+    endif
+  endcapture
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+    {%- endif -%}
+    {%- if section.settings.section_padding == false -%}
+      --spacing-section: 0;
+      --spacing-rail: 0;
+      border-bottom: 0px;
+    {%- endif -%}
+    --section-text-color: {{ section.settings.color_overlay_text }};
+    --section-overlay-color: {{ section.settings.color_overlay | color_modify: 'alpha', overlay_alpha }};
+    --section-overlay-hover-color: {{ section.settings.color_overlay_hover | color_modify: 'alpha', overlay_alpha }};
+    --section-primary-border-color: {{ section.settings.color_overlay_text }};
+    {%- if section.settings.section_padding -%}
+      --section-padding-y: 2.5rem;
+      --section-padding-x: 1.25rem;
+    {%- else -%}
+      --section-padding-y: 0px;
+      --section-padding-x: 0px;
+    {%- endif -%}
+    {%- if section.settings.gutter -%}
+      --grid-gap: 1.75rem;
+    {%- else -%}
+      --grid-gap: 0px;
+    {%- endif -%}
+  }
+  
+</style>
+
+<div class="collection-list space-y-5 px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="collection-list">
+
+  {%- if section.settings.title != blank -%}
+    <h3 class="collection-list__title text-center mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <ul class="collection-list__container text-center mx-auto max-w-screen grid grid-cols-{{ section.settings.columns_mobile }} md:grid-cols-{{ section.settings.columns_range }} {{ grid_gap }}">
+    {%- for block in section.blocks -%}
+      <li class="collection-list__grid-item"
+        id="CollectionListItem-{{ block.id }}"
+        data-id="{{ block.id }}"
+        {{ block.shopify_attributes }}>
+
+        {%- liquid 
+          assign collection = collections[block.settings.collection]
+          if collection.empty?
+            assign collection_url = '#'
+            assign collection_title = 'onboarding.collection_title' | t
+            assign collection_image = ''
+          else
+            assign collection_url = collection.url
+            assign collection_title = collection.title
+
+            if collection.image
+              assign collection_image = collection.image
+            else
+              assign collection_image = collection.products.first.featured_media.preview_image
+            endif
+          endif
+
+          capture current
+            cycle 1, 2, 3, 4, 5, 6
+          endcapture
+        -%}
+
+        <div class="collection-grid-item group relative">
+          <a href="{{ collection_url }}" class="collection-grid-item__link absolute inset-0 z-30">
+            <span class="sr-only">{{ 'onboarding.collection_title' | t }}</span>
+          </a>
+          <div class="collection-grid-item__contain relative flex flex-col space-y-3">
+            <div class="collection-grid-item__image relative overflow-hidden {{ aspect_classes }}">
+              <div class="collection-grid-item__overlay absolute inset-0 transition-colors duration-1000 bg-section-overlay group-hover:bg-section-overlay-hover z-10"></div>
+              
+              {%- if collection_image != blank -%}
+                {{ collection_image | image_url: width: 1920 | image_tag: 
+                  class: image_zoom_classes,
+                  widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                  sizes: image_sizes,
+                  loading: 'lazy' }}
+              {%- else -%}
+                {%- assign image_zoom_classes = image_zoom_classes | append: ' placeholder-svg' -%}
+                {{ 'product-' | append: current | placeholder_svg_tag: image_zoom_classes }}
+              {%- endif -%}
+              
+            </div>
+            <div class="collection-grid-item__title-contain z-20 {{ title_contain_classes }}">
+              <h4 class="collection-grid-item__title text-xl md:text-2xl {{ title_classes }}">{{ collection_title }}</h4>
+            </div>
+          </div>
+        </div>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+
+
+{% schema %}
+{
+  "name": "t:sections.collection_grid.name",
+  "class": "collection-grid-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.collection_grid.settings.title.label",
+      "default": "Collection grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "section_padding",
+      "label": "t:sections.general.section_padding",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "gutter",
+      "label": "t:sections.general.image_padding",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "columns_range",
+      "label": "t:sections.general.collections_per_row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "radio",
+      "id": "columns_mobile",
+      "label": "t:sections.general.collections_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "t:sections.general.image_ratio.label",
+      "options": [
+        {
+          "value": "auto",
+          "label": "t:sections.general.image_ratio.option_auto.label"
+        },
+        {
+          "value": "100%",
+          "label": "t:sections.general.image_ratio.option_square.label"
+        },
+        {
+          "value": "150%",
+          "label": "t:sections.general.image_ratio.option_portrait.label"
+        },
+        {
+          "value": "75%",
+          "label": "t:sections.general.image_ratio.option_landscape.label"
+        }
+      ],
+      "default": "100%"
+    },
+    {
+      "type": "radio",
+      "id": "text_placement",
+      "label": "t:sections.general.text_placement.label",
+      "default": "below",
+      "options": [
+        {
+          "value": "below",
+          "label": "t:sections.general.text_placement.option_below.label"
+        },
+        {
+          "value": "over",
+          "label": "t:sections.general.text_placement.option_over.label"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "t:sections.general.colors.color_overlay",
+      "default": "#4f4f4f"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay_hover",
+      "label": "t:sections.general.colors.color_overlay_hover",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay_text",
+      "label": "t:sections.general.colors.color_overlay_text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "color_overlay_alpha_range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.general.image_overlay_opacity",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "zoom",
+      "label": "t:sections.general.enable_rollover_zoom",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "featured_collection",
+      "name": "t:sections.collection_grid.blocks.collection.name",
+      "settings": [
+        {
+          "label": "t:sections.collection_grid.blocks.collection.settings.collection.label",
+          "id": "collection",
+          "type": "collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.collection_grid.presets.name",
+      "settings": {
+        "title": "",
+        "full_width": true,
+        "section_padding": false,
+        "columns_range": 3,
+        "gutter": false,
+        "text_placement": "over",
+        "color_overlay_alpha_range": 30
+      },
+      "blocks": [
+        {
+          "type": "featured_collection"
+        },
+        {
+          "type": "featured_collection"
+        },
+        {
+          "type": "featured_collection"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

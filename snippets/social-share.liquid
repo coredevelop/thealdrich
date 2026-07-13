@@ -1,0 +1,29 @@
+<ul class="social-share {% if color %}social-share--color{% endif %}">
+  {%- if settings.social_share_facebook_enabled -%}
+    <li class="social-share__item">
+      <a href="https://www.facebook.com/sharer.php?u={{ share_url }}"
+        class="social-share__link social-share__link--facebook">
+        {%- render 'icon-ui-facebook' -%}
+        <span>Facebook</span>
+      </a>
+    </li>
+  {%- endif -%}
+  {%- if settings.social_share_twitter_enabled -%}
+    <li class="social-share__item">
+      <a href="https://twitter.com/share?url={{ share_url }}&text={{ share_text }}"
+        class="social-share__link social-share__link--twitter">
+        {%- render 'icon-ui-twitter' -%}
+        <span>Twitter</span>
+      </a>
+    </li>
+  {%- endif -%}
+  {%- if settings.social_share_pinterest_enabled -%}
+    <li class="social-share__item">
+      <a href="https://pinterest.com/pin/create/bookmarklet/?url={{ share_url }}&description={{ share_text }}"
+        class="social-share__link social-share__link--pinterest">
+        {%- render 'icon-ui-pinterest' -%}
+        <span>Pinterest</span>
+      </a>
+    </li>
+  {%- endif -%}
+</ul>

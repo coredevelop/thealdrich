@@ -1,0 +1,11 @@
+{%- liquid
+  if settings.cart_icon == 'bag'
+  render 'icon-ui-bag-outline'
+  elsif settings.cart_icon == 'basket'
+  render 'icon-ui-basket-outline'
+  else
+  render 'icon-ui-cart-outline'
+  endif
+-%}
+<span class="empty:hidden absolute rounded-full text-2xs font-navigation -bottom-1.5 -right-1.5 w-[19px] h-[19px] flex justify-center items-center bg-header-text text-header-background" data-cart-button-count>{%- if cart.item_count > 0 -%}{{ cart.item_count }}{%- endif -%}</span>
+<span class="sr-only">{{ 'templates.cart.cart' | t }}</span>

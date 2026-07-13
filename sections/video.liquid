@@ -1,0 +1,170 @@
+{%- liquid
+  capture image_sizes
+    if section.settings.full_width
+      echo '100vw'
+    else
+      echo '(min-width: 1280px) 1280px, calc(100vw - 2.5rem)'
+    endif
+  endcapture
+
+  capture is_hosted_video
+    if section.settings.video != blank
+      echo 'true'
+    else
+      echo 'false'
+    endif
+  endcapture
+
+  capture media_type 
+    if section.settings.video
+      echo 'video'
+    elsif section.settings.video_url != blank
+      echo section.settings.video_url.type
+    else
+      echo ''
+    endif
+  endcapture
+
+  capture media_id 
+    if section.settings.video
+      echo section.settings.video.id
+    elsif section.settings.video_url != blank
+      echo section.settings.video_url.id
+    else
+      echo ''
+    endif
+  endcapture
+-%}
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+  }
+  
+</style>
+
+<div class="video px-rail py-section border-b border-primary-section-border text-center"
+  data-section-id="{{ section.id }}"
+  data-section-type="video">
+  <div class="video__contain mx-auto max-w-screen space-y-6">
+    {%- if section.settings.title != blank -%}
+      <h3 class="custom-content__title text-center text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+    {%- endif -%}
+
+
+    <video-object class="video__video-wrapper block mx-auto aspect-w-16 aspect-h-9"
+      data-media-id="{{ media_id }}"
+      data-media-type="{{ media_type }}"
+      data-hosted-video="{{ is_hosted_video }}"
+      data-loaded="false">
+      <button id="VideoObject-{{ section.id }}-{{ media_id }}"
+        class="video__cover-button absolute group"  
+        type="button">
+        {%- if section.settings.video -%}
+          {{ section.settings.video.preview_image | image_url: width: 1920 | image_tag: 
+            class: 'image-banner__image object-cover w-full h-full',
+            widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+            sizes: image_sizes,
+            loading: 'lazy' }}
+        {%- elsif section.settings.cover_image != blank -%}
+          {{ section.settings.cover_image | image_url: width: 1920 | image_tag: 
+            class: 'image-banner__image object-cover w-full h-full',
+            widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+            sizes: image_sizes,
+            loading: 'lazy' }}
+        {%- else -%}
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'responsive-fill-image placeholder-svg' }}
+        {%- endif -%}
+        <span class="video__play-button absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 p-5 flex justify-center items-center shadow-md bg-primary-background rounded-full transition-transform duration-500 ease-in-out group-hover:scale-125 group-hover:text-primary-accent group-focus:scale-125 group-focus:text-primary-accent">
+          {% render 'icon-ui-play' %}
+        </span>
+      </button>
+      <template>
+        {%- if section.settings.video -%}
+          {{ section.settings.video | media_tag: class: 'w-full h-full', image_size: '1920x' }}
+        {%- elsif section.settings.video_url != blank -%}
+          {%- case section.settings.video_url.type -%}
+            {%- when 'youtube' -%}
+              <iframe id="Video-{{ section.id }}-{{ section.settings.video_url.id }}"
+                class="js-youtube w-full" width="1440" height="762" src="https://www.youtube.com/embed/{{ section.settings.video_url.id }}?enablejsapi=1" loading="lazy"
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                title="{{ section.settings.video_description | escape }}" allowfullscreen></iframe>
+            {%- when 'vimeo' -%}
+              <iframe id="Video-{{ section.id }}-{{ section.settings.video_url.id }}"
+                class="js-vimeo w-full" width="1440" height="762" src="https://player.vimeo.com/video/{{ section.settings.video_url.id }}?title=0&byline=0&portrait=0" loading="lazy"
+                frameborder="0" allow="autoplay; fullscreen; picture-in-picture" 
+                title="{{ section.settings.video_description | escape }}" allowfullscreen></iframe>
+          {%- endcase -%}
+        {%- endif -%}
+      </template>
+    </video-object>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "t:sections.video.name",
+  "class": "video-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.video.settings.title.label",
+      "default": "Video"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.video.settings.hosted_video.label"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:sections.video.settings.video.label",
+      "info": "t:sections.video.settings.video.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.video.settings.external_video.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "t:sections.video.settings.cover_image.label",
+      "info": "t:sections.video.settings.cover_image.info"
+    },
+    {
+      "id": "video_url",
+      "type": "video_url",
+      "label": "t:sections.video.settings.video_url.label",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "default": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+    },
+    {
+      "type": "text",
+      "id": "video_description",
+      "label": "t:sections.video.settings.video_description.label",
+      "info": "t:sections.video.settings.video_description.info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.video.presets.name"
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

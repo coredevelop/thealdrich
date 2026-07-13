@@ -1,0 +1,518 @@
+{%- liquid
+  if section.blocks.size > 0
+    assign show_sidebar = true
+    assign container_class = 'collection__container--sidebar'
+  else
+    assign show_sidebar = false
+    assign container_class = 'collection__container--full'
+  endif
+
+  comment
+    For image sizing, add 1 to product_columns when sidebar is visible on desktop
+    to account for the sidebar taking up ~1 column width
+  endcomment
+  if show_sidebar and section.settings.show_sidebar_desktop
+    assign product_columns_for_sizing = section.settings.product_columns | plus: 1
+  else
+    assign product_columns_for_sizing = section.settings.product_columns
+  endif
+
+  assign grid_mobile_cols_class = 'grid-cols-' | append: section.settings.product_mobile_columns
+  capture grid_cols_class
+    echo 'lg:grid-cols-'
+    echo section.settings.product_columns
+  endcapture
+
+  capture collection_image
+    if collection.image and section.settings.image_placement != 'hidden'
+
+      capture image_sizes
+        if section.settings.image_placement == 'top-full'
+          echo '100vw'
+        elsif section.settings.image_placement == 'full'
+          echo '(min-width: 1280px) 1280px, calc(100vw - 2.5rem)'
+        elsif section.settings.image_placement == 'after-title'
+          echo '(min-width: 1280px) calc(1280px * .75), calc(100vw - 2.5rem)'
+        endif
+      endcapture
+
+      echo collection.image | image_url: width: 1920 | image_tag: class: 'collection__featured-image w-full', widths: '160, 220, 300, 420, 640, 960, 1280, 1920', sizes: image_sizes, loading: 'lazy', preload: true
+    endif
+  endcapture
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --spacing-section: 2rem;
+    border-bottom: 0px;
+  }
+  {% if section.settings.product_count == false %}
+    [data-section-id="{{ section.id }}"] #ProductCount {
+      display: none;
+    }
+  {% endif %}
+</style>
+
+{%- liquid
+  render 'asset-tag', asset: 'main-collection.css', preload_stylesheet: true
+-%}
+
+{% if collection_image != blank and section.settings.image_placement == 'top-full' %}
+{{ collection_image }}
+{% endif %}
+<div id="MainCollection" class="collection px-rail py-section relative"
+  data-section-id="{{ section.id }}"
+  data-section-type="collection">
+
+    {% if collection_image != blank and section.settings.image_placement == 'top' %}
+      <div class="mx-auto max-w-screen py-section">
+        {{ collection_image }}
+      </div>
+    {% endif %}
+
+    <div class="collection__container {{ container_class }} flex mx-auto max-w-screen">
+
+      {%- if show_sidebar -%}
+        <collection-drawer id="CollectionDrawer" client:idle
+          class="{% if section.settings.show_sidebar_desktop == false %}collection-drawer--no-sidebar{% endif %}  no-js-hidden invisible md:visible w-0 md:w-full md:max-w-1/3 lg:max-w-1/4 md:mr-7 rtl:md:mr-0 rtl:md:ml-7 flex-none">
+          <div class="collection__sidebar transform">
+            <div class="sidebar collection-sidebar w-full bg-primary-secondary-background pt-5 px-4 space-y-5">
+              {%- for block in section.blocks -%}
+
+                {%- if block.type == 'filter' or block.type == 'menu' -%}
+                  {%- liquid 
+                    assign block_title_id = 'SidebarNav-' | append: block.id
+                    case block.type
+
+                      when 'filter'
+                        capture block_content
+                          render 'facet', results: collection, filter_expand: block.settings.filter_expand, show_swatch_label: block.settings.show_swatch_label, show_swatch_count: block.settings.show_swatch_count
+                        endcapture
+                        assign block_title_class = ''
+                        assign block_title = block.settings.title | escape
+
+                        if collection.filters.size == 0
+                          continue
+                        endif
+
+                      when 'menu'
+                        assign menu = linklists[block.settings.linklist]
+                        capture block_content
+                          render 'navigation-menu', menu: menu, class: 'collection-sidebar__menu pb-6', group_class: 'menu'
+                        endcapture
+                        assign block_title_class = ''
+                        assign block_title = menu.title | escape
+                    endcase
+                  -%}
+                  
+                  <nav class="collection-sidebar__item"
+                    role="navigation"
+                    aria-labelledby="{{ block_title_id }}"
+                    data-block-type="{{ block.type }}"
+                    data-block-id="{{ block.id }}"
+                    {{ block.shopify_attributes }}>
+
+                    <h4 id="{{ block_title_id }}" class="text-xl mb-2 pb-0.5 border-b border-primary-text-20 {{ block_title_class }}">{{ block_title }}</h4>
+                    {{- block_content -}}
+                  </nav>
+                
+                {%- elsif block.type == 'custom_liquid' -%}
+                  <div class="collection-sidebar__item"  {{ block.shopify_attributes }}>
+                    {{ block.settings.custom_liquid }}
+                  </div>
+                {%- endif -%}
+                
+              {%- endfor -%}
+            </div>
+          </div>
+          <div class="collection-drawer__modal-background modal__background"
+            title="{{ 'accessibility.close' | t }}">
+            <span class="sr-only">{{ 'accessibility.close' | t }}</span>
+          </div>
+          <button id="CollectionDrawerModalClose-{{ section.id }}" type="button"
+            class="collection-drawer__modal-close modal__close"
+            aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+        </collection-drawer>
+      {%- endif -%}
+
+      <div class="collection__content w-full space-y-4 md:space-y-7">
+        <div class="collection__heading {% if section.settings.show_sidebar_desktop == false %}collection__heading--no-sidebar{% endif %} mt-1.5 space-y-4">
+          <div class="space-y-2 pb-2 border-b border-primary-section-border">
+            <h1 class="collection__title text-3xl">{{ collection.title }}</h1>
+
+            {% if collection_image != blank and section.settings.image_placement == 'after-title' %}
+              {{ collection_image }}
+            {% endif %}
+
+            {%- if section.settings.show_description and collection.description != blank -%}
+              <div class="collection__description rte max-w-none">
+                {{ collection.description }}
+              </div>
+            {%- endif -%}
+          </div>
+
+          <div class="collection__filter-container flex justify-between items-baseline flex-col lg:space-y-0 lg:flex-row">
+            <div class="collection__active-filters w-full flex flex-wrap items-center">
+              {%- for filter in collection.filters -%}
+                {%- if filter.type == "price_range" -%}
+                  {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                    <filter-remove client:idle><a class="active-filter active-filter__remove-filter" href="{{ filter.url_to_remove }}">
+                      {%- assign min_value = filter.min_value.value | default: 0 -%}
+                      {%- assign max_value = filter.max_value.value | default: filter.range_max -%}
+                      {{ min_value | money }} - {{ max_value | money }} X
+                    </a></filter-remove>
+                  {%- endif -%}
+                {%- else -%}
+                  {%- for filter_value in filter.active_values -%}
+                    <filter-remove client:idle><a class="active-filter active-filter__remove-filter" href="{{ filter_value.url_to_remove }}">
+                      {% if filter.type == 'boolean' %}{{ filter.label | escape }}: {% endif %}{{ filter_value.label }} X
+                    </a></filter-remove>
+                  {%- endfor -%}
+                {%- endif -%}
+              {%- endfor -%}
+
+              <filter-remove client:idle><a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" class="active-filter active-filter__clear">{{ 'products.facets.clear_all' | t }}</a></filter-remove>
+            </div>
+            <div class="collection__sorting-container w-full py-2 lg:py-0 lg:w-auto lg:flex-none flex items-center justify-between lg:divide-x lg:divide-primary-text-10 lg:rtl:divide-x-reverse">
+              <div class="collection__filter-button-container flex items-center w-full md:w-auto justify-between">
+                {%- if show_sidebar -%}
+                  <filter-button client:idle><button type="button"
+                    class="flex md:hidden items-center py-2 leading-none bg-primary-background hover:text-primary-accent"
+                    aria-controls="CollectionDrawer"
+                    aria-expanded="false"
+                    data-search-bar-button>
+                    <span class="inline-block w-4 h-full mr-1">{% render 'icon-ui-search' %}</span>
+                    <span>{{ 'products.facets.filter_button' | t }}</span>
+                  </button></filter-button>
+                {%- endif -%}
+                
+                <div class="flex items-center">
+                  <span class="product-count__spinner hidden opacity-0 w-5 mx-2">{%- render 'icon-ui-spinner' -%}</span>
+                  <span id="ProductCount" class="text-xs lg:px-2 font-navigation font-weight-navigation text-primary-text-70">
+                    {%- if collection.products_count == collection.all_products_count -%}
+                      {{ 'products.facets.product_count_simple' | t: count: collection.products_count }}
+                    {%- else -%}
+                      {{ 'products.facets.product_count' | t: product_count: collection.products_count, count: collection.all_products_count }}
+                    {%- endif -%}
+                  </span>
+                </div>
+              </div>
+              {%- if section.settings.enable_sorting -%}
+                <div class="collection__sorting {% if show_sidebar %}hidden md:block{% endif %} flex-none lg:pl-2 rtl:lg:pl-0 rtl:lg:pr-2">
+                  {%- assign sort_id = 'SortBy-' | append: section.id -%}
+                  <collection-sort data-clone="{{ show_sidebar }}" class="flex justify-center items-center space-x-2 rtl:space-x-reverse no-js-hidden" client:idle>
+                    {%- render 'collection-sort', results: collection, id: sort_id -%}
+                  </collection-sort>
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+
+        </div>
+        <div id="ProductGridContainer" class="collection__products space-y-5 md:space-y-10">
+          {%- paginate collection.products by section.settings.products_per_page -%}
+            {%- if collection.products.size == 0 -%}
+              {{ 'sections.collection_template.empty' | t }}<br>
+              {%- if collection.filters.size > 0 -%}
+                {{ 'sections.collection_template.use_fewer_filters_html' | t: link: collection.url, class: "underline hover:text-primary-accent" }}
+              {%- endif -%}
+            {%- else -%}
+              <ul class="collection__grid mx-auto max-w-screen grid {{ grid_mobile_cols_class }} {{ grid_cols_class }} gap-4 md:gap-7 text-center">
+                {%- for product in collection.products -%}
+                  <li class="collection__grid-item">
+                    {%- render 'product-card',
+                      product: product,
+                      collection: collection,
+                      media_size: section.settings.product_image_ratio,
+                      media_crop: section.settings.product_image_crop,
+                      product_columns: product_columns_for_sizing,
+                      product_mobile_columns: section.settings.product_mobile_columns,
+                      show_secondary_image: section.settings.product_image_hover,
+                      show_vendor: section.settings.show_vendor,
+                      show_rating: section.settings.show_rating,
+                      badge_placement: section.settings.product_badge_placement,
+                      show_swatches: section.settings.product_swatches,
+                      swatch_shape: section.settings.collection_swatches_shape -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+
+              {%- if paginate.pages > 1 -%}
+                {% render 'pagination', paginate: paginate, anchor: '' %}
+              {%- endif -%}
+
+            {%- endif -%}
+          {%- endpaginate -%}
+        </div>
+      </div>
+    </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main_collection.name",
+  "class": "main-collection-section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:sections.general.products_per_page",
+      "min": 12,
+      "max": 48,
+      "step": 12,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "product_columns",
+      "label": "t:sections.general.products_per_row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "radio",
+      "id": "product_mobile_columns",
+      "label": "t:sections.general.products_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "image_placement",
+      "label": "t:sections.main_collection.settings.image_placement.label",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.main_collection.settings.image_placement.option_top.label"
+        },
+        {
+          "value": "top-full",
+          "label": "t:sections.main_collection.settings.image_placement.option_top_full_width.label"
+        },
+        {
+          "value": "after-title",
+          "label": "t:sections.main_collection.settings.image_placement.option_after_collection_title.label"
+        },
+        {
+          "value": "hidden",
+          "label": "t:sections.main_collection.settings.image_placement.option_hidden.label"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:sections.main_collection.settings.show_description.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_count",
+      "label": "t:sections.main_collection.settings.product_count.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "t:sections.main_collection.settings.enable_sorting.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main_collection.settings.header_sidebar.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sidebar_desktop",
+      "label": "t:sections.main_collection.settings.show_sidebar_desktop.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.general.header_product_card"
+    },
+    {
+      "type": "select",
+      "id": "product_image_ratio",
+      "label": "t:sections.general.image_ratio.label",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.general.image_ratio.option_auto.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.image_ratio.option_square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.general.image_ratio.option_portrait.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.general.image_ratio.option_landscape.label"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_image_crop",
+      "label": "t:sections.general.crop_product_image",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "product_image_hover",
+      "label": "t:sections.general.show_second_image_on_hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:sections.general.show_vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "default": false,
+      "label": "t:sections.general.show_rating.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.general.header_product_badges"
+    },
+    {
+      "type": "select",
+      "id": "product_badge_placement",
+      "label": "t:sections.general.product_badge_placement.label",
+      "default": "bottom-right",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "t:sections.general.product_badge_placement.option_top_left.label"
+        },
+        {
+          "value": "top-right",
+          "label": "t:sections.general.product_badge_placement.option_top_right.label"
+        },
+        {
+          "value": "bottom-left",
+          "label": "t:sections.general.product_badge_placement.option_bottom_left.label"
+        },
+        {
+          "value": "bottom-right",
+          "label": "t:sections.general.product_badge_placement.option_bottom_right.label"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.general.header_color_swatch"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_swatches",
+      "label": "t:sections.general.show_color_swatches.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collection_swatches_shape",
+      "label": "t:sections.general.swatch_shape.label",
+      "options": [
+        {
+          "value": "circle",
+          "label": "t:sections.general.swatch_shape.option_circle.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.swatch_shape.option_square.label"
+        }
+      ],
+      "default": "circle"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "filter",
+      "name": "t:sections.main_collection.blocks.filter.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:sections.main_collection.blocks.filter.settings.paragraph_customize.content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.main_collection.blocks.filter.settings.title.label",
+          "default": "Filter products"
+        },
+        {
+          "type": "checkbox",
+          "id": "filter_expand",
+          "label": "t:sections.main_collection.blocks.filter.settings.filter_expand.label",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "t:sections.main_collection.blocks.filter.settings.swatch_filters.content"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_swatch_label",
+          "label": "t:sections.main_collection.blocks.filter.settings.swatch_filters.show_label.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_swatch_count",
+          "label": "t:sections.main_collection.blocks.filter.settings.swatch_filters.show_count.label",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "t:sections.main_collection.blocks.menu.name",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "linklist",
+          "label": "t:sections.main_collection.blocks.menu.settings.linklist.label",
+          "default": "main-menu"
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:sections.main_collection.blocks.custom_liquid.name",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:sections.main_collection.blocks.custom_liquid.settings.custom_liquid.label",
+          "info": "t:sections.main_collection.blocks.custom_liquid.settings.custom_liquid.info"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

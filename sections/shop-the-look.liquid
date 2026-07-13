@@ -1,0 +1,308 @@
+{%- liquid 
+  if section.settings.image_ratio == 'adapt'
+    assign aspect_classes = ''
+  elsif section.settings.image_ratio == '100%'
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif section.settings.image_ratio == '150%'
+    assign aspect_classes = 'aspect-w-2 aspect-h-3'
+  elsif section.settings.image_ratio == '75%'
+    assign aspect_classes = 'aspect-w-4 aspect-h-3'
+  endif
+
+  assign image_class = 'looks__image object-cover scale-fractional group-hover:scale-110 transition duration-1000 ease-out'
+
+  capture image_sizes
+    if section.settings.full_width == false
+      echo '(min-width: 1280px) calc(1280px / '
+      echo section.settings.images_per_row
+      echo '), '
+    endif
+
+    echo '(min-width: 768px) calc(100vw / '
+    echo section.settings.images_per_row
+    echo '), '
+
+    echo 'calc(100vw / '
+    echo section.settings.images_per_row_mobile
+    echo ')'
+  endcapture
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+  }
+</style>
+<div class="looks space-y-5 px-rail py-section border-b border-primary-section-border text-center"
+  data-loading="lazy-interaction"
+  data-section-id="{{ section.id }}"
+  data-section-type="looks">
+
+  {%- if section.settings.title != blank -%}
+    <h3 class="looks__title mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <div class="looks__container mx-auto max-w-screen flex flex-wrap justify-center content-center items-center">
+    {%- for block in section.blocks -%}
+      <looks-item class="looks__item w-1/{{ section.settings.images_per_row_mobile }} md:w-1/{{ section.settings.images_per_row }}"
+        id="LooksItem-{{ block.id }}"
+        data-id="{{ block.id }}"
+        data-enable-popup="{{ block.settings.enable_popup }}"
+        data-first-product="{{ block.settings.product_1 }}"
+        data-second-product="{{ block.settings.product_2 }}"
+        client:visible
+        {{ block.shopify_attributes }}>
+
+        <a class="looks__image-container block relative group overflow-hidden {{ aspect_classes }}"
+          href="{{ block.settings.link | default: '#' }}">
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1280 | image_tag: 
+              class: image_class,
+              widths: '160, 220, 300, 420, 640, 960, 1280',
+              sizes: image_sizes,
+              loading: 'lazy' }}
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg border border-primary-text-10' }}
+          {%- endif -%}
+          <div class="looks__caption {% unless block.settings.enable_overlay %}hidden{% endunless %} absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 ease-out bg-primary-accent-80 text-primary-accent-text p-2 text-left">
+            {%- if block.settings.title != blank -%}
+              <h4 class="looks__title text-xl text-primary-accent-text" data-heading>{{ block.settings.title | escape }}</h4>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="looks__text rte rte-sm" data-text>
+                {{ block.settings.text }}
+              </div>
+            {%- endif -%}
+          </div>
+        </a>
+        {%- if block.settings.enable_popup -%}
+          <looks-modal class="looks__modal modal"
+            {% if block.settings.title != blank %}aria-labelledby="LooksItem-Title-{{ block.id }}"{% endif %}
+            {% if block.settings.text != blank %}aria-describedby="LooksItem-Description-{{ block.id }}"{% endif %}
+            role="dialog"
+            aria-modal="true">
+            <button id="LooksModalClose-{{ block.id }}" type="button"
+              class="looks__modal-close modal__close"
+              aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+            <div class="looks__modal-container modal__container">  
+              <div class="looks__modal-content modal__content bg-primary-background flex flex-col lg:flex-row">
+                {%- if block.settings.link != blank -%}
+                  <a class="looks__modal-image flex justify-center m-0.5 ring-primary-accent focus:ring" href="{{ block.settings.link }}">
+                    {{ block.settings.image | image_url: width: 1280 | image_tag: 
+                      class: 'object-contain',
+                      widths: '160, 220, 300, 420, 640, 960, 1280',
+                      sizes: '(min-width: 1280px) calc(1280px / 3), 100vw',
+                      loading: 'lazy' }}
+                  </a>
+                {%- else -%}
+                  <div class="looks__modal-image flex justify-center">
+                    {{ block.settings.image | image_url: width: 1280 | image_tag: 
+                      class: 'object-contain',
+                      widths: '160, 220, 300, 420, 640, 960, 1280',
+                      sizes: '(min-width: 1280px) calc(1280px / 3), 100vw',
+                      loading: 'lazy' }}
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.title != blank or 
+                  block.settings.text != blank or
+                  block.settings.product_1 != blank or
+                  block.settings.product_2 != blank -%}              
+                  <div class="looks__modal-content m-0.5 bg-primary-background lg:w-2/5 flex-none flex flex-col justify-center p-5 space-y-4">
+                    <div class="looks__modal-caption">
+                      {%- if block.settings.title != blank -%}
+                        <h4 id="LooksItem-Label-{{ block.id }}" class="looks__title text-xl" data-heading>{{ block.settings.title | escape }}</h4>
+                      {%- endif -%}
+                      {%- if block.settings.text != blank -%}
+                        <div id="LooksItem-Description-{{ block.id }}" class="looks__text rte rte-sm" data-text>
+                          {{ block.settings.text }}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                    <div class="looks__modal-products grid grid-cols-2 gap-5"></div>
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+            <div class="looks__modal-background modal__background"
+              title="{{ 'accessibility.close' | t }}">
+              <span class="sr-only">{{ 'accessibility.close' | t }}</span>
+            </div>
+          </looks-modal>
+        {%- endif -%}
+      </looks-item>
+    {%- endfor -%}
+  </div>
+ 
+  {%- if section.settings.button_label != blank -%}
+    <a href="{{ section.settings.link | default: '#' }}" class="looks__button mx-auto max-w-screen button button--outline button--large">{{ section.settings.button_label | escape }}</a>
+  {%- endif -%}
+</div>
+{% schema %}
+{
+  "name": "t:sections.shop_the_look.name",
+  "class": "shop-the-look",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.shop_the_look.settings.title.label",
+      "default": "Shop The Look"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "t:sections.shop_the_look.settings.show_button.label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.shop_the_look.settings.button_label.label",
+      "default": "Follow Us"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:sections.shop_the_look.settings.link.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "images_per_row",
+      "label": "t:sections.general.images_per_row",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "images_per_row_mobile",
+      "label": "t:sections.general.images_per_row_mobile",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "t:sections.general.image_ratio.label",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.general.image_ratio.option_auto.label"
+        },
+        {
+          "value": "100%",
+          "label": "t:sections.general.image_ratio.option_square.label"
+        },
+        {
+          "value": "150%",
+          "label": "t:sections.general.image_ratio.option_portrait.label"
+        },
+        {
+          "value": "75%",
+          "label": "t:sections.general.image_ratio.option_landscape.label"
+        }
+      ],
+      "default": "100%"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.shop_the_look.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.shop_the_look.blocks.image.settings.image.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.shop_the_look.blocks.image.settings.link.label",
+          "info": "t:sections.shop_the_look.blocks.image.settings.link.info"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.shop_the_look.blocks.image.settings.title.label"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:sections.shop_the_look.blocks.image.settings.text.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_overlay",
+          "label": "t:sections.shop_the_look.blocks.image.settings.enable_overlay.label",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "t:sections.shop_the_look.blocks.image.settings.header_product_popup.content"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_popup",
+          "label": "t:sections.shop_the_look.blocks.image.settings.enable_popup.label",
+          "default": false
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "t:sections.shop_the_look.blocks.image.settings.product_1.label",
+          "info": "t:sections.shop_the_look.blocks.image.settings.product_1.info"
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "t:sections.shop_the_look.blocks.image.settings.product_2.label",
+          "info": "t:sections.shop_the_look.blocks.image.settings.product_2.info"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.shop_the_look.presets.name",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

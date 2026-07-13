@@ -1,0 +1,151 @@
+{%- liquid 
+  capture breadcrumb_class
+    case section.settings.show_breadcrumbs
+      when 'hidden'
+        echo 'hidden'
+      when 'desktop'
+        echo 'hidden md:flex'
+      when 'all'
+        echo 'flex'
+    endcase
+  endcapture
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --spacing-section: 0.75rem;
+  }
+  #shopify-section-{{ section.id }} + .shopify-section [data-section-id] {
+    padding-top: 0px;
+  }
+  .breadcrumb .breadcrumb__item:before {
+    content: '\203A';
+    font-size: .75rem;
+    padding-right: 0.5rem;
+  }
+  .breadcrumb .breadcrumb__item:hover:before {
+    color: var(--section-text-color-75);
+  }
+  .breadcrumb .breadcrumb__item:first-child:before {
+    content: '';
+    padding-right: 0;
+  }
+  [data-section-id="{{ section.id }}"] .social-icon__link {
+    padding: 0.25rem;
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+</style>
+<breadcrumbs class="breadcrumbs block py-section px-rail"
+  data-section-id="{{ section.id }}"
+  data-section-type="liquid">
+  <div class="mx-auto max-w-screen">
+    <div class="{{ breadcrumb_class }} space-y-1.5 md:space-y-0 justify-center md:justify-between items-center flex-col md:flex-row">
+      <nav class="breadcrumb text-2xs leading-none uppercase font-navigation tracking-tight text-section-text-75" role="navigation" aria-label="breadcrumbs">
+        <a href="{{ routes.root_url }}" class="breadcrumb__item font-weight-navigation-bolder hover:text-primary-accent" title="{{ 'general.breadcrumbs.home_link_title' | t }}">{{ 'general.breadcrumbs.home' | t }}</a>
+        
+        {%- liquid 
+          assign breadcrumb_item_class = 'breadcrumb__item pl-2 font-weight-navigation-bolder hover:text-primary-accent'
+          capture breadcrumb_additional_links
+            if request.page_type == 'product'
+              if collection and collection.handle
+                echo collection.title | link_to: collection.url, class: breadcrumb_item_class
+              endif
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo product.title
+              echo '</span>'
+
+            elsif request.page_type == 'collection'
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo collection.title
+              echo '</span>'
+
+            elsif request.page_type == 'blog'
+              if current_tags
+                echo blog.title | link_to: blog.url, class: breadcrumb_item_class
+                echo '<span class="breadcrumb__item pl-2 cursor-default">'
+                echo current_tags | join: " + " | replace: "_", " "
+                echo '</span>'
+              else
+                echo '<span class="breadcrumb__item pl-2 cursor-default">'
+                echo blog.title
+                echo '</span>'
+              endif
+
+            elsif request.page_type == 'article'
+              echo blog.title | link_to: blog.url, class: breadcrumb_item_class
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo article.title
+              echo '</span>'
+
+            elsif request.page_type == 'page'
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo page.title
+              echo '</span>'
+
+            elsif request.page_type == 'search'
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo page_title
+              echo '</span>'
+
+            elsif request.page_type == 'customers/account'
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo page_title
+              echo '</span>'
+
+            elsif request.page_type == 'customers/addresses' or request.page_type == 'customers/order'               
+              echo 'customer.account.title' | t | link_to: routes.account_url, class: breadcrumb_item_class
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo page_title
+              echo '</span>'
+            else 
+              echo '<span class="breadcrumb__item pl-2 cursor-default">'
+              echo page_title
+              echo '</span>'
+            endif
+          endcapture
+        -%}
+
+        {{ breadcrumb_additional_links }}
+      </nav>
+      {%- if section.settings.show_social_icons -%}
+        {% render 'social-icons' %}
+      {%- endif -%}
+    </div>
+  </div>
+</breadcrumbs>
+
+{% schema %}
+{
+  "name": "t:sections.breadcrumbs.name",
+  "class": "breadcrumbs-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "show_breadcrumbs",
+      "label": "t:sections.breadcrumbs.settings.show_breadcrumbs.label",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "t:sections.breadcrumbs.settings.show_breadcrumbs.option_hidden.label"
+        },
+        {
+          "value": "desktop",
+          "label": "t:sections.breadcrumbs.settings.show_breadcrumbs.option_desktop.label"
+        },
+        {
+          "value": "all",
+          "label": "t:sections.breadcrumbs.settings.show_breadcrumbs.option_all.label"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_icons",
+      "label": "t:sections.breadcrumbs.settings.show_social_icons.label",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

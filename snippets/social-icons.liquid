@@ -1,0 +1,52 @@
+{%- liquid 
+  assign social_icons = 'Twitter,Threads,Facebook,Instagram,TikTok,Pinterest,Tumblr,YouTube,Snapchat,Spotify,Medium,LinkedIn,Amazon' | split: ','
+  echo '<ul class="social-icons flex flex-wrap space-x-2">'
+
+    for icon in social_icons
+      assign icon_var = icon | downcase | replace: ' ', ''
+      assign icon_url = 'social_' | append: icon_var | append: '_url' 
+
+      if settings[icon_url] != blank
+        echo '<li class="social-icon__item"><a href="'
+          echo settings[icon_url]
+          echo '" class="social-icon__link w-6 h-6 block text-section-text hover:text-section-accent" title="'
+          echo icon 
+          echo ' - '
+          echo shop.name 
+          echo '">'
+
+          case icon_var
+            when 'twitter'
+              render 'icon-social-twitter'
+            when 'facebook'
+              render 'icon-social-facebook'
+            when 'threads'
+              render 'icon-social-threads'
+            when 'instagram'
+              render 'icon-social-instagram'
+            when 'tiktok'
+              render 'icon-social-tiktok'
+            when 'pinterest'
+              render 'icon-social-pinterest'
+            when 'tumblr'
+              render 'icon-social-tumblr'
+            when 'youtube'
+              render 'icon-social-youtube'
+            when 'snapchat'
+              render 'icon-social-snapchat'
+            when 'spotify'
+              render 'icon-social-spotify'
+            when 'medium'
+              render 'icon-social-medium'
+            when 'linkedin'
+              render 'icon-social-linkedin'
+            when 'amazon'
+              render 'icon-social-amazon'
+          endcase
+
+        echo '</a></li>'
+      endif
+
+    endfor
+  echo '</ul>'
+-%}

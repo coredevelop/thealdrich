@@ -1,0 +1,157 @@
+<cart-drawer-items id="cart-drawer-items" class="block"
+  data-section-id="{{ section.id }}"
+  data-section-type="cart-drawer-items"
+  client:idle>
+  {%- if cart != empty -%}
+    <form action="{{ routes.cart_url }}" class="cart-drawer-items__form" method="post" id="cart-drawer-form">
+      <div class="cart-drawer-items__products px-4 divide-y divide-primary-section-border">
+        {%- for item in cart.items -%}
+          <div id="CartDrawerItem-{{ item.index | plus: 1 }}"
+            class="cart-drawer-item py-4"
+            data-cart-item="{{ item.key }}">
+            
+            {%- comment -%}Two main columns: Image | Everything else{%- endcomment -%}
+            <div class="flex gap-3">
+              {%- comment -%}Column 1: Image{%- endcomment -%}
+              {%- if item.image -%}
+                <a href="{{ item.url }}" class="cart-drawer-item__image flex-none">
+                  {{ item.image | image_url: width: 160 | image_tag: 
+                    class: 'w-20 h-auto object-cover',
+                    widths: '80, 160',
+                    sizes: '80px',
+                    loading: 'lazy' }}
+                </a>
+              {%- endif -%}
+              
+              {%- comment -%}Column 2: Everything else (2 rows){%- endcomment -%}
+              <div class="flex-1 min-w-0 flex flex-col gap-3">
+                
+                {%- comment -%}Row 1: Product details | Total price{%- endcomment -%}
+                <div class="flex justify-between gap-3">
+                  {%- comment -%}Product details column{%- endcomment -%}
+                  <div class="flex-1">
+                    <a href="{{ item.url }}" class="cart-drawer-item__name text-sm font-body hover:text-primary-accent line-clamp-2">
+                      {{ item.product.title | escape }}
+                    </a>
+                    
+                    {%- unless item.product.has_only_default_variant -%}
+                      <div class="cart-drawer-item__options text-xs text-primary-text-70 mt-1">
+                        {%- for option in item.options_with_values -%}
+                          <span>{{ option.name }}: {{ option.value }}</span>
+                          {%- unless forloop.last -%}, {% endunless -%}
+                        {%- endfor -%}
+                      </div>
+                    {%- endunless -%}
+                    
+                    {%- if item.selling_plan_allocation != nil -%}
+                      <p class="cart-drawer-item__selling-plan text-xs text-primary-text-70 mt-1">
+                        {{ item.selling_plan_allocation.selling_plan.name }}
+                      </p>
+                    {%- endif -%}
+                    
+                    
+                  </div>
+                  
+                  {%- comment -%}Total price column{%- endcomment -%}
+                  <div class="cart-drawer-item__total flex-none text-right w-20">
+                    <span class="loading-spinner hidden ml-auto">{%- render 'icon-ui-spinner' -%}</span>
+                    <div class="cart-drawer-item__total-content">
+                      {%- if item.original_line_price != item.final_line_price -%}
+                        <div class="text-sm">
+                          <span class="cart-drawer-item__final-price text-primary-accent font-weight-body-bolder">
+                            {{ item.final_line_price | money }}
+                          </span>
+                          <s class="cart-drawer-item__original-line-price text-primary-text-70 text-xs block">
+                            {{ item.original_line_price | money }}
+                          </s>
+                        </div>
+                      {%- else -%}
+                        <span class="cart-drawer-item__line-price text-sm font-weight-body-bolder">
+                          {{ item.original_line_price | money }}
+                        </span>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+                <div class="cart-drawer-item__price text-sm">
+                  {%- if item.original_price != item.final_price -%}
+                    <span class="cart-drawer-item__sale-price text-primary-accent font-weight-body-bolder">
+                      {{ item.final_price | money }}
+                    </span>
+                    <s class="cart-drawer-item__original-price text-primary-text-70 text-xs ml-1">
+                      {{ item.original_price | money }}
+                    </s>
+                  {%- else -%}
+                    <span class="cart-drawer-item__regular-price">
+                      {{ item.original_price | money }}
+                    </span>
+                  {%- endif -%}
+
+                  {%- if item.discounts.size > 0 -%}
+                    <ul class="cart-drawer-item__discounts">
+                      {%- for discount in item.discounts -%}
+                        <li class="cart-drawer-item__discount flex items-center text-primary-accent text-xs font-weight-navigation-bolder uppercase">
+                          <span class="cart-drawer-item__discount-icon w-3 h-3 mr-1 flex-none">{%- render 'icon-ui-discount' -%}</span>
+                          <span>{{ discount.title }}</span>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+                {%- comment -%}Row 2: Quantity selector | Remove button{%- endcomment -%}
+                <div class="cart-drawer-item__quantity-wrapper flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <quantity-select class="cart-drawer-item__quantity w-36">
+                    <div class="quantity flex items-center gap-1">
+                      <button class="quantity__button w-8 h-8 flex items-center justify-center border border-primary-section-border rounded-l-sm hover:bg-primary-secondary-background-50" 
+                        name="minus" 
+                        type="button"
+                        aria-label="{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}">
+                        {% render 'icon-ui-minus' %}
+                      </button>
+                      <input class="quantity__input w-8 h-8 text-center text-sm border-y border-primary-section-border bg-transparent"
+                        type="number"
+                        name="updates[]"
+                        data-quantity-variant-id="{{ item.variant.id }}"
+                        value="{{ item.quantity }}"
+                        id="DrawerQuantity-{{ item.index | plus: 1 }}"
+                        min="0"
+                        data-index="{{ item.index | plus: 1 }}"
+                        aria-label="{{ 'products.product.quantity.label' | t }}">
+                      <button class="quantity__button w-8 h-8 flex items-center justify-center border border-primary-section-border rounded-r-sm hover:bg-primary-secondary-background-50" 
+                        name="plus" 
+                        type="button"
+                        aria-label="{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}">
+                        {% render 'icon-ui-plus' %}
+                      </button>
+                    </div>
+                  </quantity-select>
+                  
+                  <cart-drawer-remove-button class="cart-drawer-item__remove" 
+                    id="DrawerRemove-{{ item.index | plus: 1 }}" 
+                    data-index="{{ item.index | plus: 1 }}">
+                    <button type="button" 
+                      class="text-xs text-primary-text-70 hover:text-primary-accent underline"
+                      aria-label="{{ 'sections.cart.remove' | t: product: item.product.title | escape }}">
+                      {{ 'sections.cart.remove' | t }}
+                    </button>
+                  </cart-drawer-remove-button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="cart-drawer-item__error hidden text-xs text-red-600 mt-2" 
+              id="DrawerLineItemError-{{ item.index | plus: 1 }}" 
+              role="alert">
+              <span class="cart-drawer-item__error-text"></span>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </form>
+  {%- endif -%}
+  
+  <p class="sr-only" id="cart-drawer-live-region-text" aria-live="polite" role="status"></p>
+  <p class="sr-only" id="cart-drawer-line-item-status" aria-live="polite" aria-hidden="true" role="status">
+    {{ 'accessibility.loading' | t }}
+  </p>
+</cart-drawer-items>

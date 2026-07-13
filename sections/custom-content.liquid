@@ -1,0 +1,451 @@
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --text-align-section: {{ section.settings.alignment }};
+  }
+  
+</style>
+
+
+<div class="custom-content py-section space-y-6 text-align-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="custom-content">
+
+  {%- if section.settings.title != blank -%}
+    <h3 class="custom-content__title mx-auto max-w-screen text-center text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+
+  <div class="custom-content__container space-y-8">
+    {%- for block in section.blocks -%}
+      
+      {%- if block.settings.full_width -%}
+        <style>
+          #CustomContentItem-{{ block.id }} {
+            --max-width-screen: 100%;
+            --spacing-rail: 0;
+          }
+          #CustomContentItem-{{ block.id }} .rte {
+            max-width: none;
+          }
+        </style>
+      {%- endif -%}
+      
+      <div id="CustomContentItem-{{ block.id }}" class="custom-content__item px-rail"
+        data-type="{{ block.type }}"
+        {{ block.shopify_attributes }}>
+
+        <div class="custom-content__item-contain mx-auto max-w-screen">
+          {%- case block.type -%}
+
+            {%- when 'page' -%}
+              <div class="custom-content__page rte mx-auto">
+                {%- if block.settings.show_title -%}
+                  <h4 class="custom-content__item-title pb-4 text-xl md:text-2xl">{{ pages[block.settings.page].title }}</h4>
+                {%- endif -%}
+                <div class="custom-content__item-page rte">
+                  {{ pages[block.settings.page].content }}
+                </div>
+              </div>
+
+            {%- when 'image' -%}
+
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="custom-content__item-image-link block">
+              {%- else -%}
+                <div class="custom-content__item-image-link">
+              {%- endif -%}
+              
+              {%- if block.settings.image != blank -%}
+
+                {%- liquid
+                  capture sizes
+                    if block.settings.full_width
+                      echo '100vw'
+                    else
+                      if block.settings.image.width >= 1280
+                        echo '(min-width: 1280px) 1280px, calc(100vw - 2.5rem)'
+                      else
+                        echo '(min-width: '
+                        echo block.settings.image.width
+                        echo 'px) '
+                        echo block.settings.image.width
+                        echo 'px, 100vw'
+                      endif
+                    endif
+                  endcapture
+
+                  capture image_class
+                    echo 'custom-content__item-image block mx-auto w-full'
+                  endcapture
+
+                  capture image_style
+                    if block.settings.full_width == false
+                      echo 'max-width: '
+                      if block.settings.image_width != blank and block.settings.image_width != 100
+                        assign max_width_px = 1280 | times: block.settings.image_width | divided_by: 100
+                        echo 'calc(min('
+                        echo max_width_px
+                        echo 'px, '
+                        echo block.settings.image_width
+                        echo 'vw));'
+                      else
+                        echo '1280px;'
+                      endif
+                    endif
+                  endcapture
+                -%}
+                {{ block.settings.image | image_url: width: 1920 | image_tag: 
+                  class: image_class,
+                  style: image_style,
+                  widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                  sizes: sizes,
+                  loading: 'lazy' }}
+                  
+              {%- else -%}
+                {%- capture current -%}{% cycle 1, 2 %}{%- endcapture -%}
+                {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+
+              {%- if block.settings.link != blank -%}
+                </a>
+              {%- else -%}
+              </div>
+              {%- endif -%}
+
+            {%- when 'video' -%}
+              {%- liquid
+                capture is_hosted_video
+                  if block.settings.video != blank
+                    echo 'true'
+                  else
+                    echo 'false'
+                  endif
+                endcapture
+
+                capture media_type 
+                  if block.settings.video
+                    echo 'video'
+                  elsif block.settings.video_url != blank
+                    echo block.settings.video_url.type
+                  else
+                    echo ''
+                  endif
+                endcapture
+
+                capture media_id 
+                  if block.settings.video
+                    echo block.settings.video.id
+                  elsif block.settings.video_url != blank
+                    echo block.settings.video_url.id
+                  else
+                    echo ''
+                  endif
+                endcapture
+
+                capture image_sizes
+                  if block.settings.full_width
+                    echo '100vw'
+                  else
+                    echo '(min-width: 1280px) 1280px, calc(100vw - 2.5rem)'
+                  endif
+                endcapture
+              -%}
+              <video-object class="custom-content__video-wrapper block mx-auto aspect-w-16 aspect-h-9"
+                data-media-id="{{ media_id }}"
+                data-media-type="{{ media_type }}"
+                data-hosted-video="{{ is_hosted_video }}"
+                data-loaded="false">
+                <button id="VideoObject-{{ block.id }}-{{ media_id }}"
+                  class="video__cover-button absolute group"  
+                  type="button">
+                  {%- if block.settings.video -%}
+                    {{ block.settings.video.preview_image | image_url: width: 1920 | image_tag: 
+                      class: 'image-banner__image object-cover w-full h-full',
+                      widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                      sizes: image_sizes,
+                      loading: 'lazy' }}
+                  {%- elsif block.settings.cover_image != blank -%}
+                    {{ block.settings.cover_image | image_url: width: 1920 | image_tag: 
+                      class: 'image-banner__image object-cover w-full h-full',
+                      widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+                      sizes: image_sizes,
+                      loading: 'lazy' }}
+                  {%- else -%}
+                    {{ 'lifestyle-2' | placeholder_svg_tag: 'responsive-fill-image placeholder-svg' }}
+                  {%- endif -%}
+                  <span class="video__play-button absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 p-5 flex justify-center items-center shadow-md bg-primary-background rounded-full transition-transform duration-500 ease-in-out group-hover:scale-125 group-hover:text-primary-accent group-focus:scale-125 group-focus:text-primary-accent">
+                    {% render 'icon-ui-play' %}
+                  </span>
+                </button>
+                <template>
+                  {%- if block.settings.video -%}
+                    {{ block.settings.video | media_tag: class: 'w-full h-full', image_size: '1920x' }}
+                  {%- elsif block.settings.video_url != blank -%}
+                    {%- case block.settings.video_url.type -%}
+                      {%- when 'youtube' -%}
+                        <iframe id="Video-{{ block.id }}-{{ block.settings.video_url.id }}"
+                          class="js-youtube w-full" width="1440" height="762" src="https://www.youtube.com/embed/{{ block.settings.video_url.id }}?enablejsapi=1" loading="lazy"
+                          frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          title="{{ block.settings.video_description | escape }}" allowfullscreen></iframe>
+                      {%- when 'vimeo' -%}
+                        <iframe id="Video-{{ block.id }}-{{ block.settings.video_url.id }}"
+                          class="js-vimeo w-full" width="1440" height="762" src="https://player.vimeo.com/video/{{ block.settings.video_url.id }}?title=0&byline=0&portrait=0" loading="lazy"
+                          frameborder="0" allow="autoplay; fullscreen; picture-in-picture" 
+                          title="{{ block.settings.video_description | escape }}" allowfullscreen></iframe>
+                    {%- endcase -%}
+                  {%- endif -%}
+                </template>
+              </video-object>
+
+            {%- when 'richtext' -%}
+
+              <div class="custom-content__richtext mx-auto rte">
+                {%- if block.settings.title != blank -%}
+                  <h4 class="custom-content__item-title text-xl md:text-2xl">{{ block.settings.title | escape }}</h4>
+                {%- endif -%}
+
+                {%- if block.settings.text != blank -%}
+                  <div class="custom-content__richtext-text rte">
+                    {{ block.settings.text }}
+                  </div>
+                {%- endif -%}
+              </div>
+
+            {%- when 'html' -%}
+
+              <div class="custom-content__html mx-auto">
+                {%- if block.settings.code != blank -%}
+                  {{ block.settings.code }}
+                {%- endif -%}
+              </div>
+
+            {%- when 'button' -%}
+
+              {%- if block.settings.button_label != blank -%}
+                <div class="custom-content__button-contain mx-auto rte">
+                  <a href="{{ block.settings.button_link | default: '#' }}" class="button button--large button--outline">{{ block.settings.button_label | escape }}</a>
+                </div>
+              {%- endif -%}
+
+          {%- endcase -%}
+        </div>
+
+      </div>
+
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.custom_content.name",
+  "class": "custom-content-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.custom_content.settings.title.label",
+      "default": "Custom content"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.general.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.general.alignment.option_left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.alignment.option_center.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.general.alignment.option_right.label"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "page",
+      "name": "t:sections.custom_content.blocks.page.name",
+      "settings": [
+        {
+          "type": "page",
+          "id": "page",
+          "label": "t:sections.custom_content.blocks.page.settings.page.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_title",
+          "label": "t:sections.custom_content.blocks.page.settings.show_title.label",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "t:sections.general.full_width",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "t:sections.custom_content.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.custom_content.blocks.image.settings.image.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.custom_content.blocks.image.settings.link.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "t:sections.general.full_width",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "label": "t:sections.image_with_text.settings.image_width.label",
+          "min": 10,
+          "max": 100,
+          "step": 5,
+          "default": 100,
+          "unit": "%"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "t:sections.custom_content.blocks.video.name",
+      "settings": [
+        {
+          "type": "header",
+          "content": "t:sections.video.settings.hosted_video.label"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "t:sections.video.settings.video.label",
+          "info": "t:sections.video.settings.video.info"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.video.settings.external_video.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "cover_image",
+          "label": "t:sections.custom_content.blocks.video.settings.cover_image.label"
+        },
+        {
+          "id": "video_url",
+          "type": "video_url",
+          "label": "t:sections.custom_content.blocks.video.settings.video_url.label",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ],
+          "default": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+        },
+        {
+          "type": "text",
+          "id": "video_description",
+          "label": "t:sections.custom_content.blocks.video.settings.video_description.label",
+          "info": "t:sections.custom_content.blocks.video.settings.video_description.info"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "t:sections.general.full_width",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "richtext",
+      "name": "t:sections.custom_content.blocks.richtext.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.custom_content.blocks.richtext.settings.title.label",
+          "default": "Talk about your brand"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:sections.custom_content.blocks.richtext.settings.text.label",
+          "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "t:sections.custom_content.blocks.button.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "t:sections.custom_content.blocks.button.settings.button_label.label",
+          "default": "View more"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "t:sections.custom_content.blocks.button.settings.button_link.label"
+        }
+      ]
+    },
+    {
+      "type": "html",
+      "name": "t:sections.custom_content.blocks.html.name",
+      "settings": [
+        {
+          "type": "html",
+          "id": "code",
+          "label": "t:sections.custom_content.blocks.html.settings.code.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "t:sections.general.full_width",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.custom_content.presets.name",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "richtext"
+        },
+        {
+          "type": "button",
+          "settings": {
+            "button_link": "shopify://collections/all"
+          }
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

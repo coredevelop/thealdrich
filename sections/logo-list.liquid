@@ -1,0 +1,135 @@
+{%- liquid
+  capture image_sizes
+    echo '(min-width: 768px) '
+    echo section.settings.logo_width_md | append: 'px, '
+    echo section.settings.logo_width | append: 'px)'
+  endcapture
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --section-image-width: {{ section.settings.logo_width | append: 'px' }};
+    --section-image-width-md: {{ section.settings.logo_width_md | append: 'px' }};
+  }
+  [data-section-id="{{ section.id }}"] .logo-list__item {
+    width: var(--section-image-width);
+  }
+  @media (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] .logo-list__item {
+      width: var(--section-image-width-md);
+    }
+  }
+  
+</style>
+<div class="logo-list space-y-5 px-rail py-section text-center border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="logo-list">
+  
+  {%- if section.settings.title != blank -%}
+    <h3 class="logo-list__title mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+  {%- endif -%}
+  
+  <div class="logo-list__container mx-auto max-w-screen flex flex-wrap items-center justify-center">
+    {%- for block in section.blocks -%}
+      <div class="logo-list__item m-2 md:m-3.5 flex-none" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}">
+          {%- endif -%}
+
+          {{ block.settings.image | image_url: width: 960 | image_tag: 
+            class: 'logo-list__image w-full',
+            widths: '160, 220, 300, 420, 640, 960',
+            sizes: image_sizes,
+            loading: 'lazy' }}
+
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- endif -%}
+        {%- else -%}
+          {{ 'logo' | placeholder_svg_tag: 'logo-list__image placeholder-svg' }}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.logo_list.name",
+  "class": "logo-list-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.logo_list.settings.title.label",
+      "default": "Logo list"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_md",
+      "min": 100,
+      "max": 250,
+      "step": 10,
+      "unit": "px",
+      "label": "t:sections.logo_list.settings.logo_width.label",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 100,
+      "max": 250,
+      "step": 10,
+      "unit": "px",
+      "label": "t:sections.logo_list.settings.logo_width_mobile.label",
+      "default": 120
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_image",
+      "name": "t:sections.logo_list.blocks.logo.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.logo_list.blocks.logo.settings.image.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.logo_list.blocks.logo.settings.link.label",
+          "info": "t:sections.logo_list.blocks.logo.settings.link.info"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.logo_list.presets.name",
+      "blocks": [
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

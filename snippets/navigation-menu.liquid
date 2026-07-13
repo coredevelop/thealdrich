@@ -1,0 +1,104 @@
+<ul class="{{ class }} {{ group_class }} list-menu" role="list">
+  {%- for link in menu.links -%}
+    <li class="{{ group_class }}__list-item h-full"{% if link.links != blank %} data-inline-navigation-button{% endif %}>
+      {%- if link.links != blank -%}
+        {%- liquid 
+          if mega_menu == true and link.levels == 2
+            assign show_mega_menu = true
+          else 
+            assign show_mega_menu = false
+          endif  
+        -%}
+        <disclosure-menu class="h-full">
+          <details id="DetailsMenu-{{ group_class }}-{{ forloop.index }}"
+            class="{{ group_class }}__details h-full"
+            data-link="{{ link.url }}">
+            <summary class="{{ group_class }}__link-item h-full">
+              <div class="{{ group_class }}__summary-container">
+                <span {% if link.current %}class="{{ group_class }}__link-item-current"{% endif %}>{{ link.title | escape }}</span>
+                {% render 'icon-ui-chevron-down' %}
+              </div>
+            </summary>          
+            <ul id="InlineMenu-{{ group_class }}-child-{{ forloop.index }}"
+              class="list-menu {{ group_class }}__disclosure {{ group_class }}-child"
+              role="list"
+              tabindex="-1"
+              data-accordion-panel
+              data-accordion-level="1"
+              data-inline-navigation-submenu {% if show_mega_menu %}data-mega-menu="{{ link.links.size }}"{% endif %}>
+              {%- for childlink in link.links -%}
+                <li class="{{ group_class }}-child__list-item"{% if childlink.links != blank %} data-inline-navigation-button{% endif %}>
+                  {%- if childlink.links != blank -%}
+                    <details id="DetailsSubMenu-{{ group_class }}-{{ forloop.index }}" class="{{ group_class }}__details-child" {% if show_mega_menu %}open{% endif %}>
+                      <summary class="{{ group_class }}-child__link-item" {% if show_mega_menu %}tabindex="-1"{% endif %}>
+                        <div class="{{ group_class }}__summary-container">
+                          {%- comment -%}
+                            Get the featured image of the link type
+                          {%- endcomment -%}
+                          {%- if show_mega_menu -%}
+                            <a {% if childlink.current %}class="{{ group_class }}__link-item-current"{% endif %} href="{{ childlink.url }}">
+                              {%- if section.settings.mega_menu_images -%}
+                                {%- liquid
+                                  assign link_type = childlink.type
+                                  case link_type
+                                  when 'article_link'
+                                    assign link_image = childlink.object.image
+                                  when 'blog_link'
+                                    assign link_image = childlink.object.articles.first.image
+                                  when 'collection_link'
+                                    assign link_image = childlink.object.featured_image
+                                  when 'product_link'
+                                    assign link_image = childlink.object.featured_image
+                                  else
+                                    assign link_image = childlink.object.metafields.theme.featured_image
+                                  endcase
+                                -%}
+                                {%- if link_image -%}
+                                  {{ link_image | image_url: width: 800 | image_tag: 
+                                    class: 'w-full mb-1',
+                                    widths: '200, 300, 400, 600, 800',
+                                    loading: 'lazy' }}
+                                {%- endif -%}
+                              {%- endif -%}
+                              {{ childlink.title | escape }}
+                            </a>
+                          {%- else -%}
+                            <span {% if childlink.current %}class="{{ group_class }}__link-item-current"{% endif %}>{{ childlink.title | escape }}</span>
+                          {%- endif -%}
+                          {% render 'icon-ui-chevron-down' %}
+                        </div>
+                      </summary>
+                      <ul id="InlineSubMenu-{{ group_class }}-{{ forloop.index }}"
+                        class="list-menu {{ group_class }}__disclosure {{ group_class }}-grandchild"
+                        role="list"
+                        tabindex="-1"
+                        data-accordion-panel
+                        data-accordion-level="2"
+                        data-inline-navigation-submenu>
+                        {%- for grandchildlink in childlink.links -%}
+                          <li class="{{ group_class }}-grandchild__list-item">
+                            <a href="{{ grandchildlink.url }}" class="{{ group_class }}-grandchild__link-item"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+                              <span {% if grandchildlink.current %}class="{{ group_class }}__link-item-current"{% endif %}>{{ grandchildlink.title | escape }}</span>
+                              </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- else -%}
+                    <a href="{{ childlink.url }}" class="{{ group_class }}__link-item"{% if childlink.current %} aria-current="page"{% endif %}>
+                      <span {% if childlink.current %}class="{{ group_class }}__link-item-current"{% endif %}>{{ childlink.title | escape }}</span>
+                    </a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </details>
+        </disclosure-menu>
+      {%- else -%}
+        <a href="{{ link.url }}" class="{{ group_class }}__link-item h-full"{% if link.current %} aria-current="page"{% endif %}>
+          <span {% if link.current %}class="{{ group_class }}__link-item-current"{% endif %}>{{ link.title | escape }}</span>
+        </a>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+</ul>

@@ -1,0 +1,11 @@
+<label class="collection-sort__label sr-only sm:not-sr-only normal-case p-0" for="SortBy-{{ section.id }}">
+  <span class="whitespace-nowrap">{{ 'products.facets.sort_by_label' | t }}</span>
+</label>
+{%- assign sort_by = results.sort_by | default: results.default_sort_by -%}
+<select id="{{ id }}" name="sort_by"
+  class="collection-sort__select sm:text-sm"
+  aria-describedby="a11y-refresh-page-message">
+  {%- for option in results.sort_options -%}
+    <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected="selected"{% endif %}>{{ option.name | escape }}</option>
+  {%- endfor -%}
+</select>

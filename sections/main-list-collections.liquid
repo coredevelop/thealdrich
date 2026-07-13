@@ -1,0 +1,190 @@
+{%- liquid 
+  assign grid_cols = 'md:grid-cols-' | append: section.settings.collections_per_row
+
+  if section.settings.image_ratio == 'adapt'
+    assign aspect_classes = ''
+  elsif section.settings.image_ratio == 'square'
+    assign aspect_classes = 'aspect-w-1 aspect-h-1'
+  elsif section.settings.image_ratio == 'portrait'
+    assign aspect_classes = 'aspect-w-2 aspect-h-3'
+  elsif section.settings.image_ratio == 'landscape'
+  assign aspect_classes = 'aspect-w-4 aspect-h-3'
+  elsif section.settings.image_ratio == 'letterbox'
+    assign aspect_classes = 'aspect-w-16 aspect-h-9'
+  endif
+
+  case section.settings.sort
+    when 'products_high' or 'products_low'
+      assign collections = collections | sort: 'all_products_count'
+    when 'date' or 'date_reversed'
+      assign collections = collections | sort: 'published_at'
+  endcase
+
+  if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+    assign collections = collections | reverse
+  endif
+
+  capture image_sizes
+    echo '(min-width: 1280px) calc((1280px - 3.5rem) / 3), (min-width: 768px) calc((100vw - 6rem) / 3), '
+    if section.settings.columns_mobile == '2'
+      echo 'calc((100vw - 4.25rem) / 2)'
+    else
+      echo 'calc(100vw - 2.5rem)'
+    endif
+  endcapture
+-%}
+<style>
+  [data-section-id="{{ section.id }}"] {}
+  
+</style>
+<div class="main-list-collections px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-list-collections">
+
+  <div class="list-colletions max-w-screen mx-auto">
+    {%- if section.settings.title -%}
+      <div class="list-colletions__header mb-6 pb-4 border-b border-primary-section-border">
+        <h1 class="text-3xl md:text-4xl text-center">{{ section.settings.title }}</h1>
+      </div>
+    {%- endif -%}
+
+    <div class="list-collections__list text-center grid grid-cols-{{ section.settings.columns_mobile }} {{ grid_cols }} gap-4 md:gap-7">
+      {%- for collection in collections -%}
+        <div class="list-collections__item grid-item group relative h-full">
+          <a class="collection-card__link absolute inset-0 z-10" href="{{ collection.url }}" data-collection-card-link>
+            <span class="invisible">
+              {{ collection.title }}
+            </span>
+          </a>
+          <div class="collection-card relative flex flex-col flex-wrap items-stretch space-y-3 h-full">
+            <a href="{{ collection.url }}"
+              class="collection-card__media relative z-20 flex justify-center {{ aspect_classes }}"
+              tabindex="-1">
+              {%- liquid 
+                if collection.image
+                  assign image = collection.image
+                elsif collection.products.first
+                  assign image = collection.products.first.featured_image
+                endif
+
+              -%}
+              {%- if image != blank -%}
+                {{ image | image_url: width: 1280 | image_tag: 
+                  class: 'object-cover',
+                  widths: '160, 220, 300, 420, 640, 960, 1280',
+                  sizes: image_sizes,
+                  loading: 'lazy' }}
+              {%- else -%}
+                <div class="bg-primary-secondary-background{% if section.settings.image_ratio == 'adapt' %} min-h-[12rem] w-full{% endif %}"></div>
+              {%- endif -%}
+            </a>
+            <h2 class="collection-card__title {% if section.settings.columns_mobile == '2' %}text-xl md:text-2xl{% else %}text-2xl{% endif %} pb-6 group-hover:text-primary-accent">
+              {{ collection.title }}
+            </h2>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main_list_collections.name",
+  "class": "main-list-collections",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.main_list_collections.settings.title.label",
+      "default": "All collections"
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "options": [
+        {
+          "value": "alphabetical",
+          "label": "t:sections.main_list_collections.settings.sort.option_alphabetical.label"
+        },
+        {
+          "value": "alphabetical_reversed",
+          "label": "t:sections.main_list_collections.settings.sort.option_alphabetical_reverse.label"
+        },
+        {
+          "value": "date_reversed",
+          "label": "t:sections.main_list_collections.settings.sort.option_date_reversed.label"
+        },
+        {
+          "value": "date",
+          "label": "t:sections.main_list_collections.settings.sort.option_date.label"
+        },
+        {
+          "value": "products_high",
+          "label": "t:sections.main_list_collections.settings.sort.option_products_high.label"
+        },
+        {
+          "value": "products_low",
+          "label": "t:sections.main_list_collections.settings.sort.option_products_low.label"
+        }
+      ],
+      "default": "alphabetical",
+      "label": "t:sections.main_list_collections.settings.sort.label"
+    },
+    {
+      "type": "range",
+      "id": "collections_per_row",
+      "label": "t:sections.general.collections_per_row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "radio",
+      "id": "columns_mobile",
+      "label": "t:sections.general.collections_per_row_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "t:sections.general.image_ratio.label",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.general.image_ratio.option_auto.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.general.image_ratio.option_square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.general.image_ratio.option_portrait.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.general.image_ratio.option_landscape.label"
+        },
+        {
+          "value": "letterbox",
+          "label": "t:sections.general.image_ratio.option_letterbox.label"
+        }
+      ],
+      "default": "square"
+    }
+  ]
+}
+{% endschema %}

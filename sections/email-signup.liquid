@@ -1,0 +1,223 @@
+{%- liquid 
+  case section.settings.hero_size
+    when 'x-small'
+      assign min_height = 160
+    when 'small'
+      assign min_height = 240
+    when 'medium'
+      assign min_height = 340
+    when 'large'
+      assign min_height = 440
+    when 'x-large'
+      assign min_height = 580
+  endcase
+
+  capture content_class
+    if section.settings.solid_content_background
+      echo 'bg-section-background'
+    endif
+  endcapture
+
+  assign overlay_alpha = section.settings.color_background_alpha_range | times: 0.01
+  assign image_alpha = 1 | minus: overlay_alpha
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {%- if section.settings.full_width -%}
+      --max-width-screen: 100%;
+      --spacing-rail: 0;
+    {%- endif -%}
+    {%- if section.settings.hero_size == 'fullscreen' -%}
+      --section-min-height: 100vh;
+      --section-min-height-md: 100vh;
+    {%- else -%}
+      --section-min-height: {{ min_height | append: 'px' }};
+      --section-min-height-md: {{ min_height | times: 1.2 | append: 'px' }};
+    {%- endif -%}    
+    --section-object-position: {{ section.settings.alignment }};
+    --section-overlay-color: {{ section.settings.color_background }};
+    --section-background-color: {{ section.settings.color_background }};
+    --section-opacity: {{ image_alpha }};
+    --section-accent-color: {{ section.settings.color_accent }};
+    --section-accent-text-color: {% render 'color-contrast', color: section.settings.color_accent %};
+    --section-accent-hover-color: {{ section.settings.color_accent | color_darken: 10 }};
+    --section-text-color: {{ section.settings.color_text }};
+    --section-text-color-75: {{ section.settings.color_text | color_modify: 'alpha', 0.75 }};
+    --section-text-color-50: {{ section.settings.color_text | color_modify: 'alpha', 0.5 }};
+    --section-primary-border-color: {{ section.settings.color_text }};
+  }
+  [data-section-id="{{ section.id }}"] .newsletter__wrapper {
+    min-height: var(--section-min-height);
+  }
+  @media screen (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] .newsletter__wrapper {
+      min-height: var(--section-min-height-md);
+    }
+  }
+  [data-section-id="{{ section.id }}"] .newsletter__image-contain svg,
+  [data-section-id="{{ section.id }}"] .newsletter__image-contain img {
+    opacity: var(--section-opacity);
+  }
+  [data-section-id="{{ section.id }}"] .newsletter__image {
+    object-position: var(--section-object-position);
+  }
+  
+</style>
+
+<div class="newsletter px-rail text-center"
+  data-hero-size="{{ section.settings.hero_size }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="newsletter">
+  <div class="newsletter__wrapper mx-auto max-w-screen px-5 relative overflow-hidden flex items-center justify-center">
+    <div class="newsletter__content {{ content_class }} relative w-full sm:w-auto sm:min-w-[28rem] max-w-2xl text-section-text space-y-4 z-20 py-5 px-5 md:py-7">
+      {%- if section.settings.title != blank -%}
+        <h3 class="newsletter__title text-section-text text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="newsletter__text space-y-2 rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+      <div class="newsletter__email mt-4 mx-auto max-w-lg">
+        {%- render 'email-subscription',
+          id: section.id,
+          source: 'newsletter-section' -%}
+      </div>
+    </div>
+
+    <div class="newsletter__image-contain absolute inset-0 w-full h-full bg-section-overlay">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1920 | image_tag: 
+          class: 'newsletter__image object-cover w-full h-full',
+          widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
+          sizes: '100vw',
+          loading: 'lazy' }}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'responsive-fill-image placeholder-svg' }}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.email_signup.name",
+  "class": "newsletter-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.email_signup.settings.title.label",
+      "default": "Subscribe to our emails"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:sections.email_signup.settings.text.label",
+      "default": "<p>Give your visitors an option to sign up for a newsletter to announce sales, new products and updates.</p>"
+    },
+    {
+      "type": "select",
+      "id": "hero_size",
+      "label": "t:sections.general.section_height.label",
+      "default": "small",
+      "options": [
+        {
+          "label": "t:sections.general.section_height.option_extra_small.label",
+          "value": "x-small"
+        },
+        {
+          "label": "t:sections.general.section_height.option_small.label",
+          "value": "small"
+        },
+        {
+          "label": "t:sections.general.section_height.option_medium.label",
+          "value": "medium"
+        },
+        {
+          "label": "t:sections.general.section_height.option_large.label",
+          "value": "large"
+        },
+        {
+          "label": "t:sections.general.section_height.option_extra_large.label",
+          "value": "x-large"
+        },
+        {
+          "label": "t:sections.general.section_height.option_fullscreen.label",
+          "value": "fullscreen"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.general.full_width",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "t:sections.general.colors.color_text",
+      "default": "#606060"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "t:sections.general.colors.color_accent",
+      "default": "#424242"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "t:sections.general.colors.color_background",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "range",
+      "id": "color_background_alpha_range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.general.background_overlay_opacity",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "solid_content_background",
+      "label": "t:sections.email_signup.settings.solid_content_background.label",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.email_signup.settings.image.label",
+      "info": "t:sections.email_signup.settings.image.info"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.general.image_alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.general.image_alignment.option_top.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.general.image_alignment.option_middle.label"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.general.image_alignment.option_bottom.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.email_signup.presets.name"
+    }
+  ]
+}
+{% endschema %}

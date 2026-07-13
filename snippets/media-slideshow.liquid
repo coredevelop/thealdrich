@@ -1,0 +1,319 @@
+{%- liquid
+  comment
+    Variant images and current featured media are now passed as parameters from the sections
+    variant_images: array of variant image src values
+    current_featured_media_id: ID of the currently selected variant's featured media
+  endcomment
+  if variant_images == blank and product
+    assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src'
+  endif
+  if current_featured_media_id == blank and product
+    assign current_featured_media_id = product.selected_or_first_available_variant.featured_media.id
+  endif
+-%}
+
+<media-slideshow id="MediaSlideshow-{{ section.id }}" class="group/slideshow" data-zoom="{{ zoom }}" data-lightbox="{{ lightbox }}" data-hide-variants="{{ hide_variants | default: false }}">
+  {%- liquid 
+    assign thumbnails_placement = section.settings.thumbnails_placement
+    assign media_count = product.media.size
+    if thumbnails_placement == 'bottom' or media_count < 2
+      assign show_slider_ui = false
+    else
+      assign show_slider_ui = true
+    endif
+  -%}
+
+  {%- liquid 
+    capture slide_direction
+      if settings.typography_rtl
+        echo 'rtl'
+      else
+        echo 'ltr'
+      endif
+    endcapture
+  -%}
+
+  <div class="product__media-container product__media-container--{{ thumbnails_placement }} media">
+    <div class="splide media__main"
+      data-thumbnails-placement="{{ thumbnails_placement }}"
+      data-media-type="main"
+      data-media-ratio="{{ section.settings.image_ratio }}"
+      data-options='{
+        "type": "slide",
+        "rewind": "true",
+        "direction": "{{ slide_direction }}",
+        "autoplay": false,
+        "keyboard": "focused",
+        "gap": "0.5rem",
+        "arrows": {{ show_slider_ui }},
+        "pagination": {{ show_slider_ui }}
+      }'>
+      <div class="splide__track">
+        <ul class="splide__list">
+
+          {%- comment -%}
+            Determine which media to show first based on current_featured_media_id
+          {%- endcomment -%}
+          {%- assign first_media = nil -%}
+          {%- for media in product.media -%}
+            {%- if media.id == current_featured_media_id -%}
+              {%- assign first_media = media -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- if first_media -%}
+            {%- liquid 
+              assign image_preload = true
+              assign image_loading = ''
+              
+              assign is_variant_image = false
+              if variant_images contains first_media.preview_image.src
+                assign is_variant_image = true
+              endif
+              
+              assign is_current_variant_image = false
+              if product.selected_or_first_available_variant.featured_media and first_media.id == product.selected_or_first_available_variant.featured_media.id
+                assign is_current_variant_image = true
+              endif
+            -%}
+            <li class="splide__slide relative product__media-image group  group-data-[hide-variants=true]/slideshow:data-[variant-image=true]:data-[current-variant-image=false]:hidden"
+              data-media-type="{{ first_media.media_type }}"
+              data-media-id="{{ section.id }}-{{ first_media.id }}"
+              data-variant-image="{{ is_variant_image }}"
+              data-current-variant-image="{{ is_current_variant_image }}">
+              {%- render 'product-media', 
+                media: first_media,
+                image_preload: image_preload,
+                image_loading: image_loading,
+                loop: section.settings.enable_video_looping,
+                image_class: 'product__media-image' -%}
+            </li>
+          {%- endif -%}
+
+          {%- for media in product.media -%}
+            {%- unless media.id == current_featured_media_id -%}
+              {%- liquid 
+                if first_media == nil and forloop.first
+                  assign image_preload = true
+                  assign image_loading = ''
+                else 
+                  assign image_preload = false
+                  assign image_loading = 'lazy'
+                endif
+                
+                assign is_variant_image = false
+                if variant_images contains media.preview_image.src
+                  assign is_variant_image = true
+                endif
+                
+                assign is_current_variant_image = false
+                if product.selected_or_first_available_variant.featured_media and media.id == product.selected_or_first_available_variant.featured_media.id
+                  assign is_current_variant_image = true
+                endif
+              -%}
+              <li class="splide__slide relative product__media-image group  group-data-[hide-variants=true]/slideshow:data-[variant-image=true]:data-[current-variant-image=false]:hidden"
+                data-media-type="{{ media.media_type }}"
+                data-media-id="{{ section.id }}-{{ media.id }}"
+                data-variant-image="{{ is_variant_image }}"
+                data-current-variant-image="{{ is_current_variant_image }}">
+                {%- render 'product-media', 
+                  media: media,
+                  image_preload: image_preload,
+                  image_loading: image_loading,
+                  loop: section.settings.enable_video_looping,
+                  image_class: 'product__media-image' -%}
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+
+    {%- if first_media_model -%}
+      <button
+        class="button product__xr-button"
+        type="button"
+        aria-label="{{ 'products.product.xr_button_label' | t }}"
+        data-shopify-xr
+        data-shopify-model3d-id="{{ first_media_model.id }}"
+        data-shopify-title="{{ product.title | escape }}"
+        data-shopify-xr-hidden
+      >
+        <span class="inline-block w-3">{% render 'icon-ui-3d-model' %}</span>
+        <span>{{ 'products.product.xr_button' | t }}</span>
+      </button>
+    {%- endif -%}
+
+    {%- if thumbnails_placement == 'bottom'and media_count > 1 -%}
+      <div class="media__thumbnails-container">
+        <div class="splide media__thumbnails"
+          data-media-type="thumbnails"
+          data-options='{
+            "fixedWidth": "6rem",
+            "fixedHeight": "6rem",
+            "breakpoints": {
+              "768": {
+                "fixedWidth": "4rem",
+                "fixedHeight": "4rem"
+              }
+            }, 
+            "perMove": 1,
+            "keyboard": "focused",
+            "trimSpace": true,
+            "focus": "center",
+            "gap": "0.5rem",
+            "rewind": true,
+            "isNavigation": true,
+            "pagination": false,
+            "arrows": true
+          }'>
+          <div class="splide__track">
+            <ul class="splide__list">
+              {%- comment -%}
+                Use the same first_media determined above for consistency
+              {%- endcomment -%}
+              {%- if first_media -%}
+                {%- liquid
+                  assign is_variant_image = false
+                  if variant_images contains first_media.preview_image.src
+                    assign is_variant_image = true
+                  endif
+                  assign is_current_variant_image = false
+                  if product.selected_or_first_available_variant.featured_media and first_media.id == product.selected_or_first_available_variant.featured_media.id
+                    assign is_current_variant_image = true
+                  endif
+                -%}
+                <li class="splide__slide relative product__media-image group group-data-[hide-variants=true]/slideshow:data-[variant-image=true]:data-[current-variant-image=false]:hidden"
+                  data-variant-image="{{ is_variant_image }}"
+                  data-current-variant-image="{{ is_current_variant_image }}">
+                  {%- if first_media.media_type == 'image' -%}
+                    {{ first_media.preview_image | image_url: width: 180 | image_tag: 
+                      class: 'product__media-image ',
+                      widths: '58, 90, 116, 180',
+                      sizes: '(min-width: 768px) 90px, 58px',
+                      loading: 'lazy' }}
+                    {%- if first_media.media_type == 'video' or first_media.media_type == 'external_video' -%}
+                      <div class="product__media-badge">{% render 'icon-ui-play' %}</div>
+                    {%- elsif first_media.media_type == 'model' -%}
+                      <div class="product__media-badge">{% render 'icon-ui-3d-model' %}</div>
+                    {%- endif -%}
+                  {%- endif -%}
+                </li>
+              {%- endif -%}
+              {%- for media in product.media -%}
+                {%- unless media.id == current_featured_media_id -%}
+                  {%- liquid
+                    assign is_variant_image = false
+                    if variant_images contains media.preview_image.src
+                      assign is_variant_image = true
+                    endif
+                    assign is_current_variant_image = false
+                    if product.selected_or_first_available_variant.featured_media and media.id == product.selected_or_first_available_variant.featured_media.id
+                      assign is_current_variant_image = true
+                    endif
+                  -%}
+                  <li class="splide__slide relative product__media-image group group-data-[hide-variants=true]/slideshow:data-[variant-image=true]:data-[current-variant-image=false]:hidden"
+                    data-variant-image="{{ is_variant_image }}"
+                    data-current-variant-image="{{ is_current_variant_image }}">                          
+                    {{ media.preview_image | image_url: width: 180 | image_tag: 
+                      class: 'product__media-image ',
+                      widths: '58, 90, 116, 180',
+                      sizes: '(min-width: 768px) 90px, 58px',
+                      loading: 'lazy' }}
+                    {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                      <div class="product__media-badge">{% render 'icon-ui-play' %}</div>
+                    {%- elsif media.media_type == 'model' -%}
+                      <div class="product__media-badge">{% render 'icon-ui-3d-model' %}</div>
+                    {%- endif -%}
+                  </li>
+                {%- endunless -%}
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {%- elsif thumbnails_placement == 'left' or thumbnails_placement == 'right' -%}
+      <div class="media__thumbnails media__thumbnails--scrolling">
+        <ul>
+          {%- assign media_thumbnail_count = 0 -%}
+          {%- comment -%}
+            Use the same first_media determined above for consistency
+          {%- endcomment -%}
+          {%- if first_media -%}
+            {%- liquid
+              assign is_variant_image = false
+              if variant_images contains first_media.preview_image.src
+                assign is_variant_image = true
+              endif
+              assign is_current_variant_image = false
+              if product.selected_or_first_available_variant.featured_media and first_media.id == product.selected_or_first_available_variant.featured_media.id
+                assign is_current_variant_image = true
+              endif
+            -%}
+            <li class="media__thumbnail media__thumbnail--active relative group group-data-[hide-variants=true]/slideshow:data-[variant-image=true]:data-[current-variant-image=false]:hidden" tabindex="0" data-index="{{ media_thumbnail_count }}"
+              data-variant-image="{{ is_variant_image }}"
+              data-current-variant-image="{{ is_current_variant_image }}">
+                {%- if first_media.media_type == 'image' -%}
+                  {{ first_media.preview_image | image_url: width: 180 | image_tag: 
+                    class: 'product__media-image ',
+                    widths: '58, 90, 116, 180',
+                    sizes: '(min-width: 768px) 90px, 58px',
+                    loading: 'lazy' }}
+                  {%- if first_media.media_type == 'video' or first_media.media_type == 'external_video' -%}
+                    <div class="product__media-badge">{% render 'icon-ui-play' %}</div>
+                  {%- elsif first_media.media_type == 'model' -%}
+                    <div class="product__media-badge">{% render 'icon-ui-3d-model' %}</div>
+                  {%- endif -%}
+                {%- endif -%}
+            </li>
+            {%- assign media_thumbnail_count = media_thumbnail_count | plus: 1 -%}
+          {%- endif -%}
+          {%- for media in product.media -%}
+            {%- unless media.id == current_featured_media_id -%}
+              {%- liquid
+                assign is_variant_image = false
+                if variant_images contains media.preview_image.src
+                  assign is_variant_image = true
+                endif
+                assign is_current_variant_image = false
+                if product.selected_or_first_available_variant.featured_media and media.id == product.selected_or_first_available_variant.featured_media.id
+                  assign is_current_variant_image = true
+                endif
+              -%}
+              <li class="media__thumbnail {% if first_media == nil and media_thumbnail_count == 0 %}media__thumbnail--active{% endif %} relative group group-data-[hide-variants=true]/slideshow:data-[variant-image=true]:data-[current-variant-image=false]:hidden" tabindex="0" data-index="{{ media_thumbnail_count }}"
+                data-variant-image="{{ is_variant_image }}"
+                data-current-variant-image="{{ is_current_variant_image }}">
+                {{ media.preview_image | image_url: width: 180 | image_tag: 
+                  class: 'product__media-image ',
+                  widths: '58, 90, 116, 180',
+                  sizes: '(min-width: 768px) 90px, 58px',
+                  loading: 'lazy' }}
+                {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                  <div class="product__media-badge">{% render 'icon-ui-play' %}</div>
+                {%- elsif media.media_type == 'model' -%}
+                  <div class="product__media-badge">{% render 'icon-ui-3d-model' %}</div>
+                {%- endif -%}
+              </li>
+              {%- assign media_thumbnail_count = media_thumbnail_count | plus: 1 -%}
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="modal modal--lightbox" id="ModalLightbox-{{ section.id }}"
+    role="dialog"
+    aria-modal="true">
+    <button id="ModalLightboxClose-{{ section.id }}" type="button"
+      class="modal__close"
+      aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-ui-close' %}</button>
+    <div class="modal__container"></div>
+    <div class="modal__background"
+      title="{{ 'accessibility.close' | t }}">
+      <span class="sr-only">{{ 'accessibility.close' | t }}</span>
+    </div>
+  </div>
+
+</media-slideshow>

@@ -1,0 +1,23 @@
+{%- comment -%}
+    Generate a new color with proper contrast
+
+    Accepts:
+    - color: {String} HEX color value
+
+    Usage:
+    In your liquid file, copy the following line
+    - {% render 'color-contrast', color: settings.general_accent_color %}
+{%- endcomment -%}
+
+{%- liquid 
+  assign color_brightness = color | color_brightness | divided_by: 255 | times: 100
+  if color_brightness < 26
+    assign new_color = color | color_lighten: 90
+  elsif color_brightness >= 26 and color_brightness < 64
+    assign new_color = color | color_lighten: 80
+  else
+    assign new_color = color | color_darken: 70
+  endif
+-%}
+
+{{- new_color -}} 

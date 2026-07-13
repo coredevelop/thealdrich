@@ -1,1 +1,1 @@
-{"sections":{"breadcrumbs":{"type":"breadcrumbs","settings":{}},"main":{"type":"main-page","settings":{}}},"order":["breadcrumbs","main"]}
+{"sections":{"breadcrumbs":{"type":"breadcrumbs","settings":{"show_breadcrumbs":"all","show_social_icons":true}},"main":{"type":"main-page","settings":{}},"1783635242cb330148":{"type":"apps","settings":{"full_width":false}}},"order":["breadcrumbs","main","1783635242cb330148"]}

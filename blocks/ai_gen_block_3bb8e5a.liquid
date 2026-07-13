@@ -1,0 +1,657 @@
+{% doc %}
+  @prompt
+    Create a Shopify cart page theme block that conditionally displays custom donation fields only when a donation product is in the cart. The donation product should be detected by checking if any cart line item belongs to a specific product or has a specific tag (make it configurable via block settings). When a donation product is detected, show the following fields as line item properties saved to the cart:1. A text input labeled "Name(s) as you would like to be listed for gift acknowledgement"2. An "In Honor Of" section with a checkbox to toggle it, and when checked, reveal a text input labeled "Name"3. A "I would like my gift to support" section with checkboxes for: Exhibitions Fund, Education Fund, Annual Fund, Sculpture Garden Fund, Other — plus a standalone checkbox labeled "Make this gift anonymously"4. A standalone checkbox labeled "I have submitted an Employer's Matching Gift Form"All field values should be saved as line item properties on the donation product's cart line item when the form changes (on input/change events via JS fetch to /cart/change.js). Style the block to match a clean, minimal museum aesthetic — simple labels, light borders, generous spacing. The block should have a section heading like "Gift Information" and be collapsible or always visible based on a block setting.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-donation-fields-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: {{ block.settings.background_color }};
+    border: 1px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    padding: {{ block.settings.padding }}px;
+  }
+
+  .ai-donation-fields__header-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    cursor: {% if block.settings.collapsible %}pointer{% else %}default{% endif %};
+  }
+
+  .ai-donation-fields__heading-{{ ai_gen_id }} {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-donation-fields__toggle-{{ ai_gen_id }} {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-donation-fields__toggle-{{ ai_gen_id }}.collapsed {
+    transform: rotate(-90deg);
+  }
+
+  .ai-donation-fields__content-{{ ai_gen_id }} {
+    display: block;
+  }
+
+  .ai-donation-fields__content-{{ ai_gen_id }}.hidden {
+    display: none;
+  }
+
+  .ai-donation-fields__field-{{ ai_gen_id }} {
+    margin-bottom: 24px;
+  }
+
+  .ai-donation-fields__label-{{ ai_gen_id }} {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-donation-fields__input-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid {{ block.settings.input_border_color }};
+    border-radius: {{ block.settings.input_border_radius }}px;
+    font-size: 14px;
+    color: {{ block.settings.text_color }};
+    background-color: {{ block.settings.input_background_color }};
+    font-family: inherit;
+  }
+
+  .ai-donation-fields__input-{{ ai_gen_id }}:focus {
+    outline: none;
+    border-color: {{ block.settings.input_focus_border_color }};
+  }
+
+  .ai-donation-fields__checkbox-group-{{ ai_gen_id }} {
+    margin-bottom: 24px;
+  }
+
+  .ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .ai-donation-fields__checkbox-{{ ai_gen_id }} {
+    margin-right: 10px;
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .ai-donation-fields__checkbox-label-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: {{ block.settings.text_color }};
+    cursor: pointer;
+    line-height: 1.5;
+  }
+
+  .ai-donation-fields__subsection-{{ ai_gen_id }} {
+    margin-bottom: 24px;
+    padding: 20px;
+    background-color: {{ block.settings.subsection_background_color }};
+    border-radius: {{ block.settings.input_border_radius }}px;
+  }
+
+  .ai-donation-fields__subsection-title-{{ ai_gen_id }} {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-donation-fields__honor-content-{{ ai_gen_id }} {
+    margin-top: 16px;
+    padding-left: 28px;
+  }
+
+  .ai-donation-fields__honor-content-{{ ai_gen_id }}.hidden {
+    display: none;
+  }
+
+  .ai-donation-fields__support-checkboxes-{{ ai_gen_id }} {
+    margin-top: 16px;
+  }
+
+  .ai-donation-fields__hidden-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-donation-fields-{{ ai_gen_id }} {
+      width: 100%;
+      padding: {{ block.settings.padding | times: 0.75 }}px;
+    }
+
+    .ai-donation-fields__heading-{{ ai_gen_id }} {
+      font-size: 18px;
+    }
+  }
+{% endstyle %}
+
+<donation-fields-{{ ai_gen_id }}
+  class="ai-donation-fields-{{ ai_gen_id }} ai-donation-fields__hidden-{{ ai_gen_id }}"
+  data-detection-type="{{ block.settings.detection_type }}"
+  data-product-id="{{ block.settings.donation_product.id }}"
+  data-product-tag="{{ block.settings.donation_product_tag }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-donation-fields__header-{{ ai_gen_id }}" data-header>
+    <h2 class="ai-donation-fields__heading-{{ ai_gen_id }}">{{ block.settings.section_heading }}</h2>
+    {% if block.settings.collapsible %}
+      <svg
+        class="ai-donation-fields__toggle-{{ ai_gen_id }}"
+        data-toggle
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    {% endif %}
+  </div>
+
+  <div class="ai-donation-fields__content-{{ ai_gen_id }}" data-content>
+    <div class="ai-donation-fields__field-{{ ai_gen_id }}">
+      <label class="ai-donation-fields__label-{{ ai_gen_id }}" for="ai-donation-acknowledgement-{{ ai_gen_id }}">
+        Name(s) as you would like to be listed for gift acknowledgement
+      </label>
+      <input
+        type="text"
+        id="ai-donation-acknowledgement-{{ ai_gen_id }}"
+        class="ai-donation-fields__input-{{ ai_gen_id }}"
+        data-property="acknowledgement_name"
+      >
+    </div>
+
+    <div class="ai-donation-fields__subsection-{{ ai_gen_id }}">
+      <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+        <input
+          type="checkbox"
+          id="ai-donation-honor-toggle-{{ ai_gen_id }}"
+          class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+          data-honor-toggle
+        >
+        <label
+          class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+          for="ai-donation-honor-toggle-{{ ai_gen_id }}"
+        >
+          In Honor Of
+        </label>
+      </div>
+
+      <div class="ai-donation-fields__honor-content-{{ ai_gen_id }} hidden" data-honor-content>
+        <label class="ai-donation-fields__label-{{ ai_gen_id }}" for="ai-donation-honor-name-{{ ai_gen_id }}">
+          Name
+        </label>
+        <input
+          type="text"
+          id="ai-donation-honor-name-{{ ai_gen_id }}"
+          class="ai-donation-fields__input-{{ ai_gen_id }}"
+          data-property="in_honor_of_name"
+        >
+      </div>
+    </div>
+
+    <div class="ai-donation-fields__subsection-{{ ai_gen_id }}">
+      <div class="ai-donation-fields__subsection-title-{{ ai_gen_id }}">
+        I would like my gift to support
+      </div>
+      <div class="ai-donation-fields__support-checkboxes-{{ ai_gen_id }}">
+        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+          <input
+            type="checkbox"
+            id="ai-donation-exhibitions-{{ ai_gen_id }}"
+            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            data-property="support_exhibitions_fund"
+            value="Exhibitions Fund"
+          >
+          <label
+            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+            for="ai-donation-exhibitions-{{ ai_gen_id }}"
+          >
+            Exhibitions Fund
+          </label>
+        </div>
+
+        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+          <input
+            type="checkbox"
+            id="ai-donation-education-{{ ai_gen_id }}"
+            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            data-property="support_education_fund"
+            value="Education Fund"
+          >
+          <label
+            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+            for="ai-donation-education-{{ ai_gen_id }}"
+          >
+            Education Fund
+          </label>
+        </div>
+
+        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+          <input
+            type="checkbox"
+            id="ai-donation-annual-{{ ai_gen_id }}"
+            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            data-property="support_annual_fund"
+            value="Annual Fund"
+          >
+          <label
+            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+            for="ai-donation-annual-{{ ai_gen_id }}"
+          >
+            Annual Fund
+          </label>
+        </div>
+
+        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+          <input
+            type="checkbox"
+            id="ai-donation-sculpture-{{ ai_gen_id }}"
+            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            data-property="support_sculpture_garden_fund"
+            value="Sculpture Garden Fund"
+          >
+          <label
+            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+            for="ai-donation-sculpture-{{ ai_gen_id }}"
+          >
+            Sculpture Garden Fund
+          </label>
+        </div>
+
+        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+          <input
+            type="checkbox"
+            id="ai-donation-other-{{ ai_gen_id }}"
+            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            data-property="support_other"
+            value="Other"
+          >
+          <label
+            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+            for="ai-donation-other-{{ ai_gen_id }}"
+          >
+            Other
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+      <input
+        type="checkbox"
+        id="ai-donation-anonymous-{{ ai_gen_id }}"
+        class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+        data-property="make_gift_anonymously"
+        value="Yes"
+      >
+      <label
+        class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+        for="ai-donation-anonymous-{{ ai_gen_id }}"
+      >
+        Make this gift anonymously
+      </label>
+    </div>
+
+    <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+      <input
+        type="checkbox"
+        id="ai-donation-matching-{{ ai_gen_id }}"
+        class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+        data-property="employer_matching_gift_form_submitted"
+        value="Yes"
+      >
+      <label
+        class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
+        for="ai-donation-matching-{{ ai_gen_id }}"
+      >
+        I have submitted an Employer's Matching Gift Form
+      </label>
+    </div>
+  </div>
+</donation-fields-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class DonationFields{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.detectionType = this.dataset.detectionType;
+        this.productId = this.dataset.productId;
+        this.productTag = this.dataset.productTag;
+        this.donationLineKey = null;
+        this.isCollapsible = {{ block.settings.collapsible | json }};
+        this.isCollapsed = false;
+      }
+
+      connectedCallback() {
+        this.checkCartForDonation();
+        this.setupEventListeners();
+        this.setupCollapsible();
+
+        document.addEventListener('cart:updated', () => {
+          this.checkCartForDonation();
+        });
+      }
+
+      setupCollapsible() {
+        if (!this.isCollapsible) return;
+
+        const header = this.querySelector('[data-header]');
+        const toggle = this.querySelector('[data-toggle]');
+        const content = this.querySelector('[data-content]');
+
+        if (header && toggle && content) {
+          header.addEventListener('click', () => {
+            this.isCollapsed = !this.isCollapsed;
+            toggle.classList.toggle('collapsed', this.isCollapsed);
+            content.classList.toggle('hidden', this.isCollapsed);
+          });
+        }
+      }
+
+      async checkCartForDonation() {
+        try {
+          debugger;
+          const response = await fetch('/cart.js');
+          const cart = await response.json();
+
+          let donationLine = null;
+
+          if (this.detectionType === 'product' && this.productId) {
+            donationLine = cart.items.find(item => item.product_id.toString() === this.productId);
+          } else if (this.detectionType === 'tag' && this.productTag) {
+            donationLine = cart.items.find(item => 
+              item.product_type && item.product_type.includes(this.productTag)
+            );
+
+        
+          }
+
+          if (donationLine) {
+            this.donationLineKey = donationLine.key;
+            this.classList.remove('ai-donation-fields__hidden-{{ ai_gen_id }}');
+            this.loadExistingProperties(donationLine.properties);
+          } else {
+            this.donationLineKey = null;
+            this.classList.add('ai-donation-fields__hidden-{{ ai_gen_id }}');
+          }
+        } catch (error) {
+          console.error('Error checking cart for donation:', error);
+        }
+      }
+
+      loadExistingProperties(properties) {
+        if (!properties) return;
+
+        const inputs = this.querySelectorAll('[data-property]');
+        inputs.forEach(input => {
+          const propertyName = input.dataset.property;
+          const propertyValue = properties[propertyName];
+
+          if (input.type === 'checkbox') {
+            input.checked = propertyValue === input.value || propertyValue === 'Yes';
+          } else {
+            input.value = propertyValue || '';
+          }
+        });
+
+        const honorToggle = this.querySelector('[data-honor-toggle]');
+        const honorContent = this.querySelector('[data-honor-content]');
+        if (honorToggle && honorContent && properties.in_honor_of_name) {
+          honorToggle.checked = true;
+          honorContent.classList.remove('hidden');
+        }
+      }
+
+      setupEventListeners() {
+        const textInputs = this.querySelectorAll('input[type="text"]');
+        textInputs.forEach(input => {
+          input.addEventListener('change', () => this.updateCartProperties());
+        });
+
+        const checkboxes = this.querySelectorAll('input[type="checkbox"][data-property]');
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', () => this.updateCartProperties());
+        });
+
+        const honorToggle = this.querySelector('[data-honor-toggle]');
+        const honorContent = this.querySelector('[data-honor-content]');
+        if (honorToggle && honorContent) {
+          honorToggle.addEventListener('change', () => {
+            honorContent.classList.toggle('hidden', !honorToggle.checked);
+            if (!honorToggle.checked) {
+              const honorNameInput = honorContent.querySelector('input');
+              if (honorNameInput) {
+                honorNameInput.value = '';
+              }
+            }
+            this.updateCartProperties();
+          });
+        }
+      }
+
+      async updateCartProperties() {
+        if (!this.donationLineKey) return;
+
+        const properties = {};
+        const inputs = this.querySelectorAll('[data-property]');
+
+        inputs.forEach(input => {
+          const propertyName = input.dataset.property;
+          
+          if (input.type === 'checkbox') {
+            if (input.checked) {
+              properties[propertyName] = input.value || 'Yes';
+            }
+          } else if (input.type === 'text') {
+            if (input.value.trim()) {
+              properties[propertyName] = input.value.trim();
+            }
+          }
+        });
+
+        try {
+          await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: this.donationLineKey,
+              properties: properties
+            })
+          });
+
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+        } catch (error) {
+          console.error('Error updating cart properties:', error);
+        }
+      }
+    }
+
+    customElements.define('donation-fields-{{ ai_gen_id }}', DonationFields{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Donation cart fields",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Detection settings"
+    },
+    {
+      "type": "select",
+      "id": "detection_type",
+      "label": "Detect donation by",
+      "options": [
+        {
+          "value": "product",
+          "label": "Specific product"
+        },
+        {
+          "value": "tag",
+          "label": "Product tag"
+        }
+      ],
+      "default": "product"
+    },
+    {
+      "type": "product",
+      "id": "donation_product",
+      "label": "Donation product",
+      "info": "Used when detection type is 'Specific product'"
+    },
+    {
+      "type": "text",
+      "id": "donation_product_tag",
+      "label": "Donation product tag",
+      "info": "Used when detection type is 'Product tag'",
+      "default": "donation"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section heading",
+      "default": "Gift Information"
+    },
+    {
+      "type": "checkbox",
+      "id": "collapsible",
+      "label": "Make section collapsible",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#E5E5E5"
+    },
+    {
+      "type": "color",
+      "id": "subsection_background_color",
+      "label": "Subsection background",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "header",
+      "content": "Input fields"
+    },
+    {
+      "type": "color",
+      "id": "input_background_color",
+      "label": "Input background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border",
+      "default": "#E5E5E5"
+    },
+    {
+      "type": "color",
+      "id": "input_focus_border_color",
+      "label": "Input focus border",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "label": "Input border radius",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    }
+  ],
+  "presets": [
+    {
+      "name": "Donation cart fields"
+    }
+  ]
+}
+{% endschema %}

@@ -1,11 +1,7 @@
-{% doc %}
-  @prompt
-    Create a Shopify cart page theme block that conditionally displays custom donation fields only when a donation product is in the cart. The donation product should be detected by checking if any cart line item belongs to a specific product or has a specific tag (make it configurable via block settings). When a donation product is detected, show the following fields as line item properties saved to the cart:1. A text input labeled "Name(s) as you would like to be listed for gift acknowledgement"2. An "In Honor Of" section with a checkbox to toggle it, and when checked, reveal a text input labeled "Name"3. A "I would like my gift to support" section with checkboxes for: Exhibitions Fund, Education Fund, Annual Fund, Sculpture Garden Fund, Other — plus a standalone checkbox labeled "Make this gift anonymously"4. A standalone checkbox labeled "I have submitted an Employer's Matching Gift Form"All field values should be saved as line item properties on the donation product's cart line item when the form changes (on input/change events via JS fetch to /cart/change.js). Style the block to match a clean, minimal museum aesthetic — simple labels, light borders, generous spacing. The block should have a section heading like "Gift Information" and be collapsible or always visible based on a block setting.
-{% enddoc %}
-{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign uid = block.id | replace: '_', '' | downcase %}
 
 {% style %}
-  .ai-donation-fields-{{ ai_gen_id }} {
+  .donation-gift-fields-{{ uid }} {
     display: block;
     width: {{ block.settings.desktop_width_percent }}%;
     max-width: 100%;
@@ -16,7 +12,7 @@
     padding: {{ block.settings.padding }}px;
   }
 
-  .ai-donation-fields__header-{{ ai_gen_id }} {
+  .donation-gift-fields__header-{{ uid }} {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24,37 +20,37 @@
     cursor: {% if block.settings.collapsible %}pointer{% else %}default{% endif %};
   }
 
-  .ai-donation-fields__heading-{{ ai_gen_id }} {
+  .donation-gift-fields__heading-{{ uid }} {
     margin: 0;
     font-size: 20px;
     font-weight: 500;
     color: {{ block.settings.text_color }};
   }
 
-  .ai-donation-fields__toggle-{{ ai_gen_id }} {
+  .donation-gift-fields__toggle-{{ uid }} {
     width: 24px;
     height: 24px;
     transition: transform 0.3s ease;
     color: {{ block.settings.text_color }};
   }
 
-  .ai-donation-fields__toggle-{{ ai_gen_id }}.collapsed {
+  .donation-gift-fields__toggle-{{ uid }}.collapsed {
     transform: rotate(-90deg);
   }
 
-  .ai-donation-fields__content-{{ ai_gen_id }} {
+  .donation-gift-fields__content-{{ uid }} {
     display: block;
   }
 
-  .ai-donation-fields__content-{{ ai_gen_id }}.hidden {
+  .donation-gift-fields__content-{{ uid }}.hidden {
     display: none;
   }
 
-  .ai-donation-fields__field-{{ ai_gen_id }} {
+  .donation-gift-fields__field-{{ uid }} {
     margin-bottom: 24px;
   }
 
-  .ai-donation-fields__label-{{ ai_gen_id }} {
+  .donation-gift-fields__label-{{ uid }} {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
@@ -62,7 +58,7 @@
     color: {{ block.settings.text_color }};
   }
 
-  .ai-donation-fields__input-{{ ai_gen_id }} {
+  .donation-gift-fields__input-{{ uid }} {
     width: 100%;
     padding: 12px 16px;
     border: 1px solid {{ block.settings.input_border_color }};
@@ -73,22 +69,22 @@
     font-family: inherit;
   }
 
-  .ai-donation-fields__input-{{ ai_gen_id }}:focus {
+  .donation-gift-fields__input-{{ uid }}:focus {
     outline: none;
     border-color: {{ block.settings.input_focus_border_color }};
   }
 
-  .ai-donation-fields__checkbox-group-{{ ai_gen_id }} {
+  .donation-gift-fields__checkbox-group-{{ uid }} {
     margin-bottom: 24px;
   }
 
-  .ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }} {
+  .donation-gift-fields__checkbox-wrapper-{{ uid }} {
     display: flex;
     align-items: flex-start;
     margin-bottom: 12px;
   }
 
-  .ai-donation-fields__checkbox-{{ ai_gen_id }} {
+  .donation-gift-fields__checkbox-{{ uid }} {
     margin-right: 10px;
     margin-top: 2px;
     width: 18px;
@@ -97,68 +93,68 @@
     flex-shrink: 0;
   }
 
-  .ai-donation-fields__checkbox-label-{{ ai_gen_id }} {
+  .donation-gift-fields__checkbox-label-{{ uid }} {
     font-size: 14px;
     color: {{ block.settings.text_color }};
     cursor: pointer;
     line-height: 1.5;
   }
 
-  .ai-donation-fields__subsection-{{ ai_gen_id }} {
+  .donation-gift-fields__subsection-{{ uid }} {
     margin-bottom: 24px;
     padding: 20px;
     background-color: {{ block.settings.subsection_background_color }};
     border-radius: {{ block.settings.input_border_radius }}px;
   }
 
-  .ai-donation-fields__subsection-title-{{ ai_gen_id }} {
+  .donation-gift-fields__subsection-title-{{ uid }} {
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 16px;
     color: {{ block.settings.text_color }};
   }
 
-  .ai-donation-fields__honor-content-{{ ai_gen_id }} {
+  .donation-gift-fields__honor-content-{{ uid }} {
     margin-top: 16px;
     padding-left: 28px;
   }
 
-  .ai-donation-fields__honor-content-{{ ai_gen_id }}.hidden {
+  .donation-gift-fields__honor-content-{{ uid }}.hidden {
     display: none;
   }
 
-  .ai-donation-fields__support-checkboxes-{{ ai_gen_id }} {
+  .donation-gift-fields__support-checkboxes-{{ uid }} {
     margin-top: 16px;
   }
 
-  .ai-donation-fields__hidden-{{ ai_gen_id }} {
+  .donation-gift-fields__hidden-{{ uid }} {
     display: none;
   }
 
   @media screen and (max-width: 749px) {
-    .ai-donation-fields-{{ ai_gen_id }} {
+    .donation-gift-fields-{{ uid }} {
       width: 100%;
       padding: {{ block.settings.padding | times: 0.75 }}px;
     }
 
-    .ai-donation-fields__heading-{{ ai_gen_id }} {
+    .donation-gift-fields__heading-{{ uid }} {
       font-size: 18px;
     }
   }
 {% endstyle %}
 
-<donation-fields-{{ ai_gen_id }}
-  class="ai-donation-fields-{{ ai_gen_id }} ai-donation-fields__hidden-{{ ai_gen_id }}"
+<donation-gift-fields-{{ uid }}
+  class="donation-gift-fields-{{ uid }}{% unless block.settings.always_show %} donation-gift-fields__hidden-{{ uid }}{% endunless %}"
   data-detection-type="{{ block.settings.detection_type }}"
   data-product-id="{{ block.settings.donation_product.id }}"
-  data-product-tag="{{ block.settings.donation_product_tag }}"
+  data-product-type="{{ block.settings.donation_product_type }}"
   {{ block.shopify_attributes }}
 >
-  <div class="ai-donation-fields__header-{{ ai_gen_id }}" data-header>
-    <h2 class="ai-donation-fields__heading-{{ ai_gen_id }}">{{ block.settings.section_heading }}</h2>
+  <div class="donation-gift-fields__header-{{ uid }}" data-header>
+    <h2 class="donation-gift-fields__heading-{{ uid }}">{{ block.settings.section_heading }}</h2>
     {% if block.settings.collapsible %}
       <svg
-        class="ai-donation-fields__toggle-{{ ai_gen_id }}"
+        class="donation-gift-fields__toggle-{{ uid }}"
         data-toggle
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -173,128 +169,128 @@
     {% endif %}
   </div>
 
-  <div class="ai-donation-fields__content-{{ ai_gen_id }}" data-content>
-    <div class="ai-donation-fields__field-{{ ai_gen_id }}">
-      <label class="ai-donation-fields__label-{{ ai_gen_id }}" for="ai-donation-acknowledgement-{{ ai_gen_id }}">
+  <div class="donation-gift-fields__content-{{ uid }}" data-content>
+    <div class="donation-gift-fields__field-{{ uid }}">
+      <label class="donation-gift-fields__label-{{ uid }}" for="donation-acknowledgement-{{ uid }}">
         Name(s) as you would like to be listed for gift acknowledgement
       </label>
       <input
         type="text"
-        id="ai-donation-acknowledgement-{{ ai_gen_id }}"
-        class="ai-donation-fields__input-{{ ai_gen_id }}"
+        id="donation-acknowledgement-{{ uid }}"
+        class="donation-gift-fields__input-{{ uid }}"
         data-property="acknowledgement_name"
       >
     </div>
 
-    <div class="ai-donation-fields__subsection-{{ ai_gen_id }}">
-      <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+    <div class="donation-gift-fields__subsection-{{ uid }}">
+      <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
         <input
           type="checkbox"
-          id="ai-donation-honor-toggle-{{ ai_gen_id }}"
-          class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+          id="donation-honor-toggle-{{ uid }}"
+          class="donation-gift-fields__checkbox-{{ uid }}"
           data-honor-toggle
         >
         <label
-          class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-          for="ai-donation-honor-toggle-{{ ai_gen_id }}"
+          class="donation-gift-fields__checkbox-label-{{ uid }}"
+          for="donation-honor-toggle-{{ uid }}"
         >
           In Honor Of
         </label>
       </div>
 
-      <div class="ai-donation-fields__honor-content-{{ ai_gen_id }} hidden" data-honor-content>
-        <label class="ai-donation-fields__label-{{ ai_gen_id }}" for="ai-donation-honor-name-{{ ai_gen_id }}">
+      <div class="donation-gift-fields__honor-content-{{ uid }} hidden" data-honor-content>
+        <label class="donation-gift-fields__label-{{ uid }}" for="donation-honor-name-{{ uid }}">
           Name
         </label>
         <input
           type="text"
-          id="ai-donation-honor-name-{{ ai_gen_id }}"
-          class="ai-donation-fields__input-{{ ai_gen_id }}"
+          id="donation-honor-name-{{ uid }}"
+          class="donation-gift-fields__input-{{ uid }}"
           data-property="in_honor_of_name"
         >
       </div>
     </div>
 
-    <div class="ai-donation-fields__subsection-{{ ai_gen_id }}">
-      <div class="ai-donation-fields__subsection-title-{{ ai_gen_id }}">
+    <div class="donation-gift-fields__subsection-{{ uid }}">
+      <div class="donation-gift-fields__subsection-title-{{ uid }}">
         I would like my gift to support
       </div>
-      <div class="ai-donation-fields__support-checkboxes-{{ ai_gen_id }}">
-        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+      <div class="donation-gift-fields__support-checkboxes-{{ uid }}">
+        <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
           <input
             type="checkbox"
-            id="ai-donation-exhibitions-{{ ai_gen_id }}"
-            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            id="donation-exhibitions-{{ uid }}"
+            class="donation-gift-fields__checkbox-{{ uid }}"
             data-property="support_exhibitions_fund"
             value="Exhibitions Fund"
           >
           <label
-            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-            for="ai-donation-exhibitions-{{ ai_gen_id }}"
+            class="donation-gift-fields__checkbox-label-{{ uid }}"
+            for="donation-exhibitions-{{ uid }}"
           >
             Exhibitions Fund
           </label>
         </div>
 
-        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+        <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
           <input
             type="checkbox"
-            id="ai-donation-education-{{ ai_gen_id }}"
-            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            id="donation-education-{{ uid }}"
+            class="donation-gift-fields__checkbox-{{ uid }}"
             data-property="support_education_fund"
             value="Education Fund"
           >
           <label
-            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-            for="ai-donation-education-{{ ai_gen_id }}"
+            class="donation-gift-fields__checkbox-label-{{ uid }}"
+            for="donation-education-{{ uid }}"
           >
             Education Fund
           </label>
         </div>
 
-        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+        <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
           <input
             type="checkbox"
-            id="ai-donation-annual-{{ ai_gen_id }}"
-            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            id="donation-annual-{{ uid }}"
+            class="donation-gift-fields__checkbox-{{ uid }}"
             data-property="support_annual_fund"
             value="Annual Fund"
           >
           <label
-            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-            for="ai-donation-annual-{{ ai_gen_id }}"
+            class="donation-gift-fields__checkbox-label-{{ uid }}"
+            for="donation-annual-{{ uid }}"
           >
             Annual Fund
           </label>
         </div>
 
-        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+        <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
           <input
             type="checkbox"
-            id="ai-donation-sculpture-{{ ai_gen_id }}"
-            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            id="donation-sculpture-{{ uid }}"
+            class="donation-gift-fields__checkbox-{{ uid }}"
             data-property="support_sculpture_garden_fund"
             value="Sculpture Garden Fund"
           >
           <label
-            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-            for="ai-donation-sculpture-{{ ai_gen_id }}"
+            class="donation-gift-fields__checkbox-label-{{ uid }}"
+            for="donation-sculpture-{{ uid }}"
           >
             Sculpture Garden Fund
           </label>
         </div>
 
-        <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+        <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
           <input
             type="checkbox"
-            id="ai-donation-other-{{ ai_gen_id }}"
-            class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+            id="donation-other-{{ uid }}"
+            class="donation-gift-fields__checkbox-{{ uid }}"
             data-property="support_other"
             value="Other"
           >
           <label
-            class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-            for="ai-donation-other-{{ ai_gen_id }}"
+            class="donation-gift-fields__checkbox-label-{{ uid }}"
+            for="donation-other-{{ uid }}"
           >
             Other
           </label>
@@ -302,54 +298,79 @@
       </div>
     </div>
 
-    <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+    <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
       <input
         type="checkbox"
-        id="ai-donation-anonymous-{{ ai_gen_id }}"
-        class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+        id="donation-anonymous-{{ uid }}"
+        class="donation-gift-fields__checkbox-{{ uid }}"
         data-property="make_gift_anonymously"
         value="Yes"
       >
       <label
-        class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-        for="ai-donation-anonymous-{{ ai_gen_id }}"
+        class="donation-gift-fields__checkbox-label-{{ uid }}"
+        for="donation-anonymous-{{ uid }}"
       >
         Make this gift anonymously
       </label>
     </div>
 
-    <div class="ai-donation-fields__checkbox-wrapper-{{ ai_gen_id }}">
+    <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
       <input
         type="checkbox"
-        id="ai-donation-matching-{{ ai_gen_id }}"
-        class="ai-donation-fields__checkbox-{{ ai_gen_id }}"
+        id="donation-matching-{{ uid }}"
+        class="donation-gift-fields__checkbox-{{ uid }}"
         data-property="employer_matching_gift_form_submitted"
         value="Yes"
       >
       <label
-        class="ai-donation-fields__checkbox-label-{{ ai_gen_id }}"
-        for="ai-donation-matching-{{ ai_gen_id }}"
+        class="donation-gift-fields__checkbox-label-{{ uid }}"
+        for="donation-matching-{{ uid }}"
       >
         I have submitted an Employer's Matching Gift Form
       </label>
     </div>
   </div>
-</donation-fields-{{ ai_gen_id }}>
+</donation-gift-fields-{{ uid }}>
 
 <script>
   (function() {
-    class DonationFields{{ ai_gen_id }} extends HTMLElement {
+    class DonationGiftFields{{ uid }} extends HTMLElement {
       constructor() {
         super();
         this.detectionType = this.dataset.detectionType;
         this.productId = this.dataset.productId;
-        this.productTag = this.dataset.productTag;
+        this.productType = this.dataset.productType;
         this.donationLineKey = null;
+        this.existingProperties = {};
+        this.alwaysShow = {{ block.settings.always_show | json }};
+        this.storageKey = 'donation_gift_fields';
+        this.storedSynced = false;
+        this.debug = {{ block.settings.debug | json }};
         this.isCollapsible = {{ block.settings.collapsible | json }};
         this.isCollapsed = false;
       }
 
+      log(...args) {
+        if (this.debug) console.log('[donation-gift-fields]', ...args);
+      }
+
+      ourPropertyNames() {
+        return Array.from(this.querySelectorAll('[data-property]'))
+          .map(input => input.dataset.property);
+      }
+
+      findDonationLine(cart) {
+        if (this.detectionType === 'product' && this.productId) {
+          return cart.items.find(item => item.product_id.toString() === this.productId) || null;
+        }
+        if (this.detectionType === 'type' && this.productType) {
+          return cart.items.find(item => item.product_type && item.product_type === this.productType) || null;
+        }
+        return null;
+      }
+
       connectedCallback() {
+        this.loadStoredValues();
         this.checkCartForDonation();
         this.setupEventListeners();
         this.setupCollapsible();
@@ -377,29 +398,30 @@
 
       async checkCartForDonation() {
         try {
-          debugger;
           const response = await fetch('/cart.js');
           const cart = await response.json();
 
-          let donationLine = null;
+          const donationLine = this.findDonationLine(cart);
 
-          if (this.detectionType === 'product' && this.productId) {
-            donationLine = cart.items.find(item => item.product_id.toString() === this.productId);
-          } else if (this.detectionType === 'tag' && this.productTag) {
-            donationLine = cart.items.find(item => 
-              item.product_type && item.product_type.includes(this.productTag)
-            );
-
-        
-          }
+          this.log('detection', {
+            type: this.detectionType,
+            productId: this.productId,
+            productType: this.productType,
+            cartItems: cart.items.map(i => ({ product_id: i.product_id, product_type: i.product_type, title: i.title })),
+            matched: donationLine ? donationLine.key : null
+          });
 
           if (donationLine) {
             this.donationLineKey = donationLine.key;
-            this.classList.remove('ai-donation-fields__hidden-{{ ai_gen_id }}');
+            this.existingProperties = donationLine.properties || {};
+            this.classList.remove('donation-gift-fields__hidden-{{ uid }}');
             this.loadExistingProperties(donationLine.properties);
+            this.syncStoredToCart();
           } else {
             this.donationLineKey = null;
-            this.classList.add('ai-donation-fields__hidden-{{ ai_gen_id }}');
+            if (!this.alwaysShow) {
+              this.classList.add('donation-gift-fields__hidden-{{ uid }}');
+            }
           }
         } catch (error) {
           console.error('Error checking cart for donation:', error);
@@ -412,6 +434,9 @@
         const inputs = this.querySelectorAll('[data-property]');
         inputs.forEach(input => {
           const propertyName = input.dataset.property;
+          // Only override a field when the cart line actually has this property,
+          // so values pre-filled from localStorage (donation page) are preserved.
+          if (!(propertyName in properties)) return;
           const propertyValue = properties[propertyName];
 
           if (input.type === 'checkbox') {
@@ -432,12 +457,15 @@
       setupEventListeners() {
         const textInputs = this.querySelectorAll('input[type="text"]');
         textInputs.forEach(input => {
-          input.addEventListener('change', () => this.updateCartProperties());
+          // Persist locally on every keystroke so values survive the DONATE redirect,
+          // and push to the cart line (if any) once the field is committed.
+          input.addEventListener('input', () => this.saveStoredValues());
+          input.addEventListener('change', () => this.onFieldChange());
         });
 
         const checkboxes = this.querySelectorAll('input[type="checkbox"][data-property]');
         checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('change', () => this.updateCartProperties());
+          checkbox.addEventListener('change', () => this.onFieldChange());
         });
 
         const honorToggle = this.querySelector('[data-honor-toggle]');
@@ -451,20 +479,23 @@
                 honorNameInput.value = '';
               }
             }
-            this.updateCartProperties();
+            this.onFieldChange();
           });
         }
       }
 
-      async updateCartProperties() {
-        if (!this.donationLineKey) return;
+      onFieldChange() {
+        this.saveStoredValues();
+        this.updateCartProperties();
+      }
 
+      collectProperties() {
         const properties = {};
         const inputs = this.querySelectorAll('[data-property]');
 
         inputs.forEach(input => {
           const propertyName = input.dataset.property;
-          
+
           if (input.type === 'checkbox') {
             if (input.checked) {
               properties[propertyName] = input.value || 'Yes';
@@ -476,18 +507,94 @@
           }
         });
 
+        return properties;
+      }
+
+      loadStoredValues() {
+        let stored;
         try {
-          await fetch('/cart/change.js', {
+          stored = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+        } catch (error) {
+          stored = {};
+        }
+        if (!stored || typeof stored !== 'object') return;
+
+        const inputs = this.querySelectorAll('[data-property]');
+        inputs.forEach(input => {
+          const propertyName = input.dataset.property;
+          if (!(propertyName in stored)) return;
+          const storedValue = stored[propertyName];
+
+          if (input.type === 'checkbox') {
+            input.checked = storedValue === input.value || storedValue === 'Yes';
+          } else {
+            input.value = storedValue || '';
+          }
+        });
+
+        const honorToggle = this.querySelector('[data-honor-toggle]');
+        const honorContent = this.querySelector('[data-honor-content]');
+        if (honorToggle && honorContent && stored.in_honor_of_name) {
+          honorToggle.checked = true;
+          honorContent.classList.remove('hidden');
+        }
+      }
+
+      saveStoredValues() {
+        try {
+          localStorage.setItem(this.storageKey, JSON.stringify(this.collectProperties()));
+        } catch (error) {
+          // Storage may be unavailable (private mode / quota) — fail silently.
+        }
+      }
+
+      // On the cart page the donation line now exists; push the values entered on
+      // the donation page (carried via localStorage) onto that line. Runs once.
+      syncStoredToCart() {
+        if (this.storedSynced || !this.donationLineKey) return;
+        this.storedSynced = true;
+        if (Object.keys(this.collectProperties()).length === 0) return;
+        this.updateCartProperties();
+      }
+
+      async updateCartProperties() {
+        if (!this.donationLineKey) return;
+
+        // Start from the line's existing properties so we don't wipe values set by
+        // the donation app (e.g. the donation amount). Clear only the fields we own,
+        // then apply the current form state — /cart/change.js REPLACES all properties.
+        const merged = Object.assign({}, this.existingProperties);
+        this.ourPropertyNames().forEach(name => { delete merged[name]; });
+        Object.assign(merged, this.collectProperties());
+
+        try {
+          const response = await fetch('/cart/change.js', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               id: this.donationLineKey,
-              properties: properties
+              properties: merged
             })
           });
 
+          if (!response.ok) {
+            const body = await response.text();
+            console.error('[donation-gift-fields] /cart/change.js failed', response.status, body);
+            return;
+          }
+
+          // Changing properties gives the line a NEW key — refresh it (and cached
+          // properties) from the returned cart so later edits target the live line.
+          const cart = await response.json();
+          const refreshed = this.findDonationLine(cart);
+          if (refreshed) {
+            this.donationLineKey = refreshed.key;
+            this.existingProperties = refreshed.properties || {};
+          }
+
+          this.log('saved properties', merged);
           document.dispatchEvent(new CustomEvent('cart:updated'));
         } catch (error) {
           console.error('Error updating cart properties:', error);
@@ -495,13 +602,13 @@
       }
     }
 
-    customElements.define('donation-fields-{{ ai_gen_id }}', DonationFields{{ ai_gen_id }});
+    customElements.define('donation-gift-fields-{{ uid }}', DonationGiftFields{{ uid }});
   })();
 </script>
 
 {% schema %}
 {
-  "name": "Donation cart fields",
+  "name": "Donation gift fields",
   "tag": null,
   "settings": [
     {
@@ -518,8 +625,8 @@
           "label": "Specific product"
         },
         {
-          "value": "tag",
-          "label": "Product tag"
+          "value": "type",
+          "label": "Product type"
         }
       ],
       "default": "product"
@@ -532,10 +639,10 @@
     },
     {
       "type": "text",
-      "id": "donation_product_tag",
-      "label": "Donation product tag",
-      "info": "Used when detection type is 'Product tag'",
-      "default": "donation"
+      "id": "donation_product_type",
+      "label": "Donation product type",
+      "info": "Used when detection type is 'Product type'. Must match the product's Type field exactly.",
+      "default": "Donation"
     },
     {
       "type": "header",
@@ -549,8 +656,22 @@
     },
     {
       "type": "checkbox",
+      "id": "always_show",
+      "label": "Always show fields",
+      "info": "Show the fields even when no donation is in the cart yet. Turn ON for the donation page (above the widget); can be OFF on the cart page.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
       "id": "collapsible",
       "label": "Make section collapsible",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "debug",
+      "label": "Debug logging",
+      "info": "Logs detection and save activity to the browser console. Turn off in production.",
       "default": false
     },
     {
@@ -650,7 +771,7 @@
   ],
   "presets": [
     {
-      "name": "Donation cart fields"
+      "name": "Donation gift fields"
     }
   ]
 }

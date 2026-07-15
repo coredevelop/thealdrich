@@ -1,0 +1,107 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs": {
+      "type": "breadcrumbs",
+      "settings": {
+        "show_breadcrumbs": "all",
+        "show_social_icons": true
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "membership_form_wqH76C": {
+      "type": "membership-form",
+      "blocks": {
+        "membership_level_HfEYkQ": {
+          "type": "membership_level",
+          "settings": {
+            "product": "senior-60-90-fully-tax-deductible",
+            "label_override": ""
+          }
+        },
+        "membership_level_94tC9m": {
+          "type": "membership_level",
+          "settings": {
+            "product": "family-150-100-tax-deductible",
+            "label_override": ""
+          }
+        },
+        "membership_level_cCTKge": {
+          "type": "membership_level",
+          "settings": {
+            "product": "contemporary-council-250-200-tax-deductible",
+            "label_override": ""
+          }
+        },
+        "membership_level_b4mRXL": {
+          "type": "membership_level",
+          "settings": {
+            "product": "artist-educator-student-50-individual",
+            "label_override": ""
+          }
+        },
+        "membership_level_QLc4LN": {
+          "type": "membership_level",
+          "settings": {
+            "product": "collaborators-circle-500",
+            "label_override": ""
+          }
+        },
+        "membership_level_qUJ8NF": {
+          "type": "membership_level",
+          "settings": {
+            "product": "collectors-circle-1-000",
+            "label_override": ""
+          }
+        }
+      },
+      "block_order": [
+        "membership_level_HfEYkQ",
+        "membership_level_94tC9m",
+        "membership_level_cCTKge",
+        "membership_level_b4mRXL",
+        "membership_level_QLc4LN",
+        "membership_level_qUJ8NF"
+      ],
+      "name": "Membership form",
+      "settings": {
+        "section_padding": true,
+        "content_max_width": 820,
+        "heading": "Join or Renew as a Member",
+        "after_submit": "cart",
+        "level_label": "Please indicate membership level:",
+        "level_placeholder": "Select a membership level",
+        "first_member_label": "First Member First and Last Name",
+        "second_member_label": "Second Member First and Last Name",
+        "second_member_sublabel": "excluding Artist/Educator/Student",
+        "relationship_label": "Relationship",
+        "relationship_options": "Spouse, Family, Friend, Other",
+        "digital_card_note": "Aldrich members receive environmentally-friendly digital membership cards.",
+        "optout_label": "Click here to opt out of digital cards to receive physical cards in the mail",
+        "matching_label": "I have submitted an Employer's Matching Gift Form",
+        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org</p>",
+        "submit_label": "Submit",
+        "text_color": "#000000",
+        "required_color": "#b00020",
+        "input_border_color": "#000000",
+        "input_border_radius": 0
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs",
+    "main",
+    "membership_form_wqH76C"
+  ]
+}

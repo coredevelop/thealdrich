@@ -1,0 +1,538 @@
+<style>
+  [data-section-id="{{ section.id }}"] .membership-form__inner {
+    max-width: {{ section.settings.content_max_width }}px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  {%- if section.settings.section_padding == false -%}
+    [data-section-id="{{ section.id }}"].membership-form {
+      padding-top: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  {%- endif -%}
+
+  [data-section-id="{{ section.id }}"] .membership-form__heading {
+    margin: 0 0 24px;
+    font-weight: 600;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__field {
+    margin-bottom: 20px;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__sublabel {
+    font-weight: 400;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__required {
+    color: {{ section.settings.required_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__select,
+  [data-section-id="{{ section.id }}"] .membership-form__input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid {{ section.settings.input_border_color }};
+    border-radius: {{ section.settings.input_border_radius }}px;
+    font-size: 14px;
+    font-family: inherit;
+    color: {{ section.settings.text_color }};
+    background-color: #ffffff;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__select:focus,
+  [data-section-id="{{ section.id }}"] .membership-form__input:focus {
+    outline: none;
+    border-color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__checkbox-row input {
+    margin: 3px 10px 0 0;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__checkbox-row label {
+    font-size: 14px;
+    line-height: 1.4;
+    color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__note {
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__note-strong {
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__error {
+    display: none;
+    margin: 12px 0;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #b00020;
+    background-color: #fdecef;
+    border: 1px solid #f5c2cb;
+    border-radius: 4px;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__error.is-visible {
+    display: block;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__submit {
+    margin-top: 8px;
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__submit[aria-busy="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+</style>
+
+<div
+  class="membership-form px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="membership-form"
+>
+  <div class="membership-form__inner">
+    <membership-form-{{ section.id }} data-redirect="{{ section.settings.after_submit }}">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="membership-form__heading text-2xl md:text-3xl">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- comment -%} Membership level {%- endcomment -%}
+      <div class="membership-form__field">
+        <label class="membership-form__label" for="membership-level-{{ section.id }}">
+          {{ section.settings.level_label | escape }}
+          <span class="membership-form__required">*</span>
+        </label>
+        <select
+          id="membership-level-{{ section.id }}"
+          class="membership-form__select"
+          data-membership-level
+          required
+        >
+          <option value="" disabled selected>{{ section.settings.level_placeholder | escape }}</option>
+          {%- for block in section.blocks -%}
+            {%- assign product = block.settings.product -%}
+            {%- if product != blank -%}
+              {%- assign variant = product.selected_or_first_available_variant -%}
+              {%- if variant != blank -%}
+                {%- if block.settings.label_override != blank -%}
+                  {%- assign option_label = block.settings.label_override -%}
+                {%- else -%}
+                  {%- assign price_formatted = variant.price | money_without_currency -%}
+                  {%- assign option_label = product.title | append: ' (' | append: price_formatted | append: ')' -%}
+                {%- endif -%}
+                <option
+                  value="{{ variant.id }}"
+                  data-title="{{ product.title | escape }}"
+                  {{ block.shopify_attributes }}
+                >{{ option_label | escape }}</option>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </div>
+
+      {%- comment -%} First member name {%- endcomment -%}
+      <div class="membership-form__field">
+        <label class="membership-form__label" for="membership-first-{{ section.id }}">
+          {{ section.settings.first_member_label | escape }}
+          <span class="membership-form__required">*</span>
+        </label>
+        <input
+          type="text"
+          id="membership-first-{{ section.id }}"
+          class="membership-form__input"
+          data-property="First Member Name"
+          required
+        >
+      </div>
+
+      {%- comment -%} Second member name {%- endcomment -%}
+      <div class="membership-form__field">
+        <label class="membership-form__label" for="membership-second-{{ section.id }}">
+          {{ section.settings.second_member_label | escape }}
+          {%- if section.settings.second_member_sublabel != blank -%}
+            <span class="membership-form__sublabel">({{ section.settings.second_member_sublabel | escape }})</span>
+          {%- endif -%}
+        </label>
+        <input
+          type="text"
+          id="membership-second-{{ section.id }}"
+          class="membership-form__input"
+          data-property="Second Member Name"
+        >
+      </div>
+
+      {%- comment -%} Relationship {%- endcomment -%}
+      <div class="membership-form__field">
+        <span class="membership-form__label">{{ section.settings.relationship_label | escape }}</span>
+        {%- assign relationship_options = section.settings.relationship_options | split: ',' -%}
+        {%- for option in relationship_options -%}
+          {%- assign option_value = option | strip -%}
+          {%- if option_value != blank -%}
+            <div class="membership-form__checkbox-row">
+              <input
+                type="checkbox"
+                id="membership-rel-{{ forloop.index }}-{{ section.id }}"
+                data-relationship
+                value="{{ option_value | escape }}"
+              >
+              <label for="membership-rel-{{ forloop.index }}-{{ section.id }}">{{ option_value | escape }}</label>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Digital card note + opt out {%- endcomment -%}
+      <div class="membership-form__note">
+        {%- if section.settings.digital_card_note != blank -%}
+          <div class="membership-form__note-strong">{{ section.settings.digital_card_note | escape }}</div>
+        {%- endif -%}
+        <div class="membership-form__checkbox-row">
+          <input
+            type="checkbox"
+            id="membership-optout-{{ section.id }}"
+            data-property="Physical Card Requested"
+            value="Yes"
+          >
+          <label for="membership-optout-{{ section.id }}">{{ section.settings.optout_label | escape }}</label>
+        </div>
+      </div>
+
+      {%- comment -%} Employer matching {%- endcomment -%}
+      <div class="membership-form__checkbox-row">
+        <input
+          type="checkbox"
+          id="membership-matching-{{ section.id }}"
+          data-property="Employer Matching Gift Form Submitted"
+          value="Yes"
+        >
+        <label for="membership-matching-{{ section.id }}">{{ section.settings.matching_label | escape }}</label>
+      </div>
+
+      {%- if section.settings.footer_note != blank -%}
+        <div class="membership-form__note rte">{{ section.settings.footer_note }}</div>
+      {%- endif -%}
+
+      <div class="membership-form__error" data-error role="alert"></div>
+
+      <button
+        type="button"
+        class="membership-form__submit button button--solid"
+        data-submit
+      >{{ section.settings.submit_label | escape }}</button>
+    </membership-form-{{ section.id }}>
+  </div>
+</div>
+
+<script>
+  (function() {
+    class MembershipForm{{ section.id }} extends HTMLElement {
+      connectedCallback() {
+        this.levelSelect = this.querySelector('[data-membership-level]');
+        this.submitButton = this.querySelector('[data-submit]');
+        this.errorEl = this.querySelector('[data-error]');
+        this.redirect = this.dataset.redirect === 'checkout' ? '/checkout' : '/cart';
+
+        if (this.submitButton) {
+          this.submitButton.addEventListener('click', () => this.handleSubmit());
+        }
+      }
+
+      showError(message) {
+        if (!this.errorEl) return;
+        this.errorEl.textContent = message;
+        this.errorEl.classList.add('is-visible');
+      }
+
+      clearError() {
+        if (!this.errorEl) return;
+        this.errorEl.textContent = '';
+        this.errorEl.classList.remove('is-visible');
+      }
+
+      collectProperties() {
+        const properties = {};
+
+        this.querySelectorAll('[data-property]').forEach((input) => {
+          const name = input.dataset.property;
+          if (input.type === 'checkbox') {
+            if (input.checked) properties[name] = input.value || 'Yes';
+          } else if (input.value.trim()) {
+            properties[name] = input.value.trim();
+          }
+        });
+
+        const relationships = Array.from(this.querySelectorAll('[data-relationship]:checked'))
+          .map((input) => input.value);
+        if (relationships.length) {
+          properties['Relationship'] = relationships.join(', ');
+        }
+
+        return properties;
+      }
+
+      async handleSubmit() {
+        this.clearError();
+
+        const variantId = this.levelSelect ? this.levelSelect.value : '';
+        if (!variantId) {
+          this.showError('Please select a membership level.');
+          return;
+        }
+
+        const firstNameInput = this.querySelector('[data-property="First Member Name"]');
+        if (firstNameInput && !firstNameInput.value.trim()) {
+          this.showError('Please enter the first member’s name.');
+          firstNameInput.focus();
+          return;
+        }
+
+        const body = {
+          items: [{
+            id: Number(variantId),
+            quantity: 1,
+            properties: this.collectProperties()
+          }]
+        };
+
+        this.submitButton.setAttribute('aria-busy', 'true');
+
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+
+          if (!response.ok) {
+            const errorBody = await response.json().catch(() => ({}));
+            this.showError(errorBody.description || 'Sorry, we could not add this membership to your cart. Please try again.');
+            this.submitButton.removeAttribute('aria-busy');
+            return;
+          }
+
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+          window.location.href = this.redirect;
+        } catch (error) {
+          this.showError('Something went wrong. Please try again.');
+          this.submitButton.removeAttribute('aria-busy');
+        }
+      }
+    }
+
+    customElements.define('membership-form-{{ section.id }}', MembershipForm{{ section.id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Membership form",
+  "class": "membership-form-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "section_padding",
+      "label": "Add section padding",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content width",
+      "min": 480,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 820
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Join or Renew as a Member"
+    },
+    {
+      "type": "select",
+      "id": "after_submit",
+      "label": "After submit",
+      "options": [
+        { "value": "cart", "label": "Go to cart" },
+        { "value": "checkout", "label": "Go to checkout" }
+      ],
+      "default": "cart"
+    },
+    {
+      "type": "header",
+      "content": "Field labels"
+    },
+    {
+      "type": "text",
+      "id": "level_label",
+      "label": "Membership level label",
+      "default": "Please indicate membership level:"
+    },
+    {
+      "type": "text",
+      "id": "level_placeholder",
+      "label": "Membership level placeholder",
+      "default": "Select a membership level"
+    },
+    {
+      "type": "text",
+      "id": "first_member_label",
+      "label": "First member label",
+      "default": "First Member First and Last Name"
+    },
+    {
+      "type": "text",
+      "id": "second_member_label",
+      "label": "Second member label",
+      "default": "Second Member First and Last Name"
+    },
+    {
+      "type": "text",
+      "id": "second_member_sublabel",
+      "label": "Second member sub-label",
+      "default": "excluding Artist/Educator/Student"
+    },
+    {
+      "type": "text",
+      "id": "relationship_label",
+      "label": "Relationship label",
+      "default": "Relationship"
+    },
+    {
+      "type": "text",
+      "id": "relationship_options",
+      "label": "Relationship options",
+      "info": "Comma-separated list of checkbox options.",
+      "default": "Spouse, Family, Friend, Other"
+    },
+    {
+      "type": "text",
+      "id": "digital_card_note",
+      "label": "Digital card note",
+      "default": "Aldrich members receive environmentally-friendly digital membership cards."
+    },
+    {
+      "type": "text",
+      "id": "optout_label",
+      "label": "Opt-out checkbox label",
+      "default": "Click here to opt out of digital cards to receive physical cards in the mail"
+    },
+    {
+      "type": "text",
+      "id": "matching_label",
+      "label": "Matching gift checkbox label",
+      "default": "I have submitted an Employer's Matching Gift Form"
+    },
+    {
+      "type": "richtext",
+      "id": "footer_note",
+      "label": "Footer note",
+      "default": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org</p>"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button label",
+      "default": "Submit"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "required_color",
+      "label": "Required asterisk",
+      "default": "#b00020"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "label": "Input corner radius",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "membership_level",
+      "name": "Membership level",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Membership product",
+          "info": "The product added to cart when this level is selected. Uses its first available variant."
+        },
+        {
+          "type": "text",
+          "id": "label_override",
+          "label": "Dropdown label override",
+          "info": "Optional. Defaults to 'Product title (price)'."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Membership form",
+      "blocks": [
+        { "type": "membership_level" },
+        { "type": "membership_level" },
+        { "type": "membership_level" }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

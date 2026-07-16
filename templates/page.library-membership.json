@@ -18,6 +18,7 @@
     },
     "main": {
       "type": "main-page",
+      "disabled": true,
       "settings": {}
     },
     "1783635242cb330148": {
@@ -25,11 +26,54 @@
       "settings": {
         "full_width": false
       }
+    },
+    "library_membership_form_j4GMYK": {
+      "type": "library-membership-form",
+      "blocks": {
+        "membership_level_KdYU7p": {
+          "type": "membership_level",
+          "settings": {
+            "product": "library-membership-150",
+            "label_override": ""
+          }
+        },
+        "membership_level_E4Pp3w": {
+          "type": "membership_level",
+          "settings": {
+            "product": "",
+            "label_override": ""
+          }
+        }
+      },
+      "block_order": [
+        "membership_level_KdYU7p",
+        "membership_level_E4Pp3w"
+      ],
+      "name": "Library membership form",
+      "settings": {
+        "section_padding": true,
+        "content_max_width": 820,
+        "heading": "Library Membership",
+        "benefits": "<p><strong>Library Benefits include:</strong></p><p>• Two all-access membership cards which allows free gallery admission for up to four (4) adults per card to The Aldrich Contemporary Art Museum. Card must be presented for admission. Children under 13 always enter free.</p><p>*If an event is taking place and advertised as being “free with the price of admission,” pass-holders can enter that event at no additional charge. Please note that the cards cannot be used in combination with any other offers or for admission to members-only events that require a non-member to pay a fee. Cards are valid at The Aldrich Contemporary Art Museum only, may not be used for admission to reciprocal partner museums.</p>",
+        "after_submit": "cart",
+        "type_label": "Membership Type",
+        "library_name_label": "Library Name",
+        "contact_name_label": "Contact First and Last Name",
+        "card1_label": "Card 1 Name",
+        "card2_label": "Card 2 Name",
+        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org</p>",
+        "submit_label": "Submit",
+        "text_color": "#000000",
+        "required_color": "#b00020",
+        "input_border_color": "#000000",
+        "input_border_radius": 0
+      }
     }
   },
   "order": [
     "breadcrumbs",
     "main",
-    "1783635242cb330148"
+    "1783635242cb330148",
+    "library_membership_form_j4GMYK"
   ]
 }

@@ -1,3 +1,5 @@
+{%- assign uid = section.id | replace: '-', '' | replace: '_', '' | downcase -%}
+
 <style>
   [data-section-id="{{ section.id }}"] .membership-form__inner {
     max-width: {{ section.settings.content_max_width }}px;
@@ -120,7 +122,7 @@
   data-section-type="membership-form"
 >
   <div class="membership-form__inner">
-    <membership-form-{{ section.id }} data-redirect="{{ section.settings.after_submit }}">
+    <membership-form-{{ uid }} data-redirect="{{ section.settings.after_submit }}">
       {%- if section.settings.heading != blank -%}
         <h2 class="membership-form__heading text-2xl md:text-3xl">{{ section.settings.heading | escape }}</h2>
       {%- endif -%}
@@ -149,9 +151,17 @@
                   {%- assign price_formatted = variant.price | money_without_currency -%}
                   {%- assign option_label = product.title | append: ' (' | append: price_formatted | append: ')' -%}
                 {%- endif -%}
+                {%- comment -%} Subscription/membership products require a selling plan to be purchased. {%- endcomment -%}
+                {%- assign selling_plan_id = '' -%}
+                {%- if variant.selling_plan_allocations.size > 0 -%}
+                  {%- assign selling_plan_id = variant.selling_plan_allocations.first.selling_plan.id -%}
+                {%- elsif product.selling_plan_groups.size > 0 -%}
+                  {%- assign selling_plan_id = product.selling_plan_groups.first.selling_plans.first.id -%}
+                {%- endif -%}
                 <option
                   value="{{ variant.id }}"
                   data-title="{{ product.title | escape }}"
+                  data-selling-plan="{{ selling_plan_id }}"
                   {{ block.shopify_attributes }}
                 >{{ option_label | escape }}</option>
               {%- endif -%}
@@ -249,16 +259,17 @@
         class="membership-form__submit button button--solid"
         data-submit
       >{{ section.settings.submit_label | escape }}</button>
-    </membership-form-{{ section.id }}>
+    </membership-form-{{ uid }}>
   </div>
 </div>
 
 <script>
   (function() {
-    class MembershipForm{{ section.id }} extends HTMLElement {
+    class MembershipForm{{ uid }} extends HTMLElement {
       connectedCallback() {
         this.levelSelect = this.querySelector('[data-membership-level]');
         this.submitButton = this.querySelector('[data-submit]');
+        debugger;
         this.errorEl = this.querySelector('[data-error]');
         this.redirect = this.dataset.redirect === 'checkout' ? '/checkout' : '/cart';
 
@@ -301,6 +312,7 @@
       }
 
       async handleSubmit() {
+        debugger;
         this.clearError();
 
         const variantId = this.levelSelect ? this.levelSelect.value : '';
@@ -309,6 +321,9 @@
           return;
         }
 
+        const selectedOption = this.levelSelect.options[this.levelSelect.selectedIndex];
+        const sellingPlan = selectedOption ? selectedOption.dataset.sellingPlan : '';
+
         const firstNameInput = this.querySelector('[data-property="First Member Name"]');
         if (firstNameInput && !firstNameInput.value.trim()) {
           this.showError('Please enter the first member’s name.');
@@ -316,13 +331,16 @@
           return;
         }
 
-        const body = {
-          items: [{
-            id: Number(variantId),
-            quantity: 1,
-            properties: this.collectProperties()
-          }]
+        const item = {
+          id: Number(variantId),
+          quantity: 1,
+          properties: this.collectProperties()
         };
+        if (sellingPlan) {
+          item.selling_plan = Number(sellingPlan);
+        }
+
+        const body = { items: [item] };
 
         this.submitButton.setAttribute('aria-busy', 'true');
 
@@ -349,7 +367,7 @@
       }
     }
 
-    customElements.define('membership-form-{{ section.id }}', MembershipForm{{ section.id }});
+    customElements.define('membership-form-{{ uid }}', MembershipForm{{ uid }});
   })();
 </script>
 

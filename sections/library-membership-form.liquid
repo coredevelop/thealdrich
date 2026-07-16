@@ -1,0 +1,483 @@
+{%- assign uid = section.id | replace: '-', '' | replace: '_', '' | downcase -%}
+
+<style>
+  [data-section-id="{{ section.id }}"] .library-form__inner {
+    max-width: {{ section.settings.content_max_width }}px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  {%- if section.settings.section_padding == false -%}
+    [data-section-id="{{ section.id }}"].library-form {
+      padding-top: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  {%- endif -%}
+
+  [data-section-id="{{ section.id }}"] .library-form__heading {
+    margin: 0 0 20px;
+    font-weight: 600;
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__benefits {
+    margin-bottom: 28px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__field {
+    margin-bottom: 20px;
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__required {
+    color: {{ section.settings.required_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__select,
+  [data-section-id="{{ section.id }}"] .library-form__input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid {{ section.settings.input_border_color }};
+    border-radius: {{ section.settings.input_border_radius }}px;
+    font-size: 14px;
+    font-family: inherit;
+    color: {{ section.settings.text_color }};
+    background-color: #ffffff;
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__select:focus,
+  [data-section-id="{{ section.id }}"] .library-form__input:focus {
+    outline: none;
+    border-color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__note {
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__error {
+    display: none;
+    margin: 12px 0;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #b00020;
+    background-color: #fdecef;
+    border: 1px solid #f5c2cb;
+    border-radius: 4px;
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__error.is-visible {
+    display: block;
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__submit {
+    margin-top: 8px;
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__submit[aria-busy="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+</style>
+
+<div
+  class="library-form px-rail py-section border-b border-primary-section-border"
+  data-section-id="{{ section.id }}"
+  data-section-type="library-membership-form"
+>
+  <div class="library-form__inner">
+    <library-membership-form-{{ uid }} data-redirect="{{ section.settings.after_submit }}">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="library-form__heading text-2xl md:text-3xl">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.benefits != blank -%}
+        <div class="library-form__benefits rte">{{ section.settings.benefits }}</div>
+      {%- endif -%}
+
+      {%- comment -%} Membership type {%- endcomment -%}
+      <div class="library-form__field">
+        <label class="library-form__label" for="library-type-{{ section.id }}">
+          {{ section.settings.type_label | escape }}
+        </label>
+        <select
+          id="library-type-{{ section.id }}"
+          class="library-form__select"
+          data-membership-level
+        >
+          {%- for block in section.blocks -%}
+            {%- assign product = block.settings.product -%}
+            {%- if product != blank -%}
+              {%- assign variant = product.selected_or_first_available_variant -%}
+              {%- if variant != blank -%}
+                {%- if block.settings.label_override != blank -%}
+                  {%- assign option_label = block.settings.label_override -%}
+                {%- else -%}
+                  {%- assign price_formatted = variant.price | money_without_currency -%}
+                  {%- assign option_label = product.title | append: ' (' | append: price_formatted | append: ')' -%}
+                {%- endif -%}
+                {%- comment -%} Subscription/membership products require a selling plan to be purchased. {%- endcomment -%}
+                {%- assign selling_plan_id = '' -%}
+                {%- if variant.selling_plan_allocations.size > 0 -%}
+                  {%- assign selling_plan_id = variant.selling_plan_allocations.first.selling_plan.id -%}
+                {%- elsif product.selling_plan_groups.size > 0 -%}
+                  {%- assign selling_plan_id = product.selling_plan_groups.first.selling_plans.first.id -%}
+                {%- endif -%}
+                <option
+                  value="{{ variant.id }}"
+                  data-title="{{ product.title | escape }}"
+                  data-selling-plan="{{ selling_plan_id }}"
+                  {{ block.shopify_attributes }}
+                >{{ option_label | escape }}</option>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </div>
+
+      {%- comment -%} Library name {%- endcomment -%}
+      <div class="library-form__field">
+        <label class="library-form__label" for="library-name-{{ section.id }}">
+          {{ section.settings.library_name_label | escape }}
+          <span class="library-form__required">*</span>
+        </label>
+        <input
+          type="text"
+          id="library-name-{{ section.id }}"
+          class="library-form__input"
+          data-property="Library Name"
+          required
+        >
+      </div>
+
+      {%- comment -%} Contact name {%- endcomment -%}
+      <div class="library-form__field">
+        <label class="library-form__label" for="library-contact-{{ section.id }}">
+          {{ section.settings.contact_name_label | escape }}
+          <span class="library-form__required">*</span>
+        </label>
+        <input
+          type="text"
+          id="library-contact-{{ section.id }}"
+          class="library-form__input"
+          data-property="Contact Name"
+          required
+        >
+      </div>
+
+      {%- comment -%} Card 1 name {%- endcomment -%}
+      <div class="library-form__field">
+        <label class="library-form__label" for="library-card1-{{ section.id }}">
+          {{ section.settings.card1_label | escape }}
+          <span class="library-form__required">*</span>
+        </label>
+        <input
+          type="text"
+          id="library-card1-{{ section.id }}"
+          class="library-form__input"
+          data-property="Card 1 Name"
+          required
+        >
+      </div>
+
+      {%- comment -%} Card 2 name {%- endcomment -%}
+      <div class="library-form__field">
+        <label class="library-form__label" for="library-card2-{{ section.id }}">
+          {{ section.settings.card2_label | escape }}
+        </label>
+        <input
+          type="text"
+          id="library-card2-{{ section.id }}"
+          class="library-form__input"
+          data-property="Card 2 Name"
+        >
+      </div>
+
+      {%- if section.settings.footer_note != blank -%}
+        <div class="library-form__note rte">{{ section.settings.footer_note }}</div>
+      {%- endif -%}
+
+      <div class="library-form__error" data-error role="alert"></div>
+
+      <button
+        type="button"
+        class="library-form__submit button button--solid"
+        data-submit
+      >{{ section.settings.submit_label | escape }}</button>
+    </library-membership-form-{{ uid }}>
+  </div>
+</div>
+
+<script>
+  (function() {
+    class LibraryMembershipForm{{ uid }} extends HTMLElement {
+      connectedCallback() {
+        this.levelSelect = this.querySelector('[data-membership-level]');
+        this.submitButton = this.querySelector('[data-submit]');
+        this.errorEl = this.querySelector('[data-error]');
+        this.redirect = this.dataset.redirect === 'checkout' ? '/checkout' : '/cart';
+
+        if (this.submitButton) {
+          this.submitButton.addEventListener('click', () => this.handleSubmit());
+        }
+      }
+
+      showError(message) {
+        if (!this.errorEl) return;
+        this.errorEl.textContent = message;
+        this.errorEl.classList.add('is-visible');
+      }
+
+      clearError() {
+        if (!this.errorEl) return;
+        this.errorEl.textContent = '';
+        this.errorEl.classList.remove('is-visible');
+      }
+
+      collectProperties() {
+        const properties = {};
+        this.querySelectorAll('[data-property]').forEach((input) => {
+          const name = input.dataset.property;
+          if (input.type === 'checkbox') {
+            if (input.checked) properties[name] = input.value || 'Yes';
+          } else if (input.value.trim()) {
+            properties[name] = input.value.trim();
+          }
+        });
+        return properties;
+      }
+
+      firstMissingRequired() {
+        const requiredInputs = this.querySelectorAll('input[data-property][required]');
+        for (const input of requiredInputs) {
+          if (!input.value.trim()) return input;
+        }
+        return null;
+      }
+
+      async handleSubmit() {
+        this.clearError();
+
+        const variantId = this.levelSelect ? this.levelSelect.value : '';
+        if (!variantId) {
+          this.showError('Please select a membership type.');
+          return;
+        }
+
+        const missing = this.firstMissingRequired();
+        if (missing) {
+          this.showError('Please fill in all required fields.');
+          missing.focus();
+          return;
+        }
+
+        const selectedOption = this.levelSelect.options[this.levelSelect.selectedIndex];
+        const sellingPlan = selectedOption ? selectedOption.dataset.sellingPlan : '';
+
+        const item = {
+          id: Number(variantId),
+          quantity: 1,
+          properties: this.collectProperties()
+        };
+        if (sellingPlan) {
+          item.selling_plan = Number(sellingPlan);
+        }
+
+        this.submitButton.setAttribute('aria-busy', 'true');
+
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: [item] })
+          });
+
+          if (!response.ok) {
+            const errorBody = await response.json().catch(() => ({}));
+            this.showError(errorBody.description || 'Sorry, we could not add this membership to your cart. Please try again.');
+            this.submitButton.removeAttribute('aria-busy');
+            return;
+          }
+
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+          window.location.href = this.redirect;
+        } catch (error) {
+          this.showError('Something went wrong. Please try again.');
+          this.submitButton.removeAttribute('aria-busy');
+        }
+      }
+    }
+
+    customElements.define('library-membership-form-{{ uid }}', LibraryMembershipForm{{ uid }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Library membership form",
+  "class": "library-membership-form-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "section_padding",
+      "label": "Add section padding",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content width",
+      "min": 480,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 820
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Library Membership"
+    },
+    {
+      "type": "richtext",
+      "id": "benefits",
+      "label": "Benefits text",
+      "default": "<p><strong>Library Benefits include:</strong></p><p>• Two all-access membership cards which allows free gallery admission for up to four (4) adults per card to The Aldrich Contemporary Art Museum. Card must be presented for admission. Children under 13 always enter free.</p><p>*If an event is taking place and advertised as being “free with the price of admission,” pass-holders can enter that event at no additional charge. Please note that the cards cannot be used in combination with any other offers or for admission to members-only events that require a non-member to pay a fee. Cards are valid at The Aldrich Contemporary Art Museum only, may not be used for admission to reciprocal partner museums.</p>"
+    },
+    {
+      "type": "select",
+      "id": "after_submit",
+      "label": "After submit",
+      "options": [
+        { "value": "cart", "label": "Go to cart" },
+        { "value": "checkout", "label": "Go to checkout" }
+      ],
+      "default": "cart"
+    },
+    {
+      "type": "header",
+      "content": "Field labels"
+    },
+    {
+      "type": "text",
+      "id": "type_label",
+      "label": "Membership type label",
+      "default": "Membership Type"
+    },
+    {
+      "type": "text",
+      "id": "library_name_label",
+      "label": "Library name label",
+      "default": "Library Name"
+    },
+    {
+      "type": "text",
+      "id": "contact_name_label",
+      "label": "Contact name label",
+      "default": "Contact First and Last Name"
+    },
+    {
+      "type": "text",
+      "id": "card1_label",
+      "label": "Card 1 name label",
+      "default": "Card 1 Name"
+    },
+    {
+      "type": "text",
+      "id": "card2_label",
+      "label": "Card 2 name label",
+      "default": "Card 2 Name"
+    },
+    {
+      "type": "richtext",
+      "id": "footer_note",
+      "label": "Footer note",
+      "default": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org</p>"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button label",
+      "default": "Submit"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "required_color",
+      "label": "Required asterisk",
+      "default": "#b00020"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "label": "Input corner radius",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "membership_level",
+      "name": "Membership type",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Membership product",
+          "info": "The product added to cart when this type is selected. Uses its first available variant."
+        },
+        {
+          "type": "text",
+          "id": "label_override",
+          "label": "Dropdown label override",
+          "info": "Optional. Defaults to 'Product title (price)'."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Library membership form",
+      "blocks": [
+        { "type": "membership_level" }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

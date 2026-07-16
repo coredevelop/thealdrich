@@ -23,6 +23,13 @@
     "membership_form_wqH76C": {
       "type": "membership-form",
       "blocks": {
+        "membership_level_qecbEH": {
+          "type": "membership_level",
+          "settings": {
+            "product": "friend-100-fully-tax-deductible",
+            "label_override": ""
+          }
+        },
         "membership_level_HfEYkQ": {
           "type": "membership_level",
           "settings": {
@@ -67,6 +74,7 @@
         }
       },
       "block_order": [
+        "membership_level_qecbEH",
         "membership_level_HfEYkQ",
         "membership_level_94tC9m",
         "membership_level_cCTKge",

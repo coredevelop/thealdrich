@@ -3,13 +3,6 @@
 {% style %}
   .donation-gift-fields-{{ uid }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
-    max-width: 100%;
-    margin: 0 auto;
-    background-color: {{ block.settings.background_color }};
-    border: 1px solid {{ block.settings.border_color }};
-    border-radius: {{ block.settings.border_radius }}px;
-    padding: {{ block.settings.padding }}px;
   }
 
   .donation-gift-fields__header-{{ uid }} {
@@ -48,6 +41,10 @@
 
   .donation-gift-fields__field-{{ uid }} {
     margin-bottom: 24px;
+  }
+
+  .donation-gift-fields__required-{{ uid }} {
+    color: #b00020;
   }
 
   .donation-gift-fields__label-{{ uid }} {
@@ -102,9 +99,6 @@
 
   .donation-gift-fields__subsection-{{ uid }} {
     margin-bottom: 24px;
-    padding: 20px;
-    background-color: {{ block.settings.subsection_background_color }};
-    border-radius: {{ block.settings.input_border_radius }}px;
   }
 
   .donation-gift-fields__subsection-title-{{ uid }} {
@@ -132,11 +126,6 @@
   }
 
   @media screen and (max-width: 749px) {
-    .donation-gift-fields-{{ uid }} {
-      width: 100%;
-      padding: {{ block.settings.padding | times: 0.75 }}px;
-    }
-
     .donation-gift-fields__heading-{{ uid }} {
       font-size: 18px;
     }
@@ -144,14 +133,18 @@
 {% endstyle %}
 
 <donation-gift-fields-{{ uid }}
-  class="donation-gift-fields-{{ uid }}{% unless block.settings.always_show %} donation-gift-fields__hidden-{{ uid }}{% endunless %}"
+  class="donation-gift-fields-{{ uid }} px-rail{% unless block.settings.always_show %} donation-gift-fields__hidden-{{ uid }}{% endunless %}"
   data-detection-type="{{ block.settings.detection_type }}"
   data-product-id="{{ block.settings.donation_product.id }}"
   data-product-type="{{ block.settings.donation_product_type }}"
   {{ block.shopify_attributes }}
 >
+  <div class="donation-gift-fields__inner-{{ uid }} max-w-screen mx-auto">
+  {% if block.settings.section_heading != blank or block.settings.collapsible %}
   <div class="donation-gift-fields__header-{{ uid }}" data-header>
-    <h2 class="donation-gift-fields__heading-{{ uid }}">{{ block.settings.section_heading }}</h2>
+    {% if block.settings.section_heading != blank %}
+      <h2 class="donation-gift-fields__heading-{{ uid }}">{{ block.settings.section_heading }}</h2>
+    {% endif %}
     {% if block.settings.collapsible %}
       <svg
         class="donation-gift-fields__toggle-{{ uid }}"
@@ -168,8 +161,21 @@
       </svg>
     {% endif %}
   </div>
+  {% endif %}
 
   <div class="donation-gift-fields__content-{{ uid }}" data-content>
+    <div class="donation-gift-fields__field-{{ uid }}">
+      <label class="donation-gift-fields__label-{{ uid }}" for="donation-full-name-{{ uid }}">
+        Full Name <span class="donation-gift-fields__required-{{ uid }}">*</span>
+      </label>
+      <input
+        type="text"
+        id="donation-full-name-{{ uid }}"
+        class="donation-gift-fields__input-{{ uid }}"
+        data-property="full_name"
+      >
+    </div>
+
     <div class="donation-gift-fields__field-{{ uid }}">
       <label class="donation-gift-fields__label-{{ uid }}" for="donation-acknowledgement-{{ uid }}">
         Name(s) as you would like to be listed for gift acknowledgement
@@ -330,6 +336,7 @@
       </label>
     </div>
   </div>
+  </div>
 </donation-gift-fields-{{ uid }}>
 
 <script>
@@ -455,7 +462,7 @@
       }
 
       setupEventListeners() {
-        const textInputs = this.querySelectorAll('input[type="text"]');
+        const textInputs = this.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"]');
         textInputs.forEach(input => {
           // Persist locally on every keystroke so values survive the DONATE redirect,
           // and push to the cart line (if any) once the field is committed.
@@ -500,10 +507,8 @@
             if (input.checked) {
               properties[propertyName] = input.value || 'Yes';
             }
-          } else if (input.type === 'text') {
-            if (input.value.trim()) {
-              properties[propertyName] = input.value.trim();
-            }
+          } else if (input.value.trim()) {
+            properties[propertyName] = input.value.trim();
           }
         });
 

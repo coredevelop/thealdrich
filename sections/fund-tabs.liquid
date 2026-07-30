@@ -1,0 +1,212 @@
+{%- assign uid = section.id | replace: '-', '' | replace: '_', '' | downcase -%}
+
+<style>
+  {%- if section.settings.sticky -%}
+    [data-section-id="{{ section.id }}"].fund-tabs {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background-color: {{ section.settings.background_color }};
+    }
+  {%- endif -%}
+
+  [data-section-id="{{ section.id }}"] .fund-tabs__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 32px;
+    justify-content: {{ section.settings.alignment }};
+    padding: 14px 0;
+    margin: 0 auto;
+    max-width: {{ section.settings.content_max_width }}px;
+    border-top: 1px solid {{ section.settings.border_color }};
+    border-bottom: 1px solid {{ section.settings.border_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .fund-tabs__link {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: {{ section.settings.text_color }};
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+    text-decoration: none;
+  }
+
+  [data-section-id="{{ section.id }}"] .fund-tabs__link:hover,
+  [data-section-id="{{ section.id }}"] .fund-tabs__link.is-active {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>
+
+<div
+  class="fund-tabs px-rail"
+  data-section-id="{{ section.id }}"
+  data-section-type="fund-tabs"
+>
+  <nav class="fund-tabs__nav" aria-label="{{ section.settings.aria_label | escape }}">
+    <fund-tabs-{{ uid }} style="display: contents;" data-offset="{{ section.settings.scroll_offset }}">
+      {%- for block in section.blocks -%}
+        {%- assign target = block.settings.target | strip | downcase -%}
+        <a
+          class="fund-tabs__link"
+          href="#{{ target }}"
+          data-tab-target="{{ target }}"
+          {{ block.shopify_attributes }}
+        >{{ block.settings.label | escape }}</a>
+      {%- endfor -%}
+    </fund-tabs-{{ uid }}>
+  </nav>
+</div>
+
+<script>
+  (function() {
+    class FundTabs{{ uid }} extends HTMLElement {
+      connectedCallback() {
+        this.offset = parseInt(this.dataset.offset, 10) || 0;
+        this.links = Array.from(this.querySelectorAll('[data-tab-target]'));
+        this.links.forEach((link) => {
+          link.addEventListener('click', (event) => this.handleClick(event, link));
+        });
+      }
+
+      handleClick(event, link) {
+        const id = link.dataset.tabTarget;
+        const targetEl = id ? document.getElementById(id) : null;
+        if (!targetEl) return;
+
+        event.preventDefault();
+        const top = targetEl.getBoundingClientRect().top + window.pageYOffset - this.offset;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+
+        this.links.forEach((l) => l.classList.remove('is-active'));
+        link.classList.add('is-active');
+      }
+    }
+
+    customElements.define('fund-tabs-{{ uid }}', FundTabs{{ uid }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Fund tabs",
+  "class": "fund-tabs-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Each tab scrolls to an element whose anchor ID matches the tab's target. Fund sections auto-generate anchor IDs from their headings (e.g. 'Exhibitions Fund' -> 'exhibitions-fund')."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to top when scrolling",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "scroll_offset",
+      "label": "Scroll offset",
+      "info": "Pixels to offset the scroll target (use if a sticky header covers the top).",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content width",
+      "min": 480,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1280
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Accessibility label",
+      "default": "Fund navigation"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background (when sticky)",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Overview"
+        },
+        {
+          "type": "text",
+          "id": "target",
+          "label": "Target anchor ID",
+          "info": "The id of the element to scroll to, e.g. 'exhibitions-fund'.",
+          "default": "donation-overview"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Fund tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "label": "Overview", "target": "donation-overview" } },
+        { "type": "tab", "settings": { "label": "Exhibitions Fund", "target": "exhibitions-fund" } },
+        { "type": "tab", "settings": { "label": "Education Fund", "target": "education-fund" } },
+        { "type": "tab", "settings": { "label": "Annual Fund", "target": "annual-fund" } },
+        { "type": "tab", "settings": { "label": "Sculpture Garden Fund", "target": "sculpture-garden-fund" } }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

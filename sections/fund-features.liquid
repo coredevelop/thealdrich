@@ -24,7 +24,9 @@
     gap: var(--fund-block-gap);
   }
 
-  [data-section-id="{{ section.id }}"] .fund-feature__heading {
+  [data-section-id="{{ section.id }}"] .fund-feature__heading,
+  [data-section-id="{{ section.id }}"] .fund-features__title {
+    font-family: var(--heading-font-family);
     margin: 0 0 20px;
     font-weight: 600;
     line-height: 1.3;
@@ -94,9 +96,14 @@
           endif
           assign column_count = image_count | at_least: 1
           assign img_sizes = '(max-width: 749px) 100vw, calc(100vw / ' | append: column_count | append: ')'
+          if block.settings.anchor_id != blank
+            assign fund_anchor = block.settings.anchor_id | handleize
+          else
+            assign fund_anchor = block.settings.heading | handleize
+          endif
         -%}
 
-        <div class="fund-feature" {{ block.shopify_attributes }}>
+        <div class="fund-feature" id="{{ fund_anchor }}" style="scroll-margin-top: {{ section.settings.scroll_margin_top }}px;" {{ block.shopify_attributes }}>
           {%- if block.settings.heading != blank -%}
             <h3 class="fund-feature__heading text-xl md:text-2xl">{{ block.settings.heading | escape }}</h3>
           {%- endif -%}
@@ -174,6 +181,17 @@
       "step": 20,
       "unit": "px",
       "default": 1280
+    },
+    {
+      "type": "range",
+      "id": "scroll_margin_top",
+      "label": "Scroll offset",
+      "info": "Space above each fund when scrolled to via the Fund tabs (match the tabs' sticky height).",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 80
     },
     {
       "type": "header",
@@ -283,6 +301,12 @@
           "type": "url",
           "id": "link_url",
           "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "anchor_id",
+          "label": "Anchor ID",
+          "info": "Optional. Used by the Fund tabs to scroll here. Defaults to a slug of the heading."
         }
       ]
     }

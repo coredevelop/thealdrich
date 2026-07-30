@@ -18,7 +18,29 @@
     },
     "main": {
       "type": "main-page",
+      "disabled": true,
       "settings": {}
+    },
+    "image_banner_9tArkg": {
+      "type": "image-banner",
+      "name": "t:sections.image_banner.presets.name",
+      "settings": {
+        "image": "shopify://shop_images/Make-a-Gift-Photo-Kevin-Kraut.png",
+        "alignment": "center",
+        "title": "",
+        "text": "",
+        "banner_size": "x-large",
+        "full_width": false,
+        "button_label_1": "",
+        "button_link_1": "",
+        "button_label_2": "",
+        "button_link_2": "",
+        "button_style": "outline",
+        "color_overlay_text": "#FFFFFF",
+        "color_accent": "#FFFFFF",
+        "color_overlay": "#000000",
+        "color_overlay_alpha_range": 35
+      }
     },
     "blocks_cFCcGc": {
       "type": "_blocks",
@@ -55,12 +77,12 @@
             "desktop_width_percent": 65,
             "padding": 30,
             "border_radius": 0,
-            "background_color": "#FFFFFF",
+            "background_color": "#ffffff",
             "text_color": "#000000",
-            "border_color": "#E5E5E5",
-            "subsection_background_color": "#FAFAFA",
-            "input_background_color": "#FFFFFF",
-            "input_border_color": "#E5E5E5",
+            "border_color": "#e5e5e5",
+            "subsection_background_color": "#fafafa",
+            "input_background_color": "#ffffff",
+            "input_border_color": "#e5e5e5",
             "input_focus_border_color": "#000000",
             "input_border_radius": 2
           },
@@ -192,6 +214,7 @@
   "order": [
     "breadcrumbs",
     "main",
+    "image_banner_9tArkg",
     "blocks_cFCcGc",
     "1783635242cb330148",
     "fund_features_Fq7TDH"

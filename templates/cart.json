@@ -27,6 +27,7 @@
       "blocks": {
         "donation_gift_fields_DqgcLF": {
           "type": "donation-gift-fields",
+          "disabled": true,
           "settings": {
             "detection_type": "product",
             "donation_product": "donation-fund",

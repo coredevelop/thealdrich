@@ -1,0 +1,90 @@
+<style>
+  [data-section-id="{{ section.id }}"] .photo-credit__inner {
+    max-width: var(--max-width-screen);
+    margin: 0 auto;
+    border-top: 1px solid {{ section.settings.line_color }};
+    border-bottom: 1px solid {{ section.settings.line_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  [data-section-id="{{ section.id }}"] .photo-credit__text {
+    margin: 0;
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.075rem;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+  }
+</style>
+
+<div
+  class="photo-credit px-rail"
+  data-section-id="{{ section.id }}"
+  data-section-type="photo-credit"
+>
+  <div class="photo-credit__inner">
+    {%- if section.settings.text != blank -%}
+      <p class="photo-credit__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Photo credit",
+  "class": "photo-credit-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Credit text",
+      "default": "Top image: Photo: Kaiya McCormick"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above text",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below text",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "Line",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Photo credit"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

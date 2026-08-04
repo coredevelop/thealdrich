@@ -1,0 +1,61 @@
+{%- comment -%}
+  Page-scoped overrides. Only rendered on templates that include this section
+  (the membership page), and scoped to #MainContent so the shared header/footer are unaffected.
+{%- endcomment -%}
+<style>
+  #MainContent {
+    --body-font-family: {{ section.settings.font_stack }};
+    --heading-font-family: {{ section.settings.heading_font_stack }};
+    font-family: {{ section.settings.font_stack }};
+  }
+
+  #MainContent h1,
+  #MainContent h2,
+  #MainContent h3,
+  #MainContent h4,
+  #MainContent h5,
+  #MainContent h6 {
+    font-family: {{ section.settings.heading_font_stack }};
+  }
+
+  #MainContent [data-section-id="hero_banner"] {
+    --max-width-screen: 1280px;
+    --spacing-rail: 1.25rem;
+  }
+
+  #MainContent [data-section-id="hero_banner"] .image-banner__wrapper {
+    min-height: {{ section.settings.banner_min_height }}px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Membership font",
+  "settings": [
+    {
+      "type": "text",
+      "id": "font_stack",
+      "label": "Body font family",
+      "info": "CSS font-family stack for this page's body text.",
+      "default": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_stack",
+      "label": "Heading font family",
+      "info": "CSS font-family stack for this page's headings (h1–h6).",
+      "default": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif"
+    },
+    {
+      "type": "range",
+      "id": "banner_min_height",
+      "label": "Banner min height",
+      "min": 200,
+      "max": 1000,
+      "step": 20,
+      "unit": "px",
+      "default": 800
+    }
+  ]
+}
+{% endschema %}

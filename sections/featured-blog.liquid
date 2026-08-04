@@ -42,7 +42,35 @@
   [data-section-id="{{ section.id }}"] {
     --text-align-section: {{ section.settings.align_text }};
   }
-  
+
+  {%- if section.settings.enable_card -%}
+    [data-section-id="{{ section.id }}"] .blog-featured__item {
+      background-color: {{ section.settings.card_background }};
+      color: {{ section.settings.card_text_color }};
+      padding: {{ section.settings.card_padding }}px;
+    }
+
+    [data-section-id="{{ section.id }}"] .blog-featured__item a,
+    [data-section-id="{{ section.id }}"] .blog-featured__item .article-grid__title,
+    [data-section-id="{{ section.id }}"] .blog-featured__item .article-grid__excerpt {
+      color: {{ section.settings.card_text_color }};
+    }
+
+    [data-section-id="{{ section.id }}"] .article-grid__category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    [data-section-id="{{ section.id }}"] .article-grid__excerpt,
+    [data-section-id="{{ section.id }}"] .article-grid__excerpt p {
+      font-family: "Regular", "helvetica neue", helvetica, arial, sans-serif;
+      letter-spacing: 0.075rem;
+      line-height: 1.6;
+      font-size: 1em;
+    }
+  {%- endif -%}
 </style>
 <div class="blog-featured px-rail py-section border-b border-primary-section-border"
   data-section-id="{{ section.id }}"
@@ -50,7 +78,7 @@
 
   <div class="blog-featured__header mx-auto max-w-screen flex {{ header_justify }} content-center mb-5">
     {%- if section.settings.title != blank -%}
-      <h2 class="blog-featured__title text-2xl md:text-3xl">{{ section.settings.title | escape }}</h2>
+      <{{ section.settings.title_tag | default: 'h2' }} class="blog-featured__title text-2xl md:text-3xl">{{ section.settings.title | escape }}</{{ section.settings.title_tag | default: 'h2' }}>
     {%- endif -%}
     {% if section.settings.button_label != blank %}
       <div class="blog-featured__more">
@@ -83,13 +111,16 @@
           {%- endif -%}
 
           <div class="article-grid__meta">
+            {%- if section.settings.category_label != blank -%}
+              <div class="article-grid__category">{{ section.settings.category_label }}</div>
+            {%- endif -%}
             <h3 class="article-grid__title text-lg md:text-xl">
               <a href="{{ article.url }}">{{ article.title }}</a>
             </h3>
 
             {%- if section.settings.show_dates -%}
               <div class="article-grid__date text-xs uppercase font-navigation text-primary-text-90">
-                {{ article.published_at | time_tag: format: 'date' }}                
+                {{ article.published_at | time_tag: format: 'date' }}
               </div>
             {%- endif -%}
           </div>
@@ -130,6 +161,9 @@
           {%- endif -%}
           
           <div class="article-grid__meta">
+            {%- if section.settings.category_label != blank -%}
+              <div class="article-grid__category">{{ section.settings.category_label }}</div>
+            {%- endif -%}
             <h3 class="article-grid__title text-lg md:text-xl">
               <a href="#">{{ 'sections.featured_blog.onboarding_title' | t }}</a>
             </h3>
@@ -173,6 +207,54 @@
       "id": "title",
       "label": "t:sections.blog_posts.settings.title.label",
       "default": "Blog posts"
+    },
+    {
+      "type": "select",
+      "id": "title_tag",
+      "label": "Title heading level",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_card",
+      "label": "Show items as coloured cards",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "category_label",
+      "label": "Category label",
+      "info": "Small uppercase label above each title (e.g. Blog). Leave blank to hide."
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#3ddc97"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Card text",
+      "default": "#0d1b16"
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Card padding",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
     },
     {
       "id": "blog",

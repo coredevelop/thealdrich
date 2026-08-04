@@ -6,7 +6,6 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      background-color: {{ section.settings.background_color }};
     }
   {%- endif -%}
 
@@ -27,12 +26,12 @@
     border: 0;
     padding: 0;
     cursor: pointer;
-    font-family: inherit;
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
     font-size: 13px;
     font-weight: 500;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.075rem;
     text-transform: uppercase;
-    color: {{ section.settings.text_color }};
+    color: #000;
     opacity: 0.75;
     transition: opacity 0.15s ease;
     text-decoration: none;
@@ -163,12 +162,6 @@
       "id": "border_color",
       "label": "Border",
       "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background (when sticky)",
-      "default": "#ffffff"
     }
   ],
   "blocks": [

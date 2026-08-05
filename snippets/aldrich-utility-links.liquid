@@ -1,0 +1,138 @@
+{% doc %}
+  Renders the utility link row that sits above the museum navigation on
+  thealdrich.org — opening hours, ticket and membership links, the highlighted
+  Donate link — followed by the store's account, cart and search controls.
+
+  thealdrich.org prints this row twice: once in the top bar on desktop, and
+  again inside the mobile menu. `variant` selects which copy is being rendered
+  so only one of them carries theme editor attributes and element ids.
+
+  Link blocks accept a full URL, a root-relative store path, or an #anchor.
+  Root-relative paths get the locale prefix applied automatically.
+
+  @param {object} section - The header section, whose blocks supply the links
+  @param {string} variant - Either 'bar' (desktop top bar) or 'menu' (mobile menu)
+
+  @example
+  {% render 'aldrich-utility-links', section: section, variant: 'bar' %}
+{% enddoc %}
+
+{%- liquid
+  assign is_bar = false
+  if variant == 'bar'
+    assign is_bar = true
+  endif
+-%}
+
+<ul class="aldrich-utility aldrich-utility--{{ variant }}" role="list">
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+      {%- when 'text' -%}
+        {%- if block.settings.text != blank -%}
+          <li class="aldrich-utility__item aldrich-utility__item--text{% if block.settings.hide_when_tight %} aldrich-utility__item--optional{% endif %}"
+            {% if is_bar %}{{ block.shopify_attributes }}{% endif %}>
+            <span>{{ block.settings.text | escape }}</span>
+          </li>
+        {%- endif -%}
+
+      {%- when 'link' -%}
+        {%- if block.settings.label != blank -%}
+          {%- liquid
+            assign link_url = block.settings.link_url | default: '#'
+
+            comment
+              A root-relative path such as /pages/donation has to pick up the
+              locale prefix on secondary locales, where routes.root_url is
+              something like "/fr". Full URLs and #anchors pass through as-is.
+            endcomment
+            assign first_character = link_url | slice: 0
+            if first_character == '/'
+              unless routes.root_url == '/'
+                assign link_url = routes.root_url | append: link_url
+              endunless
+            endif
+          -%}
+          <li class="aldrich-utility__item"
+            {% if is_bar %}{{ block.shopify_attributes }}{% endif %}>
+            <a class="aldrich-utility__link{% if block.settings.highlight %} aldrich-utility__link--highlight{% endif %}"
+              href="{{ link_url }}"
+              {% if block.settings.open_in_new_tab %}target="_blank" rel="noopener"{% endif %}>{{ block.settings.label | escape }}</a>
+          </li>
+        {%- endif -%}
+    {%- endcase -%}
+  {%- endfor -%}
+
+  {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+    {%- if customer -%}
+      <li class="aldrich-utility__item">
+        <a class="aldrich-utility__link" href="{{ routes.account_url }}" rel="nofollow">
+          {%- if customer.first_name != blank -%}
+            {{- customer.first_name | escape -}}
+          {%- else -%}
+            {{- 'customer.account_fallback' | t -}}
+          {%- endif -%}
+        </a>
+      </li>
+      <li class="aldrich-utility__item">
+        <a class="aldrich-utility__link" href="{{ routes.account_logout_url }}" rel="nofollow">{{ 'customer.log_out' | t }}</a>
+      </li>
+    {%- else -%}
+      <li class="aldrich-utility__item">
+        <a class="aldrich-utility__link" href="{{ routes.account_login_url }}" rel="nofollow">{{ 'customer.log_in' | t }}</a>
+      </li>
+      <li class="aldrich-utility__item">
+        <a class="aldrich-utility__link" href="{{ routes.account_register_url }}" rel="nofollow">{{ 'customer.login_page.create_account' | t }}</a>
+      </li>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if section.settings.show_cart -%}
+    <li class="aldrich-utility__item aldrich-utility__item--cart">
+      {%- comment -%}
+        Only the top bar copy keeps id="cart-button". The theme's cart scripts
+        replace the inner HTML of that element with the `cart-button` section,
+        so the markup below mirrors that section's output.
+      {%- endcomment -%}
+      <a class="aldrich-utility__link aldrich-utility__cart"
+        {% if is_bar %}id="cart-button"{% endif %}
+        href="{{ routes.cart_url }}"
+        data-cart-button
+        {%- if settings.cart_type == 'drawer' %} data-cart-drawer-trigger{% endif -%}>
+        {%- liquid
+          if settings.cart_icon == 'bag'
+            render 'icon-ui-bag'
+          elsif settings.cart_icon == 'basket'
+            render 'icon-ui-basket'
+          else
+            render 'icon-ui-cart'
+          endif
+        -%}
+        <span class="cart-button__count" data-cart-button-count>{{ cart.item_count }}</span>
+        <span class="cart-button__label" data-cart-button-label>{{ 'templates.cart.cart' | t }}</span>
+        <span class="cart-button__total money" data-cart-button-total>{% if cart.item_count >= 1 %}{{ cart.total_price | money }}{% endif %}</span>
+      </a>
+      {%- if is_bar -%}
+        {%- render 'cart-notification' -%}
+      {%- endif -%}
+    </li>
+  {%- endif -%}
+
+  {%- if section.settings.show_search -%}
+    {%- assign search_id = 'AldrichSearch-' | append: variant -%}
+    <li class="aldrich-utility__item aldrich-utility__item--search">
+      <form class="aldrich-search" action="{{ routes.search_url }}" method="get" role="search">
+        <label class="aldrich-visually-hidden" for="{{ search_id }}">{{ 'general.search.search' | t }}</label>
+        <input class="aldrich-search__input"
+          id="{{ search_id }}"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          autocomplete="off">
+        <button class="aldrich-search__submit" type="submit">
+          {%- render 'icon-ui-search' -%}
+          <span class="aldrich-visually-hidden">{{ 'general.search.search' | t }}</span>
+        </button>
+      </form>
+    </li>
+  {%- endif -%}
+</ul>

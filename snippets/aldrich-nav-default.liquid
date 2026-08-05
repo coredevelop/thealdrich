@@ -1,0 +1,118 @@
+{% doc %}
+  Renders the museum navigation exactly as it appears on thealdrich.org, as a
+  list of `<li>` elements for the Aldrich header nav.
+
+  The museum links point at the main site. The "Shop" item is a dropdown built
+  from a Shopify menu, so the store's own category URLs stay correct and stay
+  editable in the Shopify admin.
+
+  @param {string} base_url - Root URL of the main museum site, no trailing slash
+  @param {linklist} [shop_menu] - Menu whose links fill the "Shop" dropdown
+
+  @example
+  {% render 'aldrich-nav-default',
+    base_url: 'https://thealdrich.org',
+    shop_menu: linklists.main-menu
+  %}
+{% enddoc %}
+
+<li class="aldrich-nav__item">
+  <a class="aldrich-nav__link" href="{{ base_url }}/visit">{{ 'sections.aldrich_header.nav_visit' | t }}</a>
+</li>
+
+<li class="aldrich-nav__item aldrich-nav__item--parent">
+  <button type="button"
+    class="aldrich-nav__link aldrich-nav__link--parent"
+    aria-expanded="false"
+    aria-controls="AldrichNavExhibitions"
+    data-aldrich-dropdown>{{ 'sections.aldrich_header.nav_exhibitions' | t }}</button>
+  <div class="aldrich-nav__dropdown" id="AldrichNavExhibitions" hidden>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/exhibitions">{{ 'sections.aldrich_header.nav_exhibitions_current' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/exhibitions/upcoming">{{ 'sections.aldrich_header.nav_exhibitions_upcoming' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/exhibitions/past">{{ 'sections.aldrich_header.nav_exhibitions_past' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/exhibitions/on-tour">{{ 'sections.aldrich_header.nav_exhibitions_on_tour' | t }}</a>
+  </div>
+</li>
+
+<li class="aldrich-nav__item">
+  <a class="aldrich-nav__link" href="{{ base_url }}/events">{{ 'sections.aldrich_header.nav_calendar' | t }}</a>
+</li>
+
+<li class="aldrich-nav__item aldrich-nav__item--parent">
+  <button type="button"
+    class="aldrich-nav__link aldrich-nav__link--parent"
+    aria-expanded="false"
+    aria-controls="AldrichNavLearn"
+    data-aldrich-dropdown>{{ 'sections.aldrich_header.nav_learn' | t }}</button>
+  <div class="aldrich-nav__dropdown" id="AldrichNavLearn" hidden>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn">{{ 'sections.aldrich_header.nav_overview' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/public-programs">{{ 'sections.aldrich_header.nav_learn_public_programs' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/the-studio">{{ 'sections.aldrich_header.nav_learn_studio' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/children-and-family-programs">{{ 'sections.aldrich_header.nav_learn_children' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/teen-programs">{{ 'sections.aldrich_header.nav_learn_teen' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/academic-programs">{{ 'sections.aldrich_header.nav_learn_school' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/accessibility-programs">{{ 'sections.aldrich_header.nav_learn_accessibility' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/group-tours">{{ 'sections.aldrich_header.nav_learn_group_tours' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/learn/camp-aldrich">{{ 'sections.aldrich_header.nav_learn_camp' | t }}</a>
+  </div>
+</li>
+
+<li class="aldrich-nav__item aldrich-nav__item--parent">
+  <button type="button"
+    class="aldrich-nav__link aldrich-nav__link--parent"
+    aria-expanded="false"
+    aria-controls="AldrichNavSupport"
+    data-aldrich-dropdown>{{ 'sections.aldrich_header.nav_join_give' | t }}</button>
+  <div class="aldrich-nav__dropdown aldrich-nav__dropdown--right" id="AldrichNavSupport" hidden>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support">{{ 'sections.aldrich_header.nav_overview' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support/give">{{ 'sections.aldrich_header.nav_give_make_gift' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support/membership">{{ 'sections.aldrich_header.nav_give_membership' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support/aldrich-gala-in-the-garden">{{ 'sections.aldrich_header.nav_give_gala' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support/planned-giving">{{ 'sections.aldrich_header.nav_give_planned' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support/annual-report">{{ 'sections.aldrich_header.nav_give_annual_report' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/support/our-supporters">{{ 'sections.aldrich_header.nav_give_supporters' | t }}</a>
+  </div>
+</li>
+
+{%- comment -%}
+  "Shop" is the current site, so it becomes a dropdown of the store's own
+  categories. Falls back to a plain link when no menu is set.
+{%- endcomment -%}
+{%- if shop_menu != blank and shop_menu.links.size > 0 -%}
+  <li class="aldrich-nav__item aldrich-nav__item--parent aldrich-nav__item--current">
+    <button type="button"
+      class="aldrich-nav__link aldrich-nav__link--parent"
+      aria-expanded="false"
+      aria-controls="AldrichNavShop"
+      data-aldrich-dropdown>{{ 'sections.aldrich_header.nav_shop' | t }}</button>
+    <div class="aldrich-nav__dropdown aldrich-nav__dropdown--right" id="AldrichNavShop" hidden>
+      {%- for link in shop_menu.links -%}
+        <a class="aldrich-nav__sublink{% if link.active %} aldrich-nav__sublink--current{% endif %}"
+          href="{{ link.url }}"
+          {% if link.active %}aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+      {%- endfor -%}
+    </div>
+  </li>
+{%- else -%}
+  <li class="aldrich-nav__item aldrich-nav__item--current">
+    <a class="aldrich-nav__link" href="{{ routes.root_url }}">{{ 'sections.aldrich_header.nav_shop' | t }}</a>
+  </li>
+{%- endif -%}
+
+<li class="aldrich-nav__item">
+  <a class="aldrich-nav__link" href="{{ base_url }}/news">{{ 'sections.aldrich_header.nav_news' | t }}</a>
+</li>
+
+<li class="aldrich-nav__item aldrich-nav__item--parent">
+  <button type="button"
+    class="aldrich-nav__link aldrich-nav__link--parent"
+    aria-expanded="false"
+    aria-controls="AldrichNavAbout"
+    data-aldrich-dropdown>{{ 'sections.aldrich_header.nav_about' | t }}</button>
+  <div class="aldrich-nav__dropdown aldrich-nav__dropdown--right" id="AldrichNavAbout" hidden>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/about">{{ 'sections.aldrich_header.nav_overview' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/about#board-of-trustees">{{ 'sections.aldrich_header.nav_about_trustees' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/about#the-team">{{ 'sections.aldrich_header.nav_about_team' | t }}</a>
+    <a class="aldrich-nav__sublink" href="{{ base_url }}/about#host-event">{{ 'sections.aldrich_header.nav_about_host_event' | t }}</a>
+  </div>
+</li>

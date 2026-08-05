@@ -1,0 +1,240 @@
+{%- liquid
+  assign dismiss_key = section.settings.dismiss_key | default: 'callout' | handleize
+  assign callout_id = 'AldrichCallout-' | append: section.id
+
+  comment
+    Root-relative paths need the locale prefix on secondary locales, the same
+    way the header's utility links handle it. Full URLs pass through as-is.
+  endcomment
+  assign link_url = section.settings.link_url
+  assign first_character = link_url | slice: 0
+  if first_character == '/'
+    unless routes.root_url == '/'
+      assign link_url = routes.root_url | append: link_url
+    endunless
+  endif
+-%}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    --aldrich-callout-background: {{ section.settings.color_background }};
+    --aldrich-callout-text: {{ section.settings.color_text }};
+  }
+</style>
+
+{%- if section.settings.text != blank -%}
+  <aside class="aldrich-callout"
+    id="{{ callout_id }}"
+    data-section-id="{{ section.id }}"
+    data-section-type="aldrich-callout"
+    data-aldrich-callout
+    data-callout-key="{{ dismiss_key }}">
+    <div class="aldrich-container">
+      {%- if section.settings.show_close -%}
+        <button type="button" class="aldrich-callout__toggle" data-aldrich-callout-close>
+          <span class="aldrich-visually-hidden">{{ 'accessibility.close' | t }}</span>
+          <svg class="aldrich-callout__icon" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zm-4.146-3.146a.5.5 0 00-.708-.708L8 7.293 4.854 4.146a.5.5 0 10-.708.708L7.293 8l-3.147 3.146a.5.5 0 00.708.708L8 8.707l3.146 3.147a.5.5 0 00.708-.708L8.707 8l3.147-3.146z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      {%- endif -%}
+      <div class="aldrich-callout__text">
+        <p>
+          {%- if link_url != blank -%}
+            <a href="{{ link_url }}">{{ section.settings.text | escape }}</a>
+          {%- else -%}
+            {{ section.settings.text | escape }}
+          {%- endif -%}
+        </p>
+      </div>
+    </div>
+  </aside>
+
+  {%- comment -%}
+    Hide before first paint for visitors who already dismissed this callout, so
+    it never flashes. Rendering it visible by default means it still shows when
+    JavaScript is unavailable.
+  {%- endcomment -%}
+  <script>
+    (function () {
+      if (window.Shopify && window.Shopify.designMode) return;
+      var element = document.getElementById('{{ callout_id }}');
+      if (!element) return;
+      try {
+        if (window.localStorage.getItem('aldrich-callout:' + element.dataset.calloutKey)) {
+          element.hidden = true;
+        }
+      } catch (error) {
+        /* Storage unavailable (private browsing); leave the callout visible. */
+      }
+    })();
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  /* Repeated verbatim from the header section so this stands on its own. The
+     values are identical, so stylesheet combining order is irrelevant. */
+  .aldrich-container {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  @media (min-width: 576px) {
+    .aldrich-container { max-width: 768px; }
+  }
+
+  @media (min-width: 768px) {
+    .aldrich-container { max-width: 1024px; }
+  }
+
+  @media (min-width: 1024px) {
+    .aldrich-container { max-width: 1280px; }
+  }
+
+  @media (min-width: 1280px) {
+    .aldrich-container { max-width: 1281px; }
+  }
+
+  .aldrich-visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Mirrors .callout on thealdrich.org */
+  .aldrich-callout {
+    position: relative;
+    z-index: 10;
+    padding: 15px 0;
+    font-family: var(--aldrich-mono);
+    font-size: 1rem;
+    line-height: 1.6;
+    background: var(--aldrich-callout-background, #ffe100);
+    color: var(--aldrich-callout-text, #000);
+  }
+
+  .aldrich-callout p {
+    margin: 0;
+  }
+
+  .aldrich-callout a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .aldrich-callout__toggle {
+    float: right;
+    position: relative;
+    margin-top: -15px;
+    margin-right: -10px;
+    padding: 10px;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .aldrich-callout__icon {
+    display: block;
+    width: 22px;
+    height: auto;
+  }
+
+  .aldrich-callout__text {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .aldrich-callout__toggle { padding: 15px; }
+    .aldrich-callout__icon { width: 15px; }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('click', function (event) {
+    if (!event.target.closest) return;
+
+    var button = event.target.closest('[data-aldrich-callout-close]');
+    if (!button) return;
+
+    var callout = button.closest('[data-aldrich-callout]');
+    if (!callout) return;
+
+    callout.hidden = true;
+
+    try {
+      window.localStorage.setItem('aldrich-callout:' + callout.dataset.calloutKey, '1');
+    } catch (error) {
+      /* Storage unavailable; the callout returns on the next page load. */
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Callout bar",
+  "class": "section__aldrich-callout",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Advance ticket reservations encouraged. Click here to book"
+    },
+    {
+      "type": "text",
+      "id": "link_url",
+      "label": "Link",
+      "info": "A full URL or a store path such as /pages/service-list-page. Leave empty for plain text.",
+      "default": "https://fareharbor.com/embeds/book/thealdrich/?full-items=yes"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_close",
+      "label": "Show close button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "dismiss_key",
+      "label": "Dismissal ID",
+      "info": "Once a visitor closes the bar it stays closed. Change this ID to show the bar again to everyone who dismissed the previous message.",
+      "default": "advance-tickets"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "Background",
+      "default": "#ffe100"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Callout bar"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,53 @@
+{% doc %}
+  Renders a Shopify menu as `<li>` elements for the Aldrich header nav.
+
+  Top level links with children become dropdowns, matching the one level of
+  nesting thealdrich.org uses. Deeper levels are flattened into the dropdown.
+
+  @param {linklist} menu - The menu to render
+  @param {string} [id_prefix] - Prefix for generated dropdown element ids
+
+  @example
+  {% render 'aldrich-nav-menu', menu: linklists.main-menu, id_prefix: 'AldrichNav' %}
+{% enddoc %}
+
+{%- liquid
+  assign id_prefix = id_prefix | default: 'AldrichNav'
+-%}
+
+{%- for link in menu.links -%}
+  {%- assign dropdown_id = id_prefix | append: '-' | append: forloop.index -%}
+
+  {%- if link.links.size > 0 -%}
+    <li class="aldrich-nav__item aldrich-nav__item--parent{% if link.active or link.child_active %} aldrich-nav__item--current{% endif %}">
+      <button type="button"
+        class="aldrich-nav__link aldrich-nav__link--parent"
+        aria-expanded="false"
+        aria-controls="{{ dropdown_id }}"
+        data-aldrich-dropdown>{{ link.title | escape }}</button>
+      <div class="aldrich-nav__dropdown{% if forloop.index > 4 %} aldrich-nav__dropdown--right{% endif %}" id="{{ dropdown_id }}" hidden>
+        {%- if link.url != '#' -%}
+          <a class="aldrich-nav__sublink{% if link.active %} aldrich-nav__sublink--current{% endif %}"
+            href="{{ link.url }}"
+            {% if link.active %}aria-current="page"{% endif %}>{{ 'sections.aldrich_header.nav_overview' | t }}</a>
+        {%- endif -%}
+        {%- for child in link.links -%}
+          <a class="aldrich-nav__sublink{% if child.active %} aldrich-nav__sublink--current{% endif %}"
+            href="{{ child.url }}"
+            {% if child.active %}aria-current="page"{% endif %}>{{ child.title | escape }}</a>
+          {%- for grandchild in child.links -%}
+            <a class="aldrich-nav__sublink aldrich-nav__sublink--nested{% if grandchild.active %} aldrich-nav__sublink--current{% endif %}"
+              href="{{ grandchild.url }}"
+              {% if grandchild.active %}aria-current="page"{% endif %}>{{ grandchild.title | escape }}</a>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </li>
+  {%- else -%}
+    <li class="aldrich-nav__item{% if link.active %} aldrich-nav__item--current{% endif %}">
+      <a class="aldrich-nav__link"
+        href="{{ link.url }}"
+        {% if link.active %}aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+    </li>
+  {%- endif -%}
+{%- endfor -%}

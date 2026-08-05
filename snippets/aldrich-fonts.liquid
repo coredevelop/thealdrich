@@ -1,0 +1,80 @@
+{% doc %}
+  Registers the Aldrich brand webfonts and the design tokens shared by the
+  Aldrich header and footer, so the shop matches thealdrich.org.
+
+  The font files are the same faces served by the main site. They are exposed
+  as two families rather than the main site's four, so bold is reached with
+  `font-weight: 700` instead of a separate family name.
+
+  Render once, from inside `<head>`.
+
+  @example
+  {% render 'aldrich-fonts' %}
+{% enddoc %}
+
+{% comment %}theme-check-disable AssetPreload{% endcomment %}
+<link rel="preload" as="font" href="{{ 'aldrich-Regular-Regular.woff2' | asset_url }}" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="{{ 'aldrich-Regular-Bold.woff2' | asset_url }}" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="{{ 'aldrich-ApercuPro-Mono.woff2' | asset_url }}" type="font/woff2" crossorigin>
+{% comment %}theme-check-enable AssetPreload{% endcomment %}
+
+{% style %}
+  @font-face {
+    font-family: "AldrichRegular";
+    src: url({{ 'aldrich-Regular-Regular.woff2' | asset_url }}) format("woff2"),
+         url({{ 'aldrich-Regular-Regular.woff' | asset_url }}) format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AldrichRegular";
+    src: url({{ 'aldrich-Regular-Italic.woff2' | asset_url }}) format("woff2"),
+         url({{ 'aldrich-Regular-Italic.woff' | asset_url }}) format("woff");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AldrichRegular";
+    src: url({{ 'aldrich-Regular-Bold.woff2' | asset_url }}) format("woff2"),
+         url({{ 'aldrich-Regular-Bold.woff' | asset_url }}) format("woff");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AldrichRegular";
+    src: url({{ 'aldrich-Regular-BoldItalic.woff2' | asset_url }}) format("woff2"),
+         url({{ 'aldrich-Regular-BoldItalic.woff' | asset_url }}) format("woff");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AldrichMono";
+    src: url({{ 'aldrich-ApercuPro-Mono.woff2' | asset_url }}) format("woff2"),
+         url({{ 'aldrich-ApercuPro-Mono.woff' | asset_url }}) format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --aldrich-sans: "AldrichRegular", "helvetica neue", helvetica, arial, sans-serif;
+    --aldrich-mono: "AldrichMono", "helvetica neue", helvetica, arial, sans-serif;
+    --aldrich-tracking: 0.075rem;
+    --aldrich-background: #fafafa;
+    --aldrich-ink: #000;
+    --aldrich-body: #212529;
+    --aldrich-muted: #737373;
+    --aldrich-rule: #000;
+    --aldrich-field-border: #ced4da;
+    --aldrich-field-ink: #495057;
+    --aldrich-highlight: #ffe100;
+  }
+{% endstyle %}

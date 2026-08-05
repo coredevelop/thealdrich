@@ -443,6 +443,41 @@
     },
     "video": {
       "load_video": "Cargar vídeo: {{description}}"
+    },
+    "aldrich_header": {
+      "nav_visit": "Visit",
+      "nav_exhibitions": "Exhibitions",
+      "nav_exhibitions_current": "Current",
+      "nav_exhibitions_upcoming": "Upcoming",
+      "nav_exhibitions_past": "Past",
+      "nav_exhibitions_on_tour": "On Tour",
+      "nav_calendar": "Calendar",
+      "nav_learn": "Learn",
+      "nav_overview": "Overview",
+      "nav_learn_public_programs": "Public Programs",
+      "nav_learn_studio": "The Studio",
+      "nav_learn_children": "Children and Family Programs",
+      "nav_learn_teen": "Teen Programs",
+      "nav_learn_school": "School Programs",
+      "nav_learn_accessibility": "Accessibility Programs",
+      "nav_learn_group_tours": "Group Tours",
+      "nav_learn_camp": "Camp Aldrich",
+      "nav_join_give": "Join/Give",
+      "nav_give_make_gift": "Make a Gift",
+      "nav_give_membership": "Join as a Member",
+      "nav_give_gala": "Aldrich Gala",
+      "nav_give_planned": "Planned Giving",
+      "nav_give_annual_report": "Annual Report",
+      "nav_give_supporters": "Our Supporters",
+      "nav_shop": "Shop",
+      "nav_news": "News",
+      "nav_about": "About",
+      "nav_about_trustees": "Board of Trustees",
+      "nav_about_team": "The Team",
+      "nav_about_host_event": "Host an Event"
+    },
+    "aldrich_footer": {
+      "newsletter_email_label": "Email address"
     }
   },
   "templates": {

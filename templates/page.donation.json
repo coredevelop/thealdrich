@@ -9,6 +9,14 @@
  */
 {
   "sections": {
+    "page_styles": {
+      "type": "page-styles",
+      "settings": {
+        "font_stack": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "heading_font_stack": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "banner_min_height": 800
+      }
+    },
     "breadcrumbs": {
       "type": "breadcrumbs",
       "settings": {
@@ -16,132 +24,25 @@
         "show_social_icons": true
       }
     },
-    "1783635242cb330148": {
-      "type": "apps",
-      "blocks": {
-        "donateme_donation_widget_bewLAD": {
-          "type": "shopify://apps/donateme/blocks/donation-widget/0199994a-eb22-77f1-acb2-916b9cbf2e8f",
-          "settings": {
-            "product": "donation-fund",
-            "donate_button_text": "Donate Now",
-            "show_title": false,
-            "show_description": false,
-            "show_image": false,
-            "show_presets": false,
-            "show_other_button": true,
-            "heading_color": "#000000",
-            "text_color": "#000000",
-            "input_text_color": "#000000",
-            "input_placeholder_color": "#666666",
-            "heading_font_size": 24,
-            "subtext_font_size": 16,
-            "enable_gradient": true,
-            "button_color": "#6c8ed0",
-            "gradient_end_color": "#6c8ed0",
-            "button_border_color": "#6c8ed0",
-            "donate_button_border_color": "#6c8ed0",
-            "preset_button_text_color": "#6c8ed0",
-            "preset_button_hover_text_color": "#ffffff",
-            "donate_button_text_color": "#ffffff",
-            "donate_button_hover_text_color": "#ffffff",
-            "enable_read_more": false,
-            "description_char_limit": 150,
-            "enable_frequency_selection": true,
-            "enable_fee_recovery": false,
-            "fee_recovery_text": "I would like to help cover the transaction fee of {fee_amount}",
-            "fee_checkbox_color": "#6c8ed0"
-          }
-        }
-      },
-      "block_order": [
-        "donateme_donation_widget_bewLAD"
-      ],
-      "settings": {
-        "full_width": false
-      }
-    },
-    "fund_features_Fq7TDH": {
-      "type": "fund-features",
-      "blocks": {
-        "fund_7WiLM8": {
-          "type": "fund",
-          "settings": {
-            "heading": "Exhibitions Fund",
-            "image_1": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_2": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_3": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "body": "<p>For 60 years, The Aldrich has offered first museum exhibitions for emerging or mid-career artists, first career surveys of underrepresented artists, and group exhibitions that offer unique perspectives on issues relevant to the world around us.</p><p>A gift to the Exhibitions Fund supports The Aldrich's significant curatorial program, which allows artists to create deep and insightful exhibitions and projects that will have a lasting impact within the field and the world beyond.</p>",
-            "link_label": "Read more about the Exhibitions Fund here.",
-            "link_url": "https://thealdrich.org/page/exhibitions-fund",
-            "anchor_id": "exhibitions-fund"
-          }
-        },
-        "fund_qq37d4": {
-          "type": "fund",
-          "settings": {
-            "heading": "Education Fund",
-            "image_1": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_2": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_3": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "body": "<p>As an artist-centered institution, The Aldrich is guided by the belief that artists are innovative thinkers, who offer unique perspectives on our world. Learning at The Aldrich engages visitors of all ages with artworks and ideas from these artists, fostering a public space for critical discourse.</p><p>A gift to the Education Fund supports waived admission, educator-led tours, and free busing for Title 1/At-Risk students from an area ranging from the Bronx, NY to New Haven, CT; monthly free admission days for our visitors; and enriching public programs including panel discussions and artist talks, commissioned performances, screenings, and hands-on workshops. </p>",
-            "link_label": "Read more about the Education Fund here. ",
-            "link_url": "https://thealdrich.org/page/exhibitions-fund",
-            "anchor_id": "education-fund"
-          }
-        },
-        "fund_LVdGQX": {
-          "type": "fund",
-          "settings": {
-            "heading": "Education FundAnnual Fund",
-            "image_1": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_2": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_3": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "body": "<p>The Aldrich Annual Fund is a critical financial resource that supports the daily operations of the Museum. From facilities and exhibitions to programs and staffing, annual support from our donors keeps the Museum’s doors open and allows The Aldrich to realize its mission as a leading incubator for artists at critical creative junctures, providing a collaborative platform that engages and inspires.</p><p>A gift to the Annual Fund goes directly where it is needed most一 to the artists, educators, and staff that make everything we do possible. </p>",
-            "link_label": "Read more about the Education Fund here. ",
-            "link_url": "https://thealdrich.org/page/exhibitions-fund",
-            "anchor_id": "annual-fund"
-          }
-        },
-        "fund_6bq94X": {
-          "type": "fund",
-          "settings": {
-            "heading": "Sculpture Garden Fund",
-            "image_1": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_2": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "image_3": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
-            "body": "<p>The Aldrich recently celebrated the reopening of its newly reimagined Sculpture Garden and campus, expanding what artists are able to realize at The Aldrich and offering more green space for our community to enjoy. Free and open to the public 365 days a year from dawn till dusk, the new Garden includes a Pollinator Walkway, Boardwalk, a Secret Garden, and an Amphitheater which provides a natural venue for The Aldrich’s presentation of dance, music, and school and community programs.</p><p>A gift to the Sculpture Garden will help the Museum sustain this beautiful, universally inclusive, and accessible space designed for engagement with works of art for our community.</p>",
-            "link_label": "Read more about the Education Fund here. ",
-            "link_url": "https://thealdrich.org/page/exhibitions-fund",
-            "anchor_id": "sculpture-garden-fund"
-          }
-        }
-      },
-      "block_order": [
-        "fund_7WiLM8",
-        "fund_qq37d4",
-        "fund_LVdGQX",
-        "fund_6bq94X"
-      ],
-      "name": "Fund features",
-      "settings": {
-        "section_padding": true,
-        "title": "",
-        "content_max_width": 1280,
-        "image_ratio": "4/3",
-        "image_gap": 16,
-        "image_border_radius": 0,
-        "image_placeholder_color": "#eeeeee",
-        "block_gap": 56,
-        "scroll_margin_top": 80
-      }
-    },
     "hero_banner": {
       "type": "image-banner",
       "settings": {
+        "image": "shopify://shop_images/Make-a-Gift-Photo-Kevin-Kraut.png",
+        "alignment": "center",
+        "title": "",
+        "text": "",
         "banner_size": "large",
         "full_width": false,
-        "title": "",
-        "text": ""
+        "fit_image": true,
+        "button_label_1": "",
+        "button_link_1": "",
+        "button_label_2": "",
+        "button_link_2": "",
+        "button_style": "outline",
+        "color_overlay_text": "#ffffff",
+        "color_accent": "#ffffff",
+        "color_overlay": "#ffffff",
+        "color_overlay_alpha_range": 0
       }
     },
     "donation_intro": {
@@ -151,19 +52,18 @@
           "type": "donation_text",
           "name": "Donation text",
           "settings": {
+            "eyebrow": "Support",
             "heading": "Make a Gift",
-            "body": "<p>Thank you for your support!</p><p>To make a gift with a credit card, please fill out the secure form below.</p><p>A Donor-Advised Fund allows you to recommend grants to the Museum directly from your charitable giving account. Please notify The Aldrich if you make a DAF gift as the sponsoring organization may not share your information. To recommend a grant, contact your DAF provider and direct it to:<br/>The Aldrich Contemporary Art Museum<br/>Tax ID: 06-6069965</p><p>If you wish to make a gift of stock or to send a wire transfer, please contact Kris Honeycutt, Director of Development, at 203.403.7364 or <a href=\"mailto:khoneycutt@thealdrich.org\">khoneycutt@thealdrich.org</a>.</p>",
+            "heading_tag": "h2",
+            "body": "<p><strong>Thank you for your support!</strong></p><p>To make a gift with a credit card, please fill out the secure form below.</p><p>A Donor-Advised Fund allows you to recommend grants to the Museum directly from your charitable giving account. Please notify The Aldrich if you make a DAF gift as the sponsoring organization may not share your information. To recommend a grant, contact your DAF provider and direct it to:<br/>The Aldrich Contemporary Art Museum<br/>Tax ID: 06-6069965</p><p>If you wish to make a gift of stock or to send a wire transfer, please contact Kris Honeycutt, Director of Development, at 203.403.7364 or <a href=\"mailto:khoneycutt@thealdrich.org\">khoneycutt@thealdrich.org</a>.</p>",
+            "anchor_id": "donation-overview",
             "text_alignment": "left",
-            "desktop_width_percent": 100,
             "heading_size": 24,
             "body_size": 16,
             "padding_top": 0,
             "padding_bottom": 24,
-            "padding_horizontal": 0,
             "heading_color": "#000000",
-            "text_color": "#333333",
-            "eyebrow": "Support",
-            "anchor_id": "donation-overview"
+            "text_color": "#333333"
           },
           "blocks": {}
         }
@@ -223,8 +123,11 @@
       "settings": {
         "sticky": true,
         "scroll_offset": 80,
-        "alignment": "flex-start",
-        "content_max_width": 1280
+        "alignment": "center",
+        "content_max_width": 1280,
+        "aria_label": "Fund navigation",
+        "text_color": "#000000",
+        "border_color": "#000000"
       }
     },
     "donation_fields": {
@@ -238,19 +141,21 @@
             "donation_product": "donation-fund",
             "donation_product_type": "Donation",
             "section_heading": "",
+            "intro_text": "<p>Thank you for making a gift to The Aldrich Contemporary Art Museum. Please fill out the form below to complete your gift.</p>",
             "always_show": true,
             "collapsible": false,
             "debug": false,
             "desktop_width_percent": 100,
             "padding": 30,
             "border_radius": 0,
-            "background_color": "#FFFFFF",
+            "background_color": "#ffffff",
             "text_color": "#000000",
-            "border_color": "#E5E5E5",
-            "subsection_background_color": "#FAFAFA",
-            "input_background_color": "#FFFFFF",
-            "input_border_color": "#E5E5E5",
+            "border_color": "#e5e5e5",
+            "subsection_background_color": "#fafafa",
+            "input_background_color": "#ffffff",
+            "input_border_color": "#e5e5e5",
             "input_focus_border_color": "#000000",
+            "checkbox_accent_color": "#3b6fe0",
             "input_border_radius": 2
           },
           "blocks": {}
@@ -262,15 +167,159 @@
       "name": "Donation form",
       "settings": {}
     },
+    "1783635242cb330148": {
+      "type": "apps",
+      "blocks": {
+        "donateme_donation_widget_bewLAD": {
+          "type": "shopify://apps/donateme/blocks/donation-widget/0199994a-eb22-77f1-acb2-916b9cbf2e8f",
+          "settings": {
+            "product": "donation-fund",
+            "donate_button_text": "Donate Now",
+            "show_title": false,
+            "show_description": false,
+            "show_image": false,
+            "show_presets": false,
+            "show_other_button": true,
+            "heading_color": "#000000",
+            "text_color": "#000000",
+            "input_text_color": "#000000",
+            "input_placeholder_color": "#666666",
+            "heading_font_size": 24,
+            "subtext_font_size": 16,
+            "enable_gradient": true,
+            "button_color": "#333333",
+            "gradient_end_color": "#333333",
+            "button_border_color": "#333333",
+            "donate_button_border_color": "#333333",
+            "preset_button_text_color": "#333333",
+            "preset_button_hover_text_color": "#ffffff",
+            "donate_button_text_color": "#ffffff",
+            "donate_button_hover_text_color": "#ffffff",
+            "enable_read_more": false,
+            "description_char_limit": 150,
+            "enable_frequency_selection": true,
+            "enable_fee_recovery": false,
+            "fee_recovery_text": "I would like to help cover the transaction fee of {fee_amount}",
+            "fee_checkbox_color": "#333333"
+          }
+        }
+      },
+      "block_order": [
+        "donateme_donation_widget_bewLAD"
+      ],
+      "settings": {
+        "full_width": false
+      }
+    },
+    "fund_features_Fq7TDH": {
+      "type": "fund-features",
+      "blocks": {
+        "fund_7WiLM8": {
+          "type": "fund",
+          "settings": {
+            "heading": "Exhibitions Fund",
+            "image_1": "shopify://shop_images/Exhibitions-Fund-1-Photo-Kaiya-McCormick.png",
+            "image_2": "shopify://shop_images/Exhibitions-Fund-2-Photo-Kaiya-McCormick.png",
+            "image_3": "shopify://shop_images/Exhibitions-Fund-3-Photo-Kaiya-McCormick.png",
+            "body": "<p>For 60 years, The Aldrich has offered first museum exhibitions for emerging or mid-career artists, first career surveys of underrepresented artists, and group exhibitions that offer unique perspectives on issues relevant to the world around us. Aldrich exhibitions are accompanied by publications, often the artist’s first, and many shows feature the debut of new bodies of work.</p><p>A gift to the Exhibitions Fund supports The Aldrich’s significant curatorial program, which allows artists to create deep and insightful exhibitions and projects that will have a lasting impact within the field and the world beyond. </p><p></p>",
+            "link_label": "Read more about the Exhibitions Fund here.",
+            "link_url": "https://thealdrich.org/page/exhibitions-fund",
+            "anchor_id": "exhibitions-fund"
+          }
+        },
+        "fund_qq37d4": {
+          "type": "fund",
+          "settings": {
+            "heading": "Education Fund",
+            "image_1": "shopify://shop_images/Education-Fund-1-Photo-Kaiya-McCormick.png",
+            "image_2": "shopify://shop_images/Sensory_Saturday_1.jpg",
+            "image_3": "shopify://shop_images/IMG_2889.jpg",
+            "body": "<p>As an artist-centered institution, The Aldrich is guided by the belief that artists are innovative thinkers, who offer unique perspectives on our world. Learning at The Aldrich engages visitors of all ages with artworks and ideas from these artists, fostering a public space for critical discourse.</p><p>A gift to the Education Fund supports waived admission, educator-led tours, and free busing for Title 1/At-Risk students from an area ranging from the Bronx, NY to New Haven, CT; monthly free admission days for our visitors; and enriching public programs including panel discussions and artist talks, commissioned performances, screenings, and hands-on workshops. </p><p></p>",
+            "link_label": "Read more about the Education Fund here. ",
+            "link_url": "https://thealdrich.org/page/education-fund",
+            "anchor_id": "education-fund"
+          }
+        },
+        "fund_LVdGQX": {
+          "type": "fund",
+          "settings": {
+            "heading": "Annual Fund",
+            "image_1": "shopify://shop_images/Annual-Fund-1-Photo-Kaiya-McCormick.png",
+            "image_2": "shopify://shop_images/Annual-Fund-2-Photo-Kaiya-McCormick.png",
+            "image_3": "shopify://shop_images/Annual-Fund-3-Photo-Kaiya-McCormick.png",
+            "body": "<p>The Aldrich Annual Fund is a critical financial resource that supports the daily operations of the Museum. From facilities and exhibitions to programs and staffing, annual support from our donors keeps the Museum’s doors open and allows The Aldrich to realize its mission as a leading incubator for artists at critical creative junctures, providing a collaborative platform that engages and inspires.</p><p>A gift to the Annual Fund goes directly where it is needed most一 to the artists, educators, and staff that make everything we do possible. </p>",
+            "link_label": "",
+            "link_url": "https://thealdrich.org/page/exhibitions-fund",
+            "anchor_id": "annual-fund"
+          }
+        },
+        "fund_6bq94X": {
+          "type": "fund",
+          "settings": {
+            "heading": "Sculpture Garden Fund",
+            "image_1": "shopify://shop_images/Sculpture-Garden-Fund-1-Photo-Kevin-Kraut.png",
+            "image_2": "shopify://shop_images/Sculpture-Garden-Fund-2-Photo-Kevin-Kraut.png",
+            "image_3": "shopify://shop_images/Sculpture-Garden-Fund-3-Photo-Kevin-Kraut.png",
+            "body": "<p>The Aldrich recently celebrated the reopening of its newly reimagined Sculpture Garden and campus, expanding what artists are able to realize at The Aldrich and offering more green space for our community to enjoy. Free and open to the public 365 days a year from dawn till dusk, the new Garden includes a Pollinator Walkway, Boardwalk, a Secret Garden, and an Amphitheater which provides a natural venue for The Aldrich’s presentation of dance, music, and school and community programs.</p><p>A gift to the Sculpture Garden will help the Museum sustain this beautiful, universally inclusive, and accessible space designed for engagement with works of art for our community.</p>",
+            "link_label": "",
+            "link_url": "https://thealdrich.org/page/exhibitions-fund",
+            "anchor_id": "sculpture-garden-fund"
+          }
+        }
+      },
+      "block_order": [
+        "fund_7WiLM8",
+        "fund_qq37d4",
+        "fund_LVdGQX",
+        "fund_6bq94X"
+      ],
+      "name": "Fund features",
+      "settings": {
+        "section_padding": true,
+        "title": "",
+        "content_max_width": 1280,
+        "scroll_margin_top": 80,
+        "image_ratio": "4/3",
+        "image_gap": 16,
+        "image_border_radius": 0,
+        "image_placeholder_color": "#eeeeee",
+        "block_gap": 56
+      }
+    },
     "related_news": {
       "type": "featured-blog",
       "settings": {
         "title": "Related News",
-        "post_limit": "3"
+        "title_tag": "h3",
+        "enable_card": true,
+        "category_label": "Blog",
+        "card_background": "#00e1af",
+        "card_text_color": "#0d1b16",
+        "card_padding": 20,
+        "blog": "donations",
+        "button_label": "View the blog",
+        "post_limit": "3",
+        "align_text": "left",
+        "image_ratio": "landscape",
+        "show_image_first": true,
+        "show_dates": false,
+        "show_excerpts": true,
+        "show_read_more": false
+      }
+    },
+    "photo_credit": {
+      "type": "photo-credit",
+      "settings": {
+        "text": "Top image: Photo: Kevin Kraut",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "line_color": "#000000",
+        "text_color": "#000000"
       }
     }
   },
   "order": [
+    "page_styles",
     "breadcrumbs",
     "hero_banner",
     "donation_intro",
@@ -278,6 +327,7 @@
     "donation_fields",
     "1783635242cb330148",
     "fund_features_Fq7TDH",
-    "related_news"
+    "related_news",
+    "photo_credit"
   ]
 }

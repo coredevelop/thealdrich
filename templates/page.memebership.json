@@ -10,7 +10,7 @@
 {
   "sections": {
     "membership_font": {
-      "type": "membership-font",
+      "type": "page-styles",
       "settings": {
         "font_stack": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif",
         "heading_font_stack": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif",
@@ -146,7 +146,7 @@
       "settings": {
         "sticky": true,
         "scroll_offset": 80,
-        "alignment": "flex-start",
+        "alignment": "center",
         "content_max_width": 1280,
         "aria_label": "Fund navigation",
         "text_color": "#000000",
@@ -685,7 +685,6 @@
       "type": "photo-credit",
       "settings": {
         "text": "Top image: Photo: Kaiya McCormick",
-        "font_size": 14,
         "padding_top": 24,
         "padding_bottom": 24,
         "line_color": "#000000",

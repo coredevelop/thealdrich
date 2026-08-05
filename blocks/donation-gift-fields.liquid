@@ -3,6 +3,9 @@
 {% style %}
   .donation-gift-fields-{{ uid }} {
     display: block;
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.075rem;
   }
 
   .donation-gift-fields__header-{{ uid }} {
@@ -31,6 +34,19 @@
     transform: rotate(-90deg);
   }
 
+  .donation-gift-fields__intro-{{ uid }} {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    letter-spacing: 0.075rem;
+    color: #212529;
+  }
+
+  .donation-gift-fields__intro-{{ uid }} p {
+    margin: 0;
+  }
+
   .donation-gift-fields__content-{{ uid }} {
     display: block;
   }
@@ -50,9 +66,13 @@
   .donation-gift-fields__label-{{ uid }} {
     display: block;
     margin-bottom: 8px;
-    font-size: 14px;
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: {{ block.settings.text_color }};
+    line-height: 1.6;
+    letter-spacing: 0.075rem;
+    text-transform: none;
+    color: #212529;
   }
 
   .donation-gift-fields__input-{{ uid }} {
@@ -77,24 +97,37 @@
 
   .donation-gift-fields__checkbox-wrapper-{{ uid }} {
     display: flex;
-    align-items: flex-start;
-    margin-bottom: 12px;
+    align-items: center;
+    margin-bottom: 8px;
   }
 
   .donation-gift-fields__checkbox-{{ uid }} {
-    margin-right: 10px;
-    margin-top: 2px;
-    width: 18px;
-    height: 18px;
+    margin: 0 8px 0 0;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
     flex-shrink: 0;
+    border-radius: 3px;
+    /* Theme checkboxes use appearance:none with background-color:currentColor when
+       checked, so 'color' controls the checked fill (not accent-color). */
+    color: {{ block.settings.checkbox_accent_color }};
+    accent-color: {{ block.settings.checkbox_accent_color }};
+  }
+
+  .donation-gift-fields__checkbox-{{ uid }}:checked {
+    background-color: {{ block.settings.checkbox_accent_color }};
+    border-color: {{ block.settings.checkbox_accent_color }};
   }
 
   .donation-gift-fields__checkbox-label-{{ uid }} {
-    font-size: 14px;
-    color: {{ block.settings.text_color }};
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.075rem;
+    text-transform: none;
+    color: #212529;
     cursor: pointer;
-    line-height: 1.5;
   }
 
   .donation-gift-fields__subsection-{{ uid }} {
@@ -164,6 +197,10 @@
   {% endif %}
 
   <div class="donation-gift-fields__content-{{ uid }}" data-content>
+    {% if block.settings.intro_text != blank %}
+      <div class="donation-gift-fields__intro-{{ uid }}">{{ block.settings.intro_text }}</div>
+    {% endif %}
+
     <div class="donation-gift-fields__field-{{ uid }}">
       <label class="donation-gift-fields__label-{{ uid }}" for="donation-full-name-{{ uid }}">
         Full Name <span class="donation-gift-fields__required-{{ uid }}">*</span>
@@ -218,9 +255,9 @@
     </div>
 
     <div class="donation-gift-fields__subsection-{{ uid }}">
-      <div class="donation-gift-fields__subsection-title-{{ uid }}">
+      <label class="donation-gift-fields__label-{{ uid }}">
         I would like my gift to support
-      </div>
+      </label>
       <div class="donation-gift-fields__support-checkboxes-{{ uid }}">
         <div class="donation-gift-fields__checkbox-wrapper-{{ uid }}">
           <input
@@ -660,6 +697,13 @@
       "default": "Gift Information"
     },
     {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro text",
+      "info": "Shown above the first field.",
+      "default": "<p>Thank you for making a gift to The Aldrich Contemporary Art Museum. Please fill out the form below to complete your gift.</p>"
+    },
+    {
       "type": "checkbox",
       "id": "always_show",
       "label": "Always show fields",
@@ -762,6 +806,12 @@
       "id": "input_focus_border_color",
       "label": "Input focus border",
       "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "checkbox_accent_color",
+      "label": "Checkbox accent",
+      "default": "#3B6FE0"
     },
     {
       "type": "range",

@@ -30,6 +30,16 @@
     margin: 0 0 20px;
     font-weight: 600;
     line-height: 1.3;
+    letter-spacing: 0.075rem;
+  }
+
+  [data-section-id="{{ section.id }}"] .fund-feature__body,
+  [data-section-id="{{ section.id }}"] .fund-feature__body p {
+    font-family: "Regular", "helvetica neue", helvetica, arial, sans-serif;
+    letter-spacing: 0.075rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: #212529;
   }
 
   [data-section-id="{{ section.id }}"] .fund-feature__images {
@@ -58,7 +68,11 @@
   [data-section-id="{{ section.id }}"] .fund-feature__link {
     display: inline-block;
     margin-top: 4px;
+    font-family: "RegularBold", "helvetica neue", helvetica, arial, sans-serif;
     font-weight: 700;
+    letter-spacing: 0.075rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
     text-decoration: underline;
     text-underline-offset: 3px;
     color: inherit;
@@ -146,7 +160,7 @@
           {%- endif -%}
 
           {%- if block.settings.link_label != blank and block.settings.link_url != blank -%}
-            <a class="fund-feature__link" href="{{ block.settings.link_url }}">{{ block.settings.link_label | escape }}</a>
+            <a class="fund-feature__link" href="{{ block.settings.link_url }}"><strong>{{ block.settings.link_label | escape }}</strong></a>
           {%- endif -%}
         </div>
       {%- endfor -%}

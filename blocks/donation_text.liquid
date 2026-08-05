@@ -13,26 +13,59 @@
 
   .donation-text__eyebrow-{{ uid }} {
     margin: 0 0 8px;
-    font-family: var(--heading-font-family);
-    font-size: 12px;
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: 0.08em;
+    line-height: 1.6;
     text-transform: uppercase;
+    text-decoration: none !important;
     color: {{ block.settings.heading_color }};
   }
 
   .donation-text__heading-{{ uid }} {
     margin: 0 0 12px;
     font-family: var(--heading-font-family);
-    font-size: {{ block.settings.heading_size }}px;
+    letter-spacing: 0.075rem;
     font-weight: 500;
-    line-height: 1.3;
+    line-height: 1.4;
     color: {{ block.settings.heading_color }};
   }
 
-  .donation-text__body-{{ uid }} {
-    font-size: {{ block.settings.body_size }}px;
+  h2.donation-text__heading-{{ uid }} {
+    font-size: 2.125rem;
+  }
+
+  h3.donation-text__heading-{{ uid }} {
+    font-size: 1.5rem;
+  }
+
+  .donation-text__body-{{ uid }},
+  .donation-text__body-{{ uid }} p,
+  .donation-text__body-{{ uid }} li {
+    font-family: "Regular", "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.075rem;
     line-height: 1.6;
+  }
+
+  .donation-text__body-{{ uid }} ul {
+    list-style: disc outside;
+    padding-left: 1.25em;
+    margin: 0 0 16px;
+  }
+
+  .donation-text__body-{{ uid }} ul li {
+    font-family: "Regular", "helvetica neue", helvetica, arial, sans-serif;
+    letter-spacing: 0.075rem;
+    color: #212529;
+    display: list-item;
+    list-style: disc outside;
+    margin-bottom: 4px;
+  }
+
+  .donation-text__body-{{ uid }} p strong {
+    font-family: "RegularBold", "helvetica neue", helvetica, arial, sans-serif;
   }
 
   .donation-text__body-{{ uid }} > *:first-child {
@@ -44,13 +77,8 @@
   }
 
   .donation-text__body-{{ uid }} a {
-    color: inherit;
-  }
-
-  @media screen and (max-width: 749px) {
-    .donation-text__heading-{{ uid }} {
-      font-size: {{ block.settings.heading_size | times: 0.85 | round }}px;
-    }
+    color: #000;
+    text-decoration: underline;
   }
 {% endstyle %}
 
@@ -65,7 +93,7 @@
     {% endif %}
 
     {% if block.settings.heading != blank %}
-      <h2 class="donation-text__heading-{{ uid }}">{{ block.settings.heading }}</h2>
+      <{{ block.settings.heading_tag }} class="donation-text__heading-{{ uid }}">{{ block.settings.heading }}</{{ block.settings.heading_tag }}>
     {% endif %}
 
     {% if block.settings.body != blank %}
@@ -92,6 +120,16 @@
       "label": "Heading",
       "info": "Leave blank to hide.",
       "default": "Make a Gift"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading level",
+      "options": [
+        { "value": "h2", "label": "H2 (large)" },
+        { "value": "h3", "label": "H3 (smaller)" }
+      ],
+      "default": "h2"
     },
     {
       "type": "richtext",

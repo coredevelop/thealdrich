@@ -1,0 +1,31 @@
+{%- comment -%}
+  Self-hosted custom fonts used by the donation / membership pages.
+  Declarations are global (loaded in <head>), but each font only downloads
+  when a matching font-family is actually used on the page.
+{%- endcomment -%}
+<style>
+  @font-face {
+    font-family: "RegularBold";
+    src: url("{{ 'RegularBold.woff2' | asset_url }}") format("woff2"),
+         url("{{ 'RegularBold.ttf' | asset_url }}") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Regular";
+    src: url("{{ 'RegularRegular.woff2' | asset_url }}") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "ApercuPro";
+    src: url("{{ 'ApercuPro-Mono.woff2' | asset_url }}") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>

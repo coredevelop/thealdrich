@@ -9,6 +9,14 @@
  */
 {
   "sections": {
+    "membership_font": {
+      "type": "membership-font",
+      "settings": {
+        "font_stack": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "heading_font_stack": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "banner_min_height": 800
+      }
+    },
     "breadcrumbs": {
       "type": "breadcrumbs",
       "settings": {
@@ -16,8 +24,180 @@
         "show_social_icons": true
       }
     },
-    "main": {
-      "type": "main-page",
+    "hero_banner": {
+      "type": "image-banner",
+      "settings": {
+        "image": "shopify://shop_images/Join-as-a-Member-Photo-Kaiya-McCormick.png",
+        "alignment": "center",
+        "title": "",
+        "text": "",
+        "banner_size": "large",
+        "full_width": false,
+        "fit_image": true,
+        "button_label_1": "",
+        "button_link_1": "",
+        "button_label_2": "",
+        "button_link_2": "",
+        "button_style": "outline",
+        "color_overlay_text": "#ffffff",
+        "color_accent": "#ffffff",
+        "color_overlay": "#ffffff",
+        "color_overlay_alpha_range": 0
+      }
+    },
+    "membership_intro": {
+      "type": "_blocks",
+      "blocks": {
+        "intro_text": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "Support",
+            "heading": "Join as a Member",
+            "heading_tag": "h2",
+            "body": "<p>Aldrich members provide essential support to our mission while enjoying special access to exhibitions and programs, discounts on purchases at the Museum Store, and free admission to reciprocal partner museums.</p>",
+            "anchor_id": "membership-overview",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 0,
+            "padding_bottom": 24,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "intro_text"
+      ],
+      "name": "Membership intro",
+      "settings": {}
+    },
+    "membership_tabs": {
+      "type": "fund-tabs",
+      "blocks": {
+        "t1": {
+          "type": "tab",
+          "settings": {
+            "label": "Overview",
+            "target": "membership-overview"
+          }
+        },
+        "t2": {
+          "type": "tab",
+          "settings": {
+            "label": "Core Benefits",
+            "target": "core-benefits"
+          }
+        },
+        "t3": {
+          "type": "tab",
+          "settings": {
+            "label": "Membership Levels",
+            "target": "membership-levels"
+          }
+        },
+        "t4": {
+          "type": "tab",
+          "settings": {
+            "label": "Join or Renew",
+            "target": "join-or-renew"
+          }
+        },
+        "t5": {
+          "type": "tab",
+          "settings": {
+            "label": "Digital Card FAQ",
+            "target": "digital-card-faq"
+          }
+        },
+        "t6": {
+          "type": "tab",
+          "settings": {
+            "label": "Gift Membership",
+            "target": "gift-membership"
+          }
+        },
+        "t7": {
+          "type": "tab",
+          "settings": {
+            "label": "Member Discounts",
+            "target": "member-discounts"
+          }
+        },
+        "t8": {
+          "type": "tab",
+          "settings": {
+            "label": "Member Profiles",
+            "target": "member-profiles"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "t8"
+      ],
+      "settings": {
+        "sticky": true,
+        "scroll_offset": 80,
+        "alignment": "flex-start",
+        "content_max_width": 1280,
+        "aria_label": "Fund navigation",
+        "text_color": "#000000",
+        "border_color": "#000000"
+      }
+    },
+    "membership_levels_content": {
+      "type": "_blocks",
+      "blocks": {
+        "core": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "Core Benefits and Membership Levels",
+            "heading_tag": "h3",
+            "body": "<p><strong>All Aldrich members receive the following core benefits:</strong></p><ul><li>Unlimited yearly admission per cardholder</li><li>Invitations to members-only events and previews</li><li><a href=\"https://thealdrich.org/page/reciprocal-membership-benefits\">Fairfield/Westchester Museum Alliance reciprocal benefits</a></li><li>10% discount on public programs <br/> </li><li>Digital membership card</li></ul>",
+            "anchor_id": "core-benefits",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 48,
+            "padding_bottom": 0,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        },
+        "levels": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "Membership Levels",
+            "heading_tag": "h2",
+            "body": "<p><strong>Artist/Educator/Student $50 Individual (fully tax deductible)</strong><br/>All the core benefits for one member<br/><em>Proof of eligibility: a CV with exhibition history, artist website, current Student/Staff ID, upon request</em><br/> </p><p><strong>Senior (60+) $90 (fully tax deductible)</strong><br/>All the core benefits for two members plus:</p><ul><li>10% discount in The Shop</li><li>$5 guest admission</li></ul><p><strong>Friend $100 (fully tax deductible)</strong><br/>All the above benefits for two members plus:</p><ul><li>Free admission for two to the Whitney Museum of American Art</li></ul><p><strong>Family $150 ($100 tax deductible)</strong></p><p>All the above benefits plus:</p><ul><li>Unlimited free admission for the entire family</li><li>10% discount on<em> Camp Aldrich</em></li><li>Free admission to <a href=\"https://stormking.org/\">Storm King Art Center</a> for up to 2 adults and all children under 18 in the household</li></ul><p><strong>Contemporary Council $250 ($200 tax deductible)</strong></p><p>All the above benefits plus: <br/> </p><ul><li><a href=\"https://thealdrich.org/page/reciprocal-membership-benefits\">Free admission to over 1,000 NARM and Mod/Co museums</a></li></ul><p><strong>Collaborators Circle $500 ($400 tax deductible)*</strong></p><p>All the above benefits plus: <br/> </p><ul><li>10% discount on select Aldrich Editions</li><li>Invitation to select exclusive collection, gallery, and studio visits<br/> </li></ul><p><strong>Collectors Circle $1,000 ($850 tax deductible)*</strong></p><p>All the above benefits plus:</p><ul><li>Invitations to exclusive VIP openings with exhibiting artists and curators <br/> </li><li>VIP passes to select national and international art fairs, upon request</li><li>Invitations to all private collection, gallery, and studio visits <br/> </li><li>Private tour for 10 guests upon request</li><li>Free Contemporary Council ($250) gift membership</li><li>Recognition on the annual donor wall<br/> </li></ul><p><strong>Aldrich Collects $3,500 ($400 tax deductible)</strong></p><p>This premier membership includes two limited-edition, Aldrich artist designed artworks each year. In 2025, we are thrilled that exhibiting artists Martin Beck and Anders Hamilton will be creating exclusive artworks for the membership. In addition to artwork, members enjoy private studio visits with select artists, and all the benefits of our Collaborators Circle membership, including VIP passes to international art fairs, private collection tours, and more. Past participating artists in Aldrich Collects include <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Fgenesis-belanger-through-the-eye-of-a-needle&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=jFlzGcfXFezaGPull6%2BxRpGF1LcF3FdQQAuu3kOxPE4%3D&reserved=0\" target=\"_blank\"><strong>Genesis Belanger</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Fmilano-chow&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=0zJjNG9dzK3%2FvSrFTOnXC%2F9BGRB4HXhLcOL1wMDSZi8%3D&reserved=0\" target=\"_blank\"><strong>Milano Chow</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Ftwenty-twenty&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=dePYoYcP7npy1F%2F6IFzl7q5mzN57J%2B4U78%2B4D87HVu0%3D&reserved=0\" target=\"_blank\"><strong>Oasa DuVerney</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2F52-artists-revisiting-a-feminist-milestone&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=dBzY5qkNgKa5P%2B7ggTJ0fMBcFJUKQasfrE3cDlM5Z08%3D&reserved=0\" target=\"_blank\"><strong>Florencia Escudero</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Flucia-hierro&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=ZAUprbfrIUUuIo%2BZ8gY9y89AEJiQoIb6v%2BfSELvD2V8%3D&reserved=0\" target=\"_blank\"><strong>Lucia Hierro</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Fkarla-knight-navigator&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=o%2BPKkdhlD%2FlEYsvJp%2B0vcwAJZ4MQRf0FIxwTZuDbpiA%3D&reserved=0\" target=\"_blank\"><strong>Karla Knight</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Feva-lewitt-untitled-mesh-a-j&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=BcMsWpBh8G5ql4I1dTL85XFE5hxeAFGgPWnIa211xT8%3D&reserved=0\" target=\"_blank\"><strong>Eva LeWitt</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Ftim-prentice-after-the-mobile&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=0HvgE1yibcf7Ot3hoJpEz2FGhYXYusZx6QGUSFSDhVI%3D&reserved=0\" target=\"_blank\"><strong>Tim Prentice</strong></a>, <a href=\"https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fthealdrich.org%2Fexhibitions%2Fduane-slick-the-coyote-makes-the-sunset-better&data=05%7C01%7Ckhoneycutt%40thealdrich.org%7C3202d25ebcb441ae512e08db5c999250%7Cb704254ef99b43daadeb9a5be3438fd7%7C1%7C0%7C638205586881213490%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=SdXjtd8cnLzdylJhM8vS774XFgcInEpQe%2BY6%2BxJmckU%3D&reserved=0\" target=\"_blank\"><strong>Duane Slick</strong></a><strong>, </strong><a href=\"https://thealdrich.org/exhibitions/layo-bright-dawn-and-dusk\"><strong>Layo Bright</strong></a><strong>, and </strong><a href=\"https://thealdrich.org/exhibitions/aldrich-projects-amanda-martinez\"><strong>Amanda Martínez</strong></a><strong>.</strong> Membership availability is limited and is first come, first served. <br/><br/>Artworks are available for pick up at the Museum or for delivery within 20 miles to addresses in Fairfield and Westchester County. Shipping costs and insurance will apply for distances beyond this range. To join, please contact Holly Hart at <a href=\"mailto:hhart@thealdrich.org\">hhart@thealdrich.org</a>, or 203.403.7357 for more information or to join.<br/> </p><p><strong>The Aldrich Council $3,500 (fully tax-deductible)</strong></p><p>A crucial component of the health and vitality of The Aldrich is a growing and diverse pool of individuals who contribute their time, their expertise, and their financial resources. To build this base of supporters, the Museum initiated The Aldrich Council in 2019, an invitation-only group united by a shared passion for contemporary art and a deep commitment to the Museum’s mission. Members are selected for their strategic vision, professional insight, and ability to help advance the Museum’s goals, expand its network of supporters, and ensure its long-term sustainability. Council members enjoy exclusive access to special events including artist studio visits, tours of private collections, and curator- and artist-led previews of new exhibitions.</p><p>The Aldrich Council serves the Museum in a crucial leadership capacity, offering insight and creativity to build a vibrant institution that delights and engages a broad range of visitors.</p><p>Membership in The Aldrich Council is by invitation only. If you are interested in learning more, contact Kris Honeycutt, Director of Development, at 203.403.7364, or <a href=\"mailto:khoneycutt@thealdrich.org\" target=\"_blank\">khoneycutt@thealdrich.org</a><br/> </p><p><strong>Library $150 (fully tax deductible) For public and private libraries only</strong><br/><a href=\"/pages/library-membership\"><strong>Purchase a Library Membership</strong></a></p>",
+            "anchor_id": "membership-levels",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 32,
+            "padding_bottom": 0,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "core",
+        "levels"
+      ],
+      "name": "Benefits & levels",
       "settings": {}
     },
     "membership_form_wqH76C": {
@@ -84,9 +264,8 @@
       ],
       "name": "Membership form",
       "settings": {
-        "section_padding": true,
-        "content_max_width": 820,
         "heading": "Join or Renew as a Member",
+        "anchor_id": "join-or-renew",
         "after_submit": "cart",
         "level_label": "Please indicate membership level:",
         "level_placeholder": "Select a membership level",
@@ -105,11 +284,432 @@
         "input_border_color": "#000000",
         "input_border_radius": 0
       }
+    },
+    "membership_faq_gift": {
+      "type": "_blocks",
+      "blocks": {
+        "faq": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "Digital Membership Card FAQ",
+            "heading_tag": "h3",
+            "body": "<p>Having trouble with your digital membership card? <a href=\"#\">Click here to access our Digital Membership Card FAQ.</a></p>",
+            "anchor_id": "digital-card-faq",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 48,
+            "padding_bottom": 0,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        },
+        "gift": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "Gift Membership",
+            "heading_tag": "h3",
+            "body": "<p>Share the excitement of The Aldrich Contemporary Art Museum with friends, family, and colleagues through the gift of Aldrich membership. This gift opens the door to the year's premier venue for cutting-edge visual art and educational programs. You and your friends can experience the benefits of Aldrich membership together, while supporting the Museum and helping to expand our community.</p><p>Please contact Holly Hart at <a href=\"mailto:hhart@thealdrich.org\">hhart@thealdrich.org</a> to purchase a gift membership.</p>",
+            "anchor_id": "gift-membership",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 32,
+            "padding_bottom": 0,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "faq",
+        "gift"
+      ],
+      "name": "FAQ & gift",
+      "settings": {}
+    },
+    "gift_images": {
+      "type": "featured-grid",
+      "blocks": {
+        "gift1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Purchase-a-Gift-Membership-1-Photo-Kaiya-McCormick.png",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "gift2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Purchase-a-Gift-Membership-2-Photo-Kaiya-McCormick.png",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "gift3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Purchase-a-Gift-Membership-3-Photo-Kaiya-McCormick.png",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        }
+      },
+      "block_order": [
+        "gift1",
+        "gift2",
+        "gift3"
+      ],
+      "settings": {
+        "title": "",
+        "full_width": false,
+        "section_padding": true,
+        "gutter": true,
+        "images_per_row_range": 3,
+        "images_per_row_mobile": "1",
+        "image_ratio": "landscape",
+        "text_placement": "below",
+        "color_overlay": "#4f4f4f",
+        "color_overlay_hover": "#000000",
+        "color_overlay_text": "#ffffff",
+        "color_overlay_alpha_range": 0,
+        "zoom": true
+      }
+    },
+    "membership_discounts_heading": {
+      "type": "_blocks",
+      "blocks": {
+        "b": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "Member Discounts",
+            "heading_tag": "h3",
+            "body": "",
+            "anchor_id": "member-discounts",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 48,
+            "padding_bottom": 8,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "b"
+      ],
+      "name": "text",
+      "settings": {}
+    },
+    "image_banner_REFKDz": {
+      "type": "image-banner",
+      "name": "t:sections.image_banner.presets.name",
+      "settings": {
+        "image": "shopify://shop_images/Neighborhood-Discounts.png",
+        "alignment": "top",
+        "title": "",
+        "text": "",
+        "banner_size": "x-large",
+        "full_width": false,
+        "fit_image": true,
+        "button_label_1": "",
+        "button_link_1": "",
+        "button_label_2": "",
+        "button_link_2": "",
+        "button_style": "outline",
+        "color_overlay_text": "#ffffff",
+        "color_accent": "#ffffff",
+        "color_overlay": "#000000",
+        "color_overlay_alpha_range": 30
+      }
+    },
+    "membership_discounts_text": {
+      "type": "_blocks",
+      "blocks": {
+        "b": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "",
+            "heading_tag": "h2",
+            "body": "<p>The Aldrich's Member Discount program is a special benefit only for Aldrich members. Simply show your active Aldrich membership card (physical or digital) at these local businesses to receive your members-only discount or free item. Some supplies are limited and may need to be picked up at the Museum.</p>",
+            "anchor_id": "",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 16,
+            "padding_bottom": 0,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "b"
+      ],
+      "name": "text",
+      "settings": {}
+    },
+    "membership_profiles_heading": {
+      "type": "_blocks",
+      "blocks": {
+        "b": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "Member Profiles",
+            "heading_tag": "h3",
+            "body": "",
+            "anchor_id": "member-profiles",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 48,
+            "padding_bottom": 16,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "b"
+      ],
+      "name": "text",
+      "settings": {}
+    },
+    "profiles_grid": {
+      "type": "featured-grid",
+      "blocks": {
+        "p1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/7a1b8264-3e5b-483c-a873-71ed2cc48fe9.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/419f0c3b-5bf3-49ae-87ce-7975bf0f7182.png",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/f0a763db-428d-48f3-9f9c-af99f57de43b.png",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Unknown.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p5": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Unknown-11.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p6": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Picture12.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p7": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ABC-at-the-Warhol.1_IMG_2498.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p8": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Unknown-1.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Unknown_2022-08-17-203908_hdxl.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p10": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Murrays-at-Aldrich_1.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p11": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Yilin-Jamison2.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        },
+        "p12": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/IMG_8502_2025-12-17-190835_apng_1.jpg",
+            "link": "",
+            "title": "",
+            "richtext": ""
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7",
+        "p8",
+        "p9",
+        "p10",
+        "p11",
+        "p12"
+      ],
+      "settings": {
+        "title": "",
+        "full_width": false,
+        "section_padding": false,
+        "gutter": true,
+        "images_per_row_range": 3,
+        "images_per_row_mobile": "1",
+        "image_ratio": "landscape",
+        "text_placement": "below",
+        "color_overlay": "#4f4f4f",
+        "color_overlay_hover": "#000000",
+        "color_overlay_text": "#ffffff",
+        "color_overlay_alpha_range": 0,
+        "zoom": true
+      }
+    },
+    "membership_profiles_links": {
+      "type": "_blocks",
+      "blocks": {
+        "b": {
+          "type": "donation_text",
+          "settings": {
+            "eyebrow": "",
+            "heading": "",
+            "heading_tag": "h3",
+            "body": "<p>Read Sabeth and Aaron Albert's member profile <a href=\"#\">here</a>.</p><p>Read Allison Meyler's member profile <a href=\"#\">here</a>.</p><p>Read Deborah Barnett-Brandt's member profile <a href=\"#\">here</a>.</p><p>Read Justin Christopher Carafotes' member profile <a href=\"#\">here</a>.</p><p>Read Joshua Grey's member profile <a href=\"#\">here</a>.</p><p>Read Cynthia Smith's member profile <a href=\"#\">here</a>.</p><p>Read Audrey Conrad's member profile <a href=\"#\">here</a>.</p><p>Read Catherine Lucia-Durante and Chis Durante's member profile <a href=\"#\">here</a>.</p><p>Read Alexandra Lunt and Catherine Lewandowski's member profile <a href=\"#\">here</a>.</p><p>Read The Murray Family's member profile <a href=\"#\">here</a>.</p><p>Read Meta Ann Ela's member profile <a href=\"#\">here</a>.</p><p>Read Yilin Jamison's member profile <a href=\"#\">here</a>.</p><p>Read Caitlin Mulkeen and Delphine James' member profile <a href=\"#\">here</a>.</p>",
+            "anchor_id": "",
+            "text_alignment": "left",
+            "heading_size": 24,
+            "body_size": 16,
+            "padding_top": 16,
+            "padding_bottom": 0,
+            "heading_color": "#000000",
+            "text_color": "#333333"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "b"
+      ],
+      "name": "text",
+      "settings": {}
+    },
+    "related_news": {
+      "type": "featured-blog",
+      "settings": {
+        "title": "Related News",
+        "title_tag": "h3",
+        "enable_card": true,
+        "category_label": "Blog",
+        "card_background": "#00e1af",
+        "card_text_color": "#0d1b16",
+        "card_padding": 20,
+        "blog": "news",
+        "button_label": "View the blog",
+        "post_limit": "3",
+        "align_text": "left",
+        "image_ratio": "landscape",
+        "show_image_first": true,
+        "show_dates": false,
+        "show_excerpts": true,
+        "show_read_more": false
+      }
+    },
+    "photo_credit": {
+      "type": "photo-credit",
+      "settings": {
+        "text": "Top image: Photo: Kaiya McCormick",
+        "font_size": 14,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "line_color": "#000000",
+        "text_color": "#000000"
+      }
     }
   },
   "order": [
+    "membership_font",
     "breadcrumbs",
-    "main",
-    "membership_form_wqH76C"
+    "hero_banner",
+    "membership_intro",
+    "membership_tabs",
+    "membership_levels_content",
+    "membership_form_wqH76C",
+    "membership_faq_gift",
+    "gift_images",
+    "membership_discounts_heading",
+    "image_banner_REFKDz",
+    "membership_discounts_text",
+    "membership_profiles_heading",
+    "profiles_grid",
+    "membership_profiles_links",
+    "related_news",
+    "photo_credit"
   ]
 }

@@ -46,14 +46,32 @@
   [data-section-id="{{ section.id }}"] .image-banner__image {
     object-position: var(--section-object-position);
   }
-  
+
+  {%- if section.settings.fit_image -%}
+    [data-section-id="{{ section.id }}"] .image-banner__wrapper {
+      min-height: 0;
+    }
+    @media screen and (min-width: 768px) {
+      [data-section-id="{{ section.id }}"] .image-banner__wrapper {
+        min-height: 0;
+      }
+    }
+    [data-section-id="{{ section.id }}"] .image-banner__image-contain {
+      position: relative;
+    }
+    [data-section-id="{{ section.id }}"] .image-banner__image {
+      position: relative;
+      height: auto;
+      object-fit: contain;
+    }
+  {%- endif -%}
 </style>
 <div class="image-banner px-rail text-center"
   data-section-id="{{ section.id }}"
   data-section-type="image-banner">
   <div class="image-banner__wrapper mx-auto max-w-screen relative overflow-hidden flex items-center justify-center">
 
-    <div class="image-banner__content relative space-y-4 text-section-text z-30 py-5 px-5 md:py-7">
+    <div class="image-banner__content relative space-y-4 text-section-text z-30 py-5 md:py-7">
       {%- if section.settings.title != blank -%}
         <h3 class="image-banner__title text-section-text text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
       {%- endif -%}
@@ -167,6 +185,13 @@
       "id": "full_width",
       "label": "t:sections.general.full_width",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "fit_image",
+      "label": "Show full image (no crop)",
+      "info": "Displays the whole image at its natural height instead of cropping to a fixed banner height.",
+      "default": false
     },
     {
       "type": "text",

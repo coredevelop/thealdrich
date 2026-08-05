@@ -1,1 +1,96 @@
-{"type":"header","name":"t:section_groups.header_group.name","sections":{"promos":{"type":"promos","settings":{"scroll_lock":true}},"header-top":{"type":"header-top","custom_css":[],"settings":{"scroll_lock":false,"full_width":true,"main_linklist":"main-menu","show_locale_selector":true,"show_currency_selector":true}},"header":{"type":"header","settings":{"minimal_padding":"normal","scroll_lock":true,"full_width":true,"logo":"shopify:\/\/shop_images\/Aldrich_logo_black_chevron_logo_flip_large-01-01-03-02.png","logo_max_width":280,"logo_mobile_max_width":180,"header_layout":"horizontal","main_linklist":"main-menu","mega_menu":true,"mega_menu_images":true,"uppercase_menu":true,"icons_enable":false}}},"order":["promos","header-top","header"]}
+{
+  "type": "header",
+  "name": "t:section_groups.header_group.name",
+  "sections": {
+    "aldrich-callout": {
+      "type": "aldrich-callout",
+      "settings": {
+        "text": "Advance ticket reservations encouraged. Click here to book",
+        "link_url": "https://fareharbor.com/embeds/book/thealdrich/?full-items=yes",
+        "show_close": true,
+        "dismiss_key": "advance-tickets",
+        "color_background": "#ffe100",
+        "color_text": "#000000"
+      }
+    },
+    "promos": {
+      "type": "promos",
+      "settings": {
+        "scroll_lock": true
+      }
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "hours": {
+          "type": "text",
+          "settings": {
+            "text": "We're open today from 12 pm to 5 pm",
+            "hide_when_tight": true
+          }
+        },
+        "tickets": {
+          "type": "link",
+          "settings": {
+            "label": "Purchase tickets",
+            "link_url": "/pages/service-list-page",
+            "highlight": false,
+            "open_in_new_tab": false
+          }
+        },
+        "mailing": {
+          "type": "link",
+          "settings": {
+            "label": "Join mailing list",
+            "link_url": "#aldrich-mailing-list",
+            "highlight": false,
+            "open_in_new_tab": false
+          }
+        },
+        "member": {
+          "type": "link",
+          "settings": {
+            "label": "Join as a member",
+            "link_url": "/pages/membership",
+            "highlight": false,
+            "open_in_new_tab": false
+          }
+        },
+        "donate": {
+          "type": "link",
+          "settings": {
+            "label": "Donate",
+            "link_url": "/pages/donation",
+            "highlight": true,
+            "open_in_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "hours",
+        "tickets",
+        "mailing",
+        "member",
+        "donate"
+      ],
+      "settings": {
+        "sticky": false,
+        "badge_text": "",
+        "logo_width": 300,
+        "logo_mobile_width": 200,
+        "menu_source": "aldrich",
+        "museum_url": "https://thealdrich.org",
+        "shop_linklist": "main-menu",
+        "main_linklist": "main-menu",
+        "show_account": true,
+        "show_cart": true,
+        "show_search": true
+      }
+    }
+  },
+  "order": [
+    "aldrich-callout",
+    "promos",
+    "header"
+  ]
+}

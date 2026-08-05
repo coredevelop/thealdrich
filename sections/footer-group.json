@@ -1,1 +1,52 @@
-{"type":"footer","name":"t:section_groups.footer_group.name","sections":{"footer":{"type":"footer","blocks":{"98aeb77a-6ab3-408e-9ad8-d6aefbb2ab64":{"type":"newsletter","settings":{"title":"Newsletter","text_richtext":"<p>Subscribe to be the first to hear about our exclusive offers and latest arrivals.<\/p>"}},"a03cd326-035e-4368-b05a-bae281fda7de":{"type":"contact","settings":{"title":"Get in touch","show_contact":true,"phone":"","contact_text":"","contact_link":"http:\/\/www.aldrichart.org","address":"<p>The Aldrich<br\/>258 Main Street<br\/>Ridgefield, CT 06877<br\/>Tel 203.438.4519<br\/><a href=\"mailto:general@aldrichart.org\">general@aldrichart.org<\/a><\/p>","show_social":false}}},"block_order":["98aeb77a-6ab3-408e-9ad8-d6aefbb2ab64","a03cd326-035e-4368-b05a-bae281fda7de"],"settings":{"show_payment_icons":true,"show_locale_selector":true,"show_currency_selector":true,"enable_follow_on_shop":false,"show_social":false,"trust_richtext":"","show_policy_links":false}}},"order":["footer"]}
+{
+  "type": "footer",
+  "name": "t:section_groups.footer_group.name",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "address": {
+          "type": "address",
+          "settings": {
+            "address": "<p><strong>The Aldrich</strong><br/>258 Main Street<br/>Ridgefield, CT 06877<br/>Tel <a href=\"tel:1-203-438-4519\">203.438.4519</a><br/><a href=\"mailto:general@aldrichart.org\">Email</a></p>",
+            "show_chevron": true
+          }
+        },
+        "social": {
+          "type": "social",
+          "settings": {
+            "title": "Follow Us"
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "title": "Join our mailing list",
+            "text_richtext": "",
+            "button_label": "I'm in",
+            "mailchimp_action": "https://aldrichart.us11.list-manage.com/subscribe/post-json?u=ee247c786df390b919fc2b0cf&id=0a6583d106",
+            "mailchimp_honeypot": "b_ee247c786df390b919fc2b0cf_0a6583d106"
+          }
+        }
+      },
+      "block_order": [
+        "address",
+        "social",
+        "newsletter"
+      ],
+      "settings": {
+        "legal_label": "Terms and Conditions and Privacy Policy",
+        "legal_url": "https://thealdrich.org/client-uploads/files/privacy-policy.pdf",
+        "show_policy_links": false,
+        "credit_richtext": "",
+        "show_copyright": false,
+        "show_payment_icons": false,
+        "show_locale_selector": true,
+        "show_currency_selector": true
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

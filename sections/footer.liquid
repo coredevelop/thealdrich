@@ -1,211 +1,213 @@
-{%- liquid 
-  assign block_count = section.blocks.size
-  capture block_width_class
-    case block_count
-      when 1
-        echo 'w-full'
-      when 2
-        echo 'w-full lg:w-1/2'
-      when 3
-        echo 'w-full lg:w-1/3'
-      when 4
-        echo 'w-full lg:w-1/4'
-    endcase
-  endcapture
+{%- liquid
+  assign locale_selector = false
+  assign currency_selector = false
 
-  capture menu_block_width_class
-    case block_count
-      when 1
-        echo 'w-1/2'
-      when 2
-        echo 'w-1/2'
-      when 3
-        echo 'w-full md:w-1/2 lg:w-1/3'
-      when 4
-        echo 'w-full md:w-1/2 lg:w-1/4'
-    endcase
-  endcapture
+  if shop.enabled_currencies.size > 1 and section.settings.show_currency_selector
+    assign currency_selector = true
+  endif
 
-  assign block_count = section.blocks.size
+  if shop.published_locales.size > 1 and section.settings.show_locale_selector
+    assign locale_selector = true
+  endif
+
+  if locale_selector or currency_selector
+    assign show_disclosures = true
+  endif
+
+  if section.settings.show_payment_icons and shop.enabled_payment_types != empty
+    assign show_payment_icons = true
+  endif
 -%}
+
 <style>
-  [data-section-id="{{ section.id }}"] {
-    --text-align-section: center;
-    --section-accent-color: {{ settings.footer_color_accent }};
-    --section-accent-hover-color: {{ settings.footer_color_accent | color_mix: settings.footer_color_text, 40 }};
-    --section-accent-text-color: {% render 'color-contrast', color: settings.footer_color_accent %};
-    --section-title-color: {{ settings.footer_color_text }};
-    --section-text-color: {{ settings.footer_color_text | color_mix: settings.footer_color_background, 75 }};
-    --section-text-color-80: {{ settings.footer_color_text | color_mix: settings.footer_color_background, 80 }};
-    --section-text-color-75: {{ settings.footer_color_text | color_mix: settings.footer_color_background, 75 }};
-    --section-text-color-50: {{ settings.footer_color_text | color_mix: settings.footer_color_background, 50 }};
-    --section-text-color-25: {{ settings.footer_color_text | color_mix: settings.footer_color_background, 25 }};
-    --section-text-color-20: {{ settings.footer_color_text | color_mix: settings.footer_color_background, 20 }};
-    --section-primary-border-color: {{ settings.footer_color_text }};
-    --section-background-color: {{ settings.footer_color_background }};
-  }
+  {%- comment -%}
+    The body picks up the footer's background so any overscroll area matches it,
+    the way the main site's #fafafa page background does. Page content keeps the
+    theme's own background.
+  {%- endcomment -%}
   body {
-    --section-background-color: {{ settings.footer_color_background }};
+    --section-background-color: #fafafa;
   }
   #MainContent {
     --section-background-color: {{ settings.general_background_color }};
   }
-  
 </style>
-<div class="footer-section px-rail {% if block_count > 0 %}pb-section{% else %}py-section{% endif %} bg-section-background text-section-text text-align-section"
+
+<div class="aldrich-footer"
   data-section-id="{{ section.id }}"
   data-section-type="footer">
+  <div class="aldrich-container">
+    <div class="aldrich-footer__columns">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
 
-  <div class="footer-section__grid max-w-screen mx-auto flex flex-wrap justify-center divide-y lg:divide-y-0 divide-section-text-25">
-    {%- for block in section.blocks -%}
-      {%- assign item_classes = 'footer-section__item footer-section__item--' | append: block.type -%}
-      {%- case block.type -%}
-        {%- when 'menu' -%}
-          {%- liquid
-            capture aria_label
-              if block.settings.title != blank
-                echo 'aria-labelledby="nav-'
-                echo block.settings.title | handleize
-                echo '"'
-              else
-                echo 'aria-label="'
-                echo linklists[block.settings.footer_linklist].title
-                echo '"'
-              endif
-            endcapture
-
-            assign menu = linklists[block.settings.footer_linklist]
-          -%}
-          <div class="{{ item_classes }} {{ menu_block_width_class }}"
-            role="navigation"
-            {{ aria_label }}
-            {{ block.shopify_attributes }}>
-            <div class="footer-section__item-content mx-auto max-w-lg py-5 lg:py-10 px-5 font-navigation font-weight-navigation text-sm space-y-2">
-              {%- if block.settings.title != blank -%}
-                <h4 id="nav-{{ block.settings.title | handleize }}"
-                  class="footer-menu__title text-xl text-section-title">{{ block.settings.title | escape }}</h4>
+          {%- when 'address' -%}
+            <div class="aldrich-footer__col aldrich-footer__col--address" {{ block.shopify_attributes }}>
+              {%- if block.settings.address != blank -%}
+                <address class="aldrich-footer__address">{{ block.settings.address }}</address>
               {%- endif -%}
-              {%- if block.settings.text_richtext != blank -%}
-                <div class="footer-menu__text rte rte-sm">{{ block.settings.text_richtext }}</div>
+              {%- if block.settings.show_chevron -%}
+                <span class="aldrich-footer__chevron" aria-hidden="true">
+                  {{- 'aldrich-chevron.svg' | inline_asset_content -}}
+                </span>
+              {%- endif -%}
+            </div>
+
+          {%- when 'social' -%}
+            <div class="aldrich-footer__col aldrich-footer__col--social" {{ block.shopify_attributes }}>
+              {%- if block.settings.title != blank -%}
+                <h2 class="aldrich-footer__heading"><strong>{{ block.settings.title | escape }}</strong></h2>
+              {%- endif -%}
+              <p class="aldrich-footer__stack">
+                {%- if settings.social_instagram_url != blank -%}
+                  <a href="{{ settings.social_instagram_url }}" target="_blank" rel="noopener">Instagram</a><br>
+                {%- endif -%}
+                {%- if settings.social_facebook_url != blank -%}
+                  <a href="{{ settings.social_facebook_url }}" target="_blank" rel="noopener">Facebook</a><br>
+                {%- endif -%}
+                {%- if settings.social_youtube_url != blank -%}
+                  <a href="{{ settings.social_youtube_url }}" target="_blank" rel="noopener">YouTube</a><br>
+                {%- endif -%}
+                {%- if settings.social_twitter_url != blank -%}
+                  <a href="{{ settings.social_twitter_url }}" target="_blank" rel="noopener">Twitter</a><br>
+                {%- endif -%}
+                {%- if settings.social_tiktok_url != blank -%}
+                  <a href="{{ settings.social_tiktok_url }}" target="_blank" rel="noopener">TikTok</a><br>
+                {%- endif -%}
+                {%- if settings.social_pinterest_url != blank -%}
+                  <a href="{{ settings.social_pinterest_url }}" target="_blank" rel="noopener">Pinterest</a><br>
+                {%- endif -%}
+                {%- if settings.social_linkedin_url != blank -%}
+                  <a href="{{ settings.social_linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a><br>
+                {%- endif -%}
+              </p>
+            </div>
+
+          {%- when 'menu' -%}
+            {%- assign menu = linklists[block.settings.footer_linklist] -%}
+            <div class="aldrich-footer__col aldrich-footer__col--menu"
+              role="navigation"
+              aria-label="{{ block.settings.title | default: menu.title | escape }}"
+              {{ block.shopify_attributes }}>
+              {%- if block.settings.title != blank -%}
+                <h2 class="aldrich-footer__heading"><strong>{{ block.settings.title | escape }}</strong></h2>
               {%- endif -%}
               {%- if menu != blank -%}
-                <nav>
-                  {%- render 'navigation-menu' with menu as menu
-                    class: 'footer-menu__menu'
-                    group_class: 'footer-menu' -%}
-                </nav>
+                <p class="aldrich-footer__stack">
+                  {%- for link in menu.links -%}
+                    <a href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title | escape }}</a><br>
+                  {%- endfor -%}
+                </p>
               {%- endif -%}
             </div>
-          </div>
 
-        {%- when 'newsletter' -%}
-          <div class="{{ item_classes }} {{ block_width_class }}">
-            <div class="footer-section__item-content mx-auto max-w-lg py-5 lg:py-10 px-5 space-y-2">
+          {%- when 'newsletter' -%}
+            {%- liquid
+              assign form_id = 'AldrichNewsletter-' | append: section.id
+              assign mailchimp_action = block.settings.mailchimp_action | strip
+            -%}
+            <div class="aldrich-footer__col aldrich-footer__col--newsletter" {{ block.shopify_attributes }}>
               {%- if block.settings.title != blank -%}
-                <h4 id="nav-{{ block.settings.title | handleize }}"
-                  class="footer-newsletter__title text-xl text-section-title">{{ block.settings.title | escape }}</h4>
+                <h2 class="aldrich-footer__heading" id="aldrich-mailing-list"><strong>{{ block.settings.title | escape }}</strong></h2>
               {%- endif -%}
               {%- if block.settings.text_richtext != blank -%}
-                <div class="footer-newsletter__text rte rte-sm">{{ block.settings.text_richtext }}</div>
+                <div class="aldrich-footer__newsletter-text">{{ block.settings.text_richtext }}</div>
               {%- endif -%}
-              <div class="footer-newsletter__email">
-                {%- render 'email-subscription',
-                  id: section.id,
-                  source: 'newsletter-section' -%}
-              </div>
-            </div>
-          </div>
 
-        {%- when 'contact' -%}
-          <div class="{{ item_classes }} {{ block_width_class }}">
-            <div class="footer-section__item-content mx-auto max-w-lg py-5 lg:py-10 px-5 space-y-2">
-              {%- if block.settings.title != blank -%}
-                <h4 id="nav-{{ block.settings.title | handleize }}"
-                  class="footer-contact__title text-xl text-section-title">{{ block.settings.title | escape }}</h4>
-              {%- endif -%}
-              {%- if block.settings.show_contact -%}
-                <div class="footer-contact__meta flex justify-center rte-sm divide-x rtl:divide-x-reverse divide-section-text-25">
-                  {%- if block.settings.phone != blank -%}
-                    <span class="px-2">
-                      <a href="tel:{{ block.settings.phone | escape | handleize }}">{{ block.settings.phone | escape }}</a>
-                    </span>
-                  {%- endif -%}
-                  {%- if block.settings.contact_text != blank -%}
-                    <span class="px-2">
-                      {%- if block.settings.contact_link != blank -%}
-                        <a href="{{ block.settings.contact_link }}">{{ block.settings.contact_text | escape }}</a>
-                      {%- else -%}
-                        <span>{{ block.settings.contact_text | escape }}</span>
-                      {%- endif -%}
-                    </span>
-                  {%- endif -%}
+              {%- if mailchimp_action != blank -%}
+                {%- comment -%}
+                  Posts to the museum's Mailchimp list, like thealdrich.org. The
+                  main site submits its form over JSONP and prints Mailchimp's
+                  reply in place, so `target` never actually gets used; it is
+                  kept here as the no-JavaScript fallback.
+                {%- endcomment -%}
+                <form class="aldrich-form aldrich-footer__form"
+                  id="{{ form_id }}"
+                  action="{{ mailchimp_action }}"
+                  method="get"
+                  target="_blank"
+                  novalidate
+                  data-aldrich-newsletter
+                  data-message-invalid="{{ 'newsletter.error' | t | escape }}">
+
+                  <div class="aldrich-form__group">
+                    <label for="{{ form_id }}-first">{{ 'customer.register.first_name' | t }}</label>
+                    <input type="text"
+                      class="aldrich-field"
+                      id="{{ form_id }}-first"
+                      name="FNAME"
+                      autocomplete="given-name">
                   </div>
-                
-              {%- endif -%}
-              {%- if block.settings.address != blank -%}
-                <div class="footer-contact__address rte rte-sm">{{ block.settings.address }}</div>
-              {%- endif -%}
-              {%- if block.settings.show_social -%}
-                {% render 'social-icons' %}
+
+                  <div class="aldrich-form__group">
+                    <label for="{{ form_id }}-last">{{ 'customer.register.last_name' | t }}</label>
+                    <input type="text"
+                      class="aldrich-field"
+                      id="{{ form_id }}-last"
+                      name="LNAME"
+                      autocomplete="family-name">
+                  </div>
+
+                  <div class="aldrich-form__group">
+                    <label for="{{ form_id }}-email">{{ 'sections.aldrich_footer.newsletter_email_label' | t }}</label>
+                    <input type="email"
+                      class="aldrich-field"
+                      id="{{ form_id }}-email"
+                      name="EMAIL"
+                      autocomplete="email"
+                      autocorrect="off"
+                      autocapitalize="off"
+                      aria-required="true"
+                      required
+                      data-aldrich-newsletter-email>
+                  </div>
+
+                  {%- if block.settings.mailchimp_honeypot != blank -%}
+                    {%- comment -%}Mailchimp's bot trap: real people leave it empty.{%- endcomment -%}
+                    <div class="aldrich-form__honeypot" aria-hidden="true">
+                      <input type="text" name="{{ block.settings.mailchimp_honeypot | strip }}" tabindex="-1" value="">
+                    </div>
+                  {%- endif -%}
+
+                  <div class="aldrich-form__message"
+                    role="status"
+                    aria-live="polite"
+                    data-aldrich-newsletter-message></div>
+
+                  <button type="submit" class="aldrich-button">{{ block.settings.button_label | default: "I'm in" | escape }}</button>
+                </form>
               {%- endif -%}
             </div>
-          </div>
 
-      {%- endcase -%}
-    {%- endfor -%}
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
 
-    {%- if section.settings.enable_follow_on_shop or section.settings.show_social -%}
-      {%- liquid
-        assign show_social = section.settings.show_social
-        if shop.features.follow_on_shop? and section.settings.enable_follow_on_shop
-          assign enable_follow_on_shop = true
-        else
-          assign enable_follow_on_shop = false
-        endif
+    <hr class="aldrich-rule aldrich-rule--thin aldrich-footer__rule">
 
-        if enable_follow_on_shop and show_social
-          assign footer_section_follow_classes = 'flex flex-col md:flex-row justify-between w-full py-4 lg:py-0'
-        else
-          assign footer_section_follow_classes = 'flex flex-col md:flex-row justify-center w-full py-4 lg:py-0'
-        endif
-      -%}
-      {%- if show_social or enable_follow_on_shop -%}
-        <div class="footer-section__follow {{ footer_section_follow_classes }}">
-          {%- if show_social -%}
-            {% render 'social-icons' %}
+    {%- if section.settings.legal_label != blank or section.settings.show_policy_links -%}
+      <div class="aldrich-footer__row">
+        <ul class="aldrich-footer__inline" role="list">
+          {%- if section.settings.legal_label != blank -%}
+            <li>
+              <a href="{{ section.settings.legal_url | default: '#' }}">{{ section.settings.legal_label | escape }}</a>
+            </li>
           {%- endif -%}
-          {%- if enable_follow_on_shop -%}
-            {{ shop | login_button: action: 'follow' }}
+          {%- if section.settings.show_policy_links -%}
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}
+                <li><a href="{{ policy.url }}">{{ policy.title }}</a></li>
+              {%- endif -%}
+            {%- endfor -%}
           {%- endif -%}
-        </div>
-      {%- endif -%}
-      
+        </ul>
+      </div>
     {%- endif -%}
 
-    {%- liquid 
-      assign locale_selector = false
-      assign currency_selector = false
-
-      if shop.enabled_currencies.size > 1 and section.settings.show_currency_selector
-        assign currency_selector = true
-      endif
-
-      if shop.published_locales.size > 1 and section.settings.show_locale_selector
-        assign locale_selector = true
-      endif
-
-      if locale_selector or currency_selector
-        assign show_disclosures = true
-      endif
-
-      if section.settings.show_payment_icons and shop.enabled_payment_types != empty
-        assign show_payment_icons = true
-      endif
-    -%}
-    <div class="footer-section__item w-full fill-current footer-section__item--payments py-4 lg:py-2 col-span-full flex flex-col md:flex-row space-y-2 items-center md:items-center justify-center {% if show_disclosures and show_payment_icons %}md:justify-between{% endif %} items-end">
-      <div class="footer-section__localization">
+    {%- if show_disclosures or show_payment_icons -%}
+      <div class="aldrich-footer__row aldrich-footer__row--store">
         {%- if show_disclosures -%}
-          <div class="footer-section__disclosures no-js-hidden flex justify-center space-x-4 rtl:space-x-reverse font-navigation font-weight-navigation">
+          <div class="aldrich-footer__disclosures no-js-hidden">
             {%- if locale_selector -%}
               <disclosure-form class="disclosure">
                 {%- form 'localization', id: 'FooterLanguageForm', class: 'header-top__selectors-form', data-form-submit-form: '' -%}
@@ -220,7 +222,7 @@
                     <span class="px-1">{{ localization.language.endonym_name | capitalize }}</span>
                     {% render 'icon-ui-chevron-down' %}
                   </button>
-                  <ul id="FooterLanguageList" role="list" class="disclosure__list" 
+                  <ul id="FooterLanguageList" role="list" class="disclosure__list"
                     hidden
                     data-accordion-panel
                     data-accordion-level="1">
@@ -253,7 +255,7 @@
                     <span class="px-1">{{ localization.country.name }} ({{ localization.country.currency.iso_code }} {{ localization.country.currency.symbol }})</span>
                     {% render 'icon-ui-chevron-down' %}
                   </button>
-                  <ul id="FooterCurrencyList" role="list" class="disclosure__list" 
+                  <ul id="FooterCurrencyList" role="list" class="disclosure__list"
                     hidden
                     data-accordion-panel
                     data-accordion-level="1">
@@ -274,67 +276,448 @@
           </div>
         {%- endif -%}
 
-      </div>
-      {%- if show_payment_icons -%}
-        <div class="footer-section__payment-types">
-          <div class="text-sm pb-1 sr-only">{{ 'sections.footer.payment' | t }}</div>
-          <ul class="payment-types__list flex flex-wrap justify-center">
-            {%- for type in shop.enabled_payment_types -%}
-              {%- assign type_handle = type | handleize -%}
-              {%- assign icon_class = 'payment-icon payment-icon--' | append: type_handle -%}
-              <li class="payment-types__{{ type_handle }} m-1">{{ type | payment_type_svg_tag: class: icon_class }}</li>
-            {%- endfor -%}
-          </ul>
-        </div>
-      {%- endif -%}
-    </div>
-  </div>
-
-  {%- if section.settings.trust_richtext != empty or section.settings.trust_badge != blank -%}
-    <div class="footer-section__trust py-4">
-      {%- if section.settings.trust_richtext != empty -%}
-        <div class="trust-text mx-auto rte text-align-section text-sm">{{ section.settings.trust_richtext }}</div>
-      {%- endif -%}
-      {%- if section.settings.trust_badge != blank -%}
-        {%- liquid
-          capture sizes
-            if section.settings.trust_badge.width >= 1280
-              echo '(min-width: 1280px) 1280px, calc(100vw - 2.5rem)'
-            else
-              echo '(min-width: '
-              echo section.settings.trust_badge.width
-              echo 'px) '
-              echo section.settings.trust_badge.width
-              echo 'px, 100vw'
-            endif
-          endcapture
-        -%}
-        <div class="trust-image mx-auto" style="max-width: {{ section.settings.trust_badge.width }}px;">
-          {{ section.settings.trust_badge | image_url: width: 1920 | image_tag: 
-            class: 'block mx-auto',
-            widths: '160, 220, 300, 420, 640, 960, 1280, 1920',
-            sizes: sizes,
-            loading: 'lazy' }}
-        </div>
-        
-      {%- endif -%}
-    </div>
-  {%- endif -%}
-
-  
-  <ul class="footer-section__credits text-xs flex flex-wrap max-w-screen mx-auto justify-center divide-x divide-section-text-20">
-    <li class="footer-section__copyright pr-2">&copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url }}</li>
-    <li class="px-2">{{ powered_by_link }}</li>
-    {%- if section.settings.show_policy_links -%}
-      {%- for policy in shop.policies -%}
-        {%- if policy != blank -%}
-          <li class="px-2"><a href="{{ policy.url }}">{{ policy.title }}</a></li>
+        {%- if show_payment_icons -%}
+          <div class="aldrich-footer__payment-types">
+            <div class="sr-only">{{ 'sections.footer.payment' | t }}</div>
+            <ul class="aldrich-footer__payment-list" role="list">
+              {%- for type in shop.enabled_payment_types -%}
+                <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+              {%- endfor -%}
+            </ul>
+          </div>
         {%- endif -%}
-      {%- endfor -%}
+      </div>
     {%- endif -%}
-  </ul>
 
+    {%- liquid
+      assign show_credit_row = false
+      if section.settings.credit_richtext != blank
+        assign show_credit_row = true
+      endif
+      if section.settings.show_copyright
+        assign show_credit_row = true
+      endif
+    -%}
+    {%- if show_credit_row -%}
+      <div class="aldrich-footer__row aldrich-footer__row--credit">
+        {%- if section.settings.credit_richtext != blank -%}
+          <div class="aldrich-footer__credit">{{ section.settings.credit_richtext }}</div>
+        {%- endif -%}
+        {%- if section.settings.show_copyright -%}
+          <p class="aldrich-footer__credit">
+            &copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url }}
+          </p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
 </div>
+
+{% stylesheet %}
+  /* Repeated verbatim from the header section so the footer stands on its own.
+     The values are identical, so the order the stylesheets combine in is
+     irrelevant. */
+  .aldrich-container {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  @media (min-width: 576px) {
+    .aldrich-container { max-width: 768px; }
+  }
+
+  @media (min-width: 768px) {
+    .aldrich-container { max-width: 1024px; }
+  }
+
+  @media (min-width: 1024px) {
+    .aldrich-container { max-width: 1280px; }
+  }
+
+  @media (min-width: 1280px) {
+    .aldrich-container { max-width: 1281px; }
+  }
+
+  .aldrich-footer {
+    background: var(--aldrich-background);
+    color: var(--aldrich-body);
+    font-family: var(--aldrich-sans);
+    letter-spacing: var(--aldrich-tracking);
+    font-size: 1rem;
+    line-height: 1.6;
+    padding-top: 2.5rem;
+    /* The main site ends its footer with a deep gap below the credit line. Kept
+       on the footer itself so it survives the credit row being switched off. */
+    padding-bottom: 100px;
+  }
+
+  .aldrich-footer a {
+    color: var(--aldrich-ink);
+    text-decoration: none;
+  }
+
+  .aldrich-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .aldrich-footer strong {
+    font-weight: 700;
+  }
+
+  .aldrich-footer__heading {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  .aldrich-footer__address,
+  .aldrich-footer__stack {
+    margin: 0;
+    font-style: normal;
+  }
+
+  .aldrich-footer__address p,
+  .aldrich-footer__newsletter-text p,
+  .aldrich-footer__credit p {
+    margin: 0;
+  }
+
+  /* Column grid, mirroring the main site's centred Bootstrap row ----------- */
+  .aldrich-footer__columns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-right: -8px;
+    margin-left: -8px;
+  }
+
+  .aldrich-footer__col {
+    position: relative;
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .aldrich-footer__col + .aldrich-footer__col {
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 576px) {
+    .aldrich-footer__col + .aldrich-footer__col { margin-top: 0; }
+
+    .aldrich-footer__col--address,
+    .aldrich-footer__col--newsletter {
+      flex: 0 0 33.3333333333%;
+      max-width: 33.3333333333%;
+    }
+
+    .aldrich-footer__col--social,
+    .aldrich-footer__col--menu {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .aldrich-footer__col--address,
+    .aldrich-footer__col--newsletter {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+
+    .aldrich-footer__col--social,
+    .aldrich-footer__col--menu {
+      flex: 0 0 16.6666666667%;
+      max-width: 16.6666666667%;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .aldrich-footer__col--address,
+    .aldrich-footer__col--newsletter {
+      flex: 0 0 16.6666666667%;
+      max-width: 16.6666666667%;
+    }
+
+    .aldrich-footer__col--social,
+    .aldrich-footer__col--menu {
+      flex: 0 0 8.3333333333%;
+      max-width: 8.3333333333%;
+    }
+  }
+
+  /* Chevron mark under the address block */
+  .aldrich-footer__chevron {
+    display: block;
+    margin-top: 1.5rem;
+  }
+
+  .aldrich-footer__chevron svg {
+    display: block;
+    width: 20%;
+    height: auto;
+    fill: var(--aldrich-ink);
+  }
+
+  @media (min-width: 576px) {
+    .aldrich-footer__chevron {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+      right: 8px;
+      margin-top: 0;
+    }
+
+    .aldrich-footer__chevron svg { width: 50%; }
+  }
+
+  /* Newsletter form ------------------------------------------------------- */
+  .aldrich-form {
+    font-family: var(--aldrich-mono);
+    line-height: 1.6;
+    letter-spacing: normal;
+    font-size: 0.875rem;
+  }
+
+  .aldrich-form__group {
+    max-width: 50vw;
+    min-width: 150px;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Every declaration below is spelled out, and selectors are deliberately
+     two classes deep, because the theme styles bare `label` and `[type=email]`
+     globally: it uppercases labels in the navigation font and puts a 2px border
+     and 0.5rem/0.75rem padding on inputs. A single class ties on specificity
+     with [type="email"], so it would win or lose on stylesheet order. */
+  .aldrich-form .aldrich-form__group label {
+    display: block;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    font-family: var(--aldrich-mono);
+    font-size: inherit;
+    line-height: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+    color: inherit;
+  }
+
+  .aldrich-form .aldrich-field {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-family: var(--aldrich-mono);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--aldrich-field-ink);
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid var(--aldrich-field-border);
+    border-radius: 0.2rem;
+    box-shadow: none;
+  }
+
+  .aldrich-form .aldrich-field:focus {
+    border-color: hsl(0, 0%, 25%);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+  }
+
+  .aldrich-form .aldrich-button {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.75em 0.75rem;
+    font-family: var(--aldrich-mono);
+    font-size: 0.875rem;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    letter-spacing: normal;
+    background-color: var(--aldrich-ink);
+    border: 1px solid var(--aldrich-ink);
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+
+  .aldrich-form .aldrich-button:hover {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .aldrich-form__honeypot {
+    position: absolute;
+    left: -5000px;
+  }
+
+  .aldrich-form__message:empty {
+    display: none;
+  }
+
+  .aldrich-form__message {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .aldrich-form__message a {
+    text-decoration: underline;
+  }
+
+  .aldrich-form__message--error {
+    color: #9d0000;
+  }
+
+  @media (min-width: 768px) {
+    /* Labels inherit this; the inputs deliberately stay at 0.875rem, matching
+       Bootstrap's .form-control-sm on the main site. */
+    .aldrich-form { font-size: 0.75rem; }
+    .aldrich-form .aldrich-button { font-size: 0.75rem; }
+  }
+
+  /* Rules and bottom rows ------------------------------------------------- */
+  .aldrich-rule {
+    box-sizing: content-box;
+    height: 2px;
+    margin: 1.5rem 0;
+    background-color: var(--aldrich-rule);
+    border: none;
+  }
+
+  .aldrich-rule--thin { height: 1px; }
+
+  @media (min-width: 768px) {
+    .aldrich-rule { height: 1px; }
+  }
+
+  .aldrich-footer__rule { display: block; }
+
+  @media (min-width: 576px) {
+    .aldrich-footer__rule { display: none; }
+  }
+
+  .aldrich-footer__row {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  .aldrich-footer__inline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .aldrich-footer__inline > li {
+    display: inline-block;
+  }
+
+  .aldrich-footer__row--store {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .aldrich-footer__disclosures {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-family: var(--aldrich-mono);
+    font-size: 0.75rem;
+    letter-spacing: normal;
+  }
+
+  .aldrich-footer__payment-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    fill: currentColor;
+  }
+
+  .aldrich-footer__credit {
+    margin: 0;
+    font-size: 0.75rem;
+  }
+
+  .aldrich-footer__credit a {
+    text-decoration: underline;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    var ERROR_CLASS = 'aldrich-form__message--error';
+    var EMAIL_PATTERN = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]{2,}$/;
+    var counter = 0;
+
+    function report(target, text, isError) {
+      if (!target) return;
+      // Mailchimp's messages can contain markup. Strip the tags and set text
+      // rather than innerHTML, so a third-party response can never inject nodes.
+      target.textContent = String(text).replace(/<[^>]*>/g, '').trim();
+      target.classList.toggle(ERROR_CLASS, !!isError);
+    }
+
+    // Mailchimp's post-json endpoint only answers over JSONP, using `c` as the
+    // callback parameter.
+    function submitViaJsonp(form, message) {
+      var callbackName = 'aldrichNewsletterCallback' + counter++;
+      var query = new URLSearchParams(new FormData(form)).toString();
+      var separator = form.getAttribute('action').indexOf('?') === -1 ? '?' : '&';
+      var script = document.createElement('script');
+
+      function cleanUp() {
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[callbackName] = function (data) {
+        cleanUp();
+        var succeeded = data && data.result === 'success';
+        report(message, (data && data.msg) || '', !succeeded);
+      };
+
+      script.onerror = function () {
+        cleanUp();
+        report(message, form.dataset.messageInvalid || 'Subscription failed.', true);
+      };
+
+      script.src = form.getAttribute('action') + separator + query + '&c=' + callbackName;
+      document.head.appendChild(script);
+    }
+
+    document.addEventListener('submit', function (event) {
+      if (!event.target.closest) return;
+      var form = event.target.closest('[data-aldrich-newsletter]');
+      if (!form) return;
+
+      event.preventDefault();
+
+      var message = form.querySelector('[data-aldrich-newsletter-message]');
+      var emailField = form.querySelector('[data-aldrich-newsletter-email]');
+      var email = emailField ? emailField.value.trim() : '';
+
+      if (!EMAIL_PATTERN.test(email)) {
+        report(message, form.dataset.messageInvalid || 'Invalid email address', true);
+        if (emailField) emailField.focus();
+        return;
+      }
+
+      submitViaJsonp(form, message);
+    });
+  })();
+{% endjavascript %}
 
 {% schema %}
 {
@@ -344,13 +727,54 @@
   "settings": [
     {
       "type": "header",
+      "content": "Legal"
+    },
+    {
+      "type": "text",
+      "id": "legal_label",
+      "label": "Legal link label",
+      "default": "Terms and Conditions and Privacy Policy"
+    },
+    {
+      "type": "text",
+      "id": "legal_url",
+      "label": "Legal link URL",
+      "info": "A full URL or a store path.",
+      "default": "https://thealdrich.org/client-uploads/files/privacy-policy.pdf"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_policy_links",
+      "label": "t:sections.footer.settings.show_policy_links.label",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Credit"
+    },
+    {
+      "type": "richtext",
+      "id": "credit_richtext",
+      "label": "Credit text",
+      "info": "Optional. Leave empty to hide the credit line."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_copyright",
+      "label": "Show copyright line",
+      "info": "Off by default, because thealdrich.org does not show one.",
+      "default": false
+    },
+    {
+      "type": "header",
       "content": "t:sections.footer.settings.header_payment_methods.content"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
       "label": "t:sections.footer.settings.show_payment_icons.label",
-      "default": true
+      "info": "Off by default, because thealdrich.org does not show payment icons.",
+      "default": false
     },
     {
       "type": "header",
@@ -373,51 +797,45 @@
       "id": "show_currency_selector",
       "label": "t:sections.footer.settings.show_currency_selector.label",
       "default": true
-    },
-    {
-      "type": "header",
-      "content": "t:sections.footer.settings.header_follow_on_shop.content",
-      "info": "t:sections.footer.settings.header_follow_on_shop.info"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_follow_on_shop",
-      "default": true,
-      "label": "t:sections.footer.settings.enable_follow_on_shop.label"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.footer.settings.header_show_social.content",
-      "info": "t:sections.footer.settings.header_show_social.info"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_social",
-      "default": false,
-      "label": "t:sections.footer.settings.show_social.label"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.footer.settings.header_checkout_badge.content"
-    },
-    {
-      "type": "richtext",
-      "id": "trust_richtext",
-      "label": "t:sections.footer.settings.trust_richtext.label"
-    },
-    {
-      "type": "image_picker",
-      "id": "trust_badge",
-      "label": "t:sections.footer.settings.trust_badge.label"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_policy_links",
-      "label": "t:sections.footer.settings.show_policy_links.label",
-      "default": true
     }
   ],
   "blocks": [
+    {
+      "type": "address",
+      "name": "Address",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "address",
+          "label": "t:sections.footer.blocks.contact.settings.address.label",
+          "default": "<p><strong>The Aldrich</strong><br/>258 Main Street<br/>Ridgefield, CT 06877</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_chevron",
+          "label": "Show chevron mark",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Follow us",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.footer.blocks.menu.settings.title.label",
+          "default": "Follow Us"
+        },
+        {
+          "type": "paragraph",
+          "content": "Links are taken from the social accounts set in Theme settings."
+        }
+      ]
+    },
     {
       "type": "menu",
       "name": "t:sections.footer.blocks.menu.name",
@@ -426,13 +844,7 @@
           "type": "text",
           "id": "title",
           "label": "t:sections.footer.blocks.menu.settings.title.label",
-          "default": "Footer menu"
-        },
-        {
-          "type": "richtext",
-          "id": "text_richtext",
-          "label": "t:sections.footer.blocks.menu.settings.text_richtext.label",
-          "default": "<p>Learn more about us</p>"
+          "default": "Shop"
         },
         {
           "type": "link_list",
@@ -451,59 +863,32 @@
           "type": "text",
           "id": "title",
           "label": "t:sections.footer.blocks.newsletter.settings.title.label",
-          "default": "Newsletter"
+          "default": "Join our mailing list"
         },
         {
           "type": "richtext",
           "id": "text_richtext",
-          "label": "t:sections.footer.blocks.newsletter.settings.text_richtext.label",
-          "default": "<p>Subscribe to be the first to hear about our exclusive offers and latest arrivals.</p>"
-        }
-      ]
-    },
-    {
-      "type": "contact",
-      "name": "t:sections.footer.blocks.contact.name",
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "t:sections.footer.blocks.contact.settings.title.label",
-          "default": "Contact us"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_contact",
-          "label": "t:sections.footer.blocks.contact.settings.show_contact.label",
-          "default": true
+          "label": "t:sections.footer.blocks.newsletter.settings.text_richtext.label"
         },
         {
           "type": "text",
-          "id": "phone",
-          "label": "t:sections.footer.blocks.contact.settings.phone.label",
-          "default": "1.877.555.9300"
+          "id": "button_label",
+          "label": "Button label",
+          "default": "I'm in"
         },
         {
           "type": "text",
-          "id": "contact_text",
-          "label": "t:sections.footer.blocks.contact.settings.contact_text.label"
+          "id": "mailchimp_action",
+          "label": "Mailchimp form action",
+          "info": "The list's post-json URL, the same one thealdrich.org submits to. Required — the form is hidden when this is empty.",
+          "default": "https://aldrichart.us11.list-manage.com/subscribe/post-json?u=ee247c786df390b919fc2b0cf&id=0a6583d106"
         },
         {
-          "type": "url",
-          "id": "contact_link",
-          "label": "t:sections.footer.blocks.contact.settings.contact_link.label"
-        },
-        {
-          "type": "richtext",
-          "id": "address",
-          "label": "t:sections.footer.blocks.contact.settings.address.label",
-          "default": "<p></p>"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_social",
-          "label": "t:sections.footer.blocks.contact.settings.show_social_icons.label",
-          "default": true
+          "type": "text",
+          "id": "mailchimp_honeypot",
+          "label": "Mailchimp bot-trap field name",
+          "info": "The hidden b_… field name from the Mailchimp embed code. Submissions that fill it are treated as spam.",
+          "default": "b_ee247c786df390b919fc2b0cf_0a6583d106"
         }
       ]
     }

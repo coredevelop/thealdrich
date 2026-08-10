@@ -68,9 +68,18 @@
         "input_border_color": "#000000",
         "input_border_radius": 0
       }
+    },
+    "page_styles": {
+      "type": "page-styles",
+      "settings": {
+        "font_stack": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "heading_font_stack": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "banner_min_height": 800
+      }
     }
   },
   "order": [
+    "page_styles",
     "breadcrumbs",
     "main",
     "1783635242cb330148",

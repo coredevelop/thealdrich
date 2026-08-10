@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "header",
   "name": "t:section_groups.header_group.name",
@@ -6,7 +15,7 @@
       "type": "aldrich-callout",
       "settings": {
         "text": "Advance ticket reservations encouraged. Click here to book",
-        "link_url": "https://fareharbor.com/embeds/book/thealdrich/?full-items=yes",
+        "link_url": "https://the-aldrich-contemporary-art-museum-sandbox.myshopify.com/pages/service-list-page",
         "show_close": true,
         "dismiss_key": "advance-tickets",
         "color_background": "#ffe100",

@@ -18,7 +18,18 @@
     },
     "main": {
       "type": "main-page",
+      "disabled": true,
       "settings": {}
+    },
+    "rich_text_ty878G": {
+      "type": "rich-text",
+      "name": "t:sections.rich_text.presets.name",
+      "settings": {
+        "title": "Purchase tickets",
+        "text": "",
+        "width": 960,
+        "alignment": "center"
+      }
     },
     "1783635242cb330148": {
       "type": "apps",
@@ -45,22 +56,12 @@
       "settings": {
         "full_width": false
       }
-    },
-    "rich_text_ty878G": {
-      "type": "rich-text",
-      "name": "t:sections.rich_text.presets.name",
-      "settings": {
-        "title": "Purchase tickets",
-        "text": "",
-        "width": 960,
-        "alignment": "center"
-      }
     }
   },
   "order": [
     "breadcrumbs",
     "main",
-    "1783635242cb330148",
-    "rich_text_ty878G"
+    "rich_text_ty878G",
+    "1783635242cb330148"
   ]
 }

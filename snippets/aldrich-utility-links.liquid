@@ -127,9 +127,14 @@
           type="search"
           name="q"
           value="{{ search.terms | escape }}"
-          autocomplete="off">
+          autocomplete="off"
+          data-aldrich-search-input>
+        <button class="aldrich-search__clear" type="button" data-aldrich-search-clear{% if search.terms == blank %} hidden{% endif %}>
+          <svg class="aldrich-search__clear-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3.5 3.5l9 9m0-9-9 9"/></svg>
+          <span class="aldrich-visually-hidden">{{ 'accessibility.close' | t }}</span>
+        </button>
         <button class="aldrich-search__submit" type="submit">
-          {%- render 'icon-ui-search' -%}
+          <svg class="aldrich-search__icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" clip-rule="evenodd"/></svg>
           <span class="aldrich-visually-hidden">{{ 'general.search.search' | t }}</span>
         </button>
       </form>

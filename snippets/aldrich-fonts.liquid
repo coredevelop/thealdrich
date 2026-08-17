@@ -28,6 +28,18 @@
     font-display: swap;
   }
 
+  /* The main site's top-level navigation selects the Bold family directly
+     while retaining a CSS font-weight of 400. Keeping it as a separate family
+     reproduces both its rendered appearance and computed weight. */
+  @font-face {
+    font-family: "AldrichNav";
+    src: url({{ 'aldrich-Regular-Bold.woff2' | asset_url }}) format("woff2"),
+         url({{ 'aldrich-Regular-Bold.woff' | asset_url }}) format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
   @font-face {
     font-family: "AldrichRegular";
     src: url({{ 'aldrich-Regular-Italic.woff2' | asset_url }}) format("woff2"),
@@ -66,6 +78,7 @@
 
   :root {
     --aldrich-sans: "AldrichRegular", "helvetica neue", helvetica, arial, sans-serif;
+    --aldrich-nav: "AldrichNav", "AldrichRegular", "helvetica neue", helvetica, arial, sans-serif;
     --aldrich-mono: "AldrichMono", "helvetica neue", helvetica, arial, sans-serif;
     --aldrich-tracking: 0.075rem;
     --aldrich-background: #fafafa;

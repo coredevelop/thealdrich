@@ -27,8 +27,8 @@
     padding: 0;
     cursor: pointer;
     font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 400;
     letter-spacing: 0.075rem;
     text-transform: uppercase;
     color: #000;
@@ -37,11 +37,16 @@
     text-decoration: none;
   }
 
-  [data-section-id="{{ section.id }}"] .fund-tabs__link:hover,
-  [data-section-id="{{ section.id }}"] .fund-tabs__link.is-active {
+  [data-section-id="{{ section.id }}"] .fund-tabs__link:hover {
     opacity: 1;
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  [data-section-id="{{ section.id }}"] .fund-tabs__link.is-active {
+    opacity: 1;
+    background-color: rgb(255, 225, 0);
+    text-decoration: none;
   }
 </style>
 
@@ -55,7 +60,7 @@
       {%- for block in section.blocks -%}
         {%- assign target = block.settings.target | strip | downcase -%}
         <a
-          class="fund-tabs__link"
+          class="fund-tabs__link{% if block.settings.label == 'Overview' %} is-active{% endif %}"
           href="#{{ target }}"
           data-tab-target="{{ target }}"
           {{ block.shopify_attributes }}

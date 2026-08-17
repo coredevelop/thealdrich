@@ -2,10 +2,11 @@
 
 <style>
   {%- if section.settings.sticky -%}
-    [data-section-id="{{ section.id }}"].fund-tabs {
+    #shopify-section-{{ section.id }} {
       position: sticky;
       top: 0;
       z-index: 20;
+      background-color: var(--primary-background-color, #fafafa);
     }
   {%- endif -%}
 
@@ -88,7 +89,7 @@
 
         event.preventDefault();
         const top = targetEl.getBoundingClientRect().top + window.pageYOffset - this.offset;
-        window.scrollTo({ top: top, behavior: 'smooth' });
+        window.scrollTo({ top: top, behavior: 'instant' });
 
         this.links.forEach((l) => l.classList.remove('is-active'));
         link.classList.add('is-active');

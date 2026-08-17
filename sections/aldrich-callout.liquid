@@ -114,12 +114,15 @@
   .aldrich-callout {
     position: relative;
     z-index: 10;
+    box-sizing: border-box;
+    height: 60px;
     padding: 15px 0;
     font-family: var(--aldrich-mono);
     font-size: 1rem;
     line-height: 1.6;
     background: var(--aldrich-callout-background, #ffe100);
-    color: var(--aldrich-callout-text, #000);
+    color: var(--aldrich-callout-text, #212529);
+    font-weight: 400;
   }
 
   .aldrich-callout p {
@@ -160,6 +163,15 @@
   @media (min-width: 768px) {
     .aldrich-callout__toggle { padding: 15px; }
     .aldrich-callout__icon { width: 15px; }
+  }
+
+  /* The main site's mobile callout expands when this message wraps to two
+     lines; constraining it to the desktop height clips that rhythm. */
+  @media (max-width: 767.98px) {
+    .aldrich-callout {
+      height: auto;
+      min-height: 60px;
+    }
   }
 {% endstylesheet %}
 
@@ -228,7 +240,7 @@
       "type": "color",
       "id": "color_text",
       "label": "Text",
-      "default": "#000000"
+      "default": "#212529"
     }
   ],
   "presets": [

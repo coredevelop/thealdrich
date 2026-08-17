@@ -10,7 +10,7 @@
         "show_close": true,
         "dismiss_key": "advance-tickets",
         "color_background": "#ffe100",
-        "color_text": "#000000"
+        "color_text": "#212529"
       }
     },
     "promos": {
@@ -25,7 +25,7 @@
         "hours": {
           "type": "text",
           "settings": {
-            "text": "We're open today from 12 pm to 5 pm",
+            "text": "We’re open today from 12 pm to 5 pm",
             "hide_when_tight": true
           }
         },

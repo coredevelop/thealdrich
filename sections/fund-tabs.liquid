@@ -25,7 +25,7 @@
   [data-section-id="{{ section.id }}"] .fund-tabs__link {
     background: none;
     border: 0;
-    padding: 0;
+
     cursor: pointer;
     font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
     font-size: 14px;
@@ -33,21 +33,21 @@
     letter-spacing: 0.075rem;
     text-transform: uppercase;
     color: #000;
-    opacity: 0.75;
     transition: opacity 0.15s ease;
+    padding: .25em .5625em .125em .5625em;
     text-decoration: none;
   }
 
   [data-section-id="{{ section.id }}"] .fund-tabs__link:hover {
     opacity: 1;
-    text-decoration: underline;
-    text-underline-offset: 4px;
+
   }
 
   [data-section-id="{{ section.id }}"] .fund-tabs__link.is-active {
     opacity: 1;
     background-color: rgb(255, 225, 0);
     text-decoration: none;
+
   }
 </style>
 
@@ -57,7 +57,11 @@
   data-section-type="fund-tabs"
 >
   <nav class="fund-tabs__nav" aria-label="{{ section.settings.aria_label | escape }}">
-    <fund-tabs-{{ uid }} style="display: contents;" data-offset="{{ section.settings.scroll_offset }}">
+    <fund-tabs-{{ uid }}
+      style="display: contents;"
+      data-offset="{{ section.settings.scroll_offset }}"
+      data-scroll-spy="{% if template.suffix == 'donation' %}true{% else %}false{% endif %}"
+    >
       {%- for block in section.blocks -%}
         {%- assign target = block.settings.target | strip | downcase -%}
         <a
@@ -77,8 +81,74 @@
       connectedCallback() {
         this.offset = parseInt(this.dataset.offset, 10) || 0;
         this.links = Array.from(this.querySelectorAll('[data-tab-target]'));
+        this.linkHandlers = this.links.map((link) => {
+          const handler = (event) => this.handleClick(event, link);
+          link.addEventListener('click', handler);
+          return { link, handler };
+        });
+
+        if (this.dataset.scrollSpy !== 'true') return;
+
+        this.handleViewportChange = () => this.scheduleActiveUpdate();
+        window.addEventListener('scroll', this.handleViewportChange, { passive: true });
+        window.addEventListener('resize', this.handleViewportChange);
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', this.handleViewportChange, { once: true });
+        } else {
+          this.updateActiveFromScroll();
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.handleViewportChange) {
+          window.removeEventListener('scroll', this.handleViewportChange);
+          window.removeEventListener('resize', this.handleViewportChange);
+          document.removeEventListener('DOMContentLoaded', this.handleViewportChange);
+        }
+        this.linkHandlers.forEach(({ link, handler }) => {
+          link.removeEventListener('click', handler);
+        });
+
+        if (this.activeUpdateFrame) {
+          window.cancelAnimationFrame(this.activeUpdateFrame);
+        }
+      }
+
+      scheduleActiveUpdate() {
+        if (this.activeUpdateFrame) return;
+
+        this.activeUpdateFrame = window.requestAnimationFrame(() => {
+          this.activeUpdateFrame = null;
+          this.updateActiveFromScroll();
+        });
+      }
+
+      updateActiveFromScroll() {
+        const targets = this.links.map((link) => ({
+          link,
+          element: document.getElementById(link.dataset.tabTarget)
+        })).filter((item) => item.element);
+        let activeLink = targets[0]?.link || this.links[0];
+        const activationLine = window.pageYOffset + this.offset + 1;
+
+        targets.forEach(({ link, element }) => {
+          const targetTop = element.getBoundingClientRect().top + window.pageYOffset;
+          if (targetTop <= activationLine) activeLink = link;
+        });
+
+        if (activeLink) this.setActiveLink(activeLink);
+      }
+
+      setActiveLink(activeLink) {
         this.links.forEach((link) => {
-          link.addEventListener('click', (event) => this.handleClick(event, link));
+          const isActive = link === activeLink;
+          link.classList.toggle('is-active', isActive);
+          if (isActive) {
+            link.setAttribute('aria-current', 'location');
+          } else {
+            link.removeAttribute('aria-current');
+          }
         });
       }
 
@@ -90,13 +160,13 @@
         event.preventDefault();
         const top = targetEl.getBoundingClientRect().top + window.pageYOffset - this.offset;
         window.scrollTo({ top: top, behavior: 'instant' });
-
-        this.links.forEach((l) => l.classList.remove('is-active'));
-        link.classList.add('is-active');
+        this.setActiveLink(link);
       }
     }
 
-    customElements.define('fund-tabs-{{ uid }}', FundTabs{{ uid }});
+    if (!customElements.get('fund-tabs-{{ uid }}')) {
+      customElements.define('fund-tabs-{{ uid }}', FundTabs{{ uid }});
+    }
   })();
 </script>
 

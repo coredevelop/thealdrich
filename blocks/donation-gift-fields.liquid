@@ -75,6 +75,11 @@
     color: #212529;
   }
 
+  .donation-gift-fields__label--compact-{{ uid }} {
+    margin-bottom: 4px!important;;
+    font-weight: 400!important;
+  }
+
   .donation-gift-fields__input-{{ uid }} {
     width: 100%;
     padding: 12px 16px;
@@ -103,8 +108,9 @@
 
   .donation-gift-fields__checkbox-{{ uid }} {
     margin: 0 8px 0 0;
-    width: 16px;
-    height: 16px;
+    margin-top:-2px;
+    width: 14px;
+    height: 14px;
     cursor: pointer;
     flex-shrink: 0;
     border-radius: 3px;
@@ -120,6 +126,7 @@
   }
 
   .donation-gift-fields__checkbox-label-{{ uid }} {
+    padding-bottom: 0;
     font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
     font-size: 0.75rem;
     font-weight: 500;
@@ -202,7 +209,7 @@
     {% endif %}
 
     <div class="donation-gift-fields__field-{{ uid }}">
-      <label class="donation-gift-fields__label-{{ uid }}" for="donation-full-name-{{ uid }}">
+      <label class="donation-gift-fields__label-{{ uid }} donation-gift-fields__label--compact-{{ uid }}" for="donation-full-name-{{ uid }}">
         Full Name <span class="donation-gift-fields__required-{{ uid }}">*</span>
       </label>
       <input
@@ -214,7 +221,7 @@
     </div>
 
     <div class="donation-gift-fields__field-{{ uid }}">
-      <label class="donation-gift-fields__label-{{ uid }}" for="donation-acknowledgement-{{ uid }}">
+      <label class="donation-gift-fields__label-{{ uid }} donation-gift-fields__label--compact-{{ uid }}" for="donation-acknowledgement-{{ uid }}">
         Name(s) as you would like to be listed for gift acknowledgement
       </label>
       <input
@@ -242,7 +249,7 @@
       </div>
 
       <div class="donation-gift-fields__honor-content-{{ uid }} hidden" data-honor-content>
-        <label class="donation-gift-fields__label-{{ uid }}" for="donation-honor-name-{{ uid }}">
+        <label class="donation-gift-fields__label-{{ uid }} donation-gift-fields__label--compact-{{ uid }}" for="donation-honor-name-{{ uid }}">
           Name
         </label>
         <input
@@ -255,7 +262,7 @@
     </div>
 
     <div class="donation-gift-fields__subsection-{{ uid }}">
-      <label class="donation-gift-fields__label-{{ uid }}">
+      <label class="donation-gift-fields__label-{{ uid }} donation-gift-fields__label--compact-{{ uid }}">
         I would like my gift to support
       </label>
       <div class="donation-gift-fields__support-checkboxes-{{ uid }}">
@@ -369,7 +376,7 @@
         class="donation-gift-fields__checkbox-label-{{ uid }}"
         for="donation-matching-{{ uid }}"
       >
-        I have submitted an Employer's Matching Gift Form
+        I have submitted an Employer’s Matching Gift Form
       </label>
     </div>
   </div>

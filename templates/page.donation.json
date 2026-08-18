@@ -19,9 +19,24 @@
     },
     "breadcrumbs": {
       "type": "breadcrumbs",
+      "custom_css": [
+        ".breadcrumbs {padding-top: 10px;}",
+        ".breadcrumbs > .max-w-screen {border-top: 1px solid #000000; padding-top: 0.75rem;}"
+      ],
       "settings": {
         "show_breadcrumbs": "all",
-        "show_social_icons": true
+        "show_social_icons": false
+      }
+    },
+    "make_a_gift_link": {
+      "type": "custom-liquid",
+      "custom_css": [
+        ".donation-page__make-a-gift {color: #000; font-family: \"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif; letter-spacing: 0.075rem;}"
+      ],
+      "settings": {
+        "full_width": false,
+        "section_padding": false,
+        "custom_liquid": "<style>#shopify-section-{{ section.id }} { margin-bottom: 10px; }</style><a class=\"donation-page__make-a-gift\" href=\"#donation-overview\">Make a Gift</a>"
       }
     },
     "hero_banner": {
@@ -207,6 +222,10 @@
       "block_order": [
         "donateme_donation_widget_bewLAD"
       ],
+      "custom_css": [
+        ".donation-widget {font-family: ApercuPro, helvetica neue, helvetica, arial, sans-serif !important; font-weight: 500 !important; line-height: 1.6 !important; letter-spacing: 0.075rem !important;}",
+        ".apps {padding-top: 0 !important; padding-bottom: 0 !important;}"
+      ],
       "settings": {
         "full_width": false
       }
@@ -273,6 +292,10 @@
         "fund_LVdGQX",
         "fund_6bq94X"
       ],
+      "custom_css": [
+        ".fund-feature__heading {color: rgb(33, 37, 41); font-weight: 400; line-height: 38.4px;}",
+        ".fund-feature__body {max-width: 97%;}"
+      ],
       "name": "Fund features",
       "settings": {
         "section_padding": true,
@@ -288,6 +311,10 @@
     },
     "related_news": {
       "type": "featured-blog",
+      "custom_css": [
+        ".blog-featured__title {font-size: 24px; letter-spacing: 1.2px; color: rgb(33, 37, 41); font-weight: 400; line-height: 38.4px;}",
+        ".blog-featured__grid .article-grid__title {font-size: 1.25rem; font-family: \"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif; letter-spacing: 0.075rem; line-height: 1.6;}"
+      ],
       "settings": {
         "title": "Related News",
         "title_tag": "h3",
@@ -295,7 +322,7 @@
         "category_label": "Blog",
         "card_background": "#00e1af",
         "card_text_color": "#0d1b16",
-        "card_padding": 20,
+        "card_padding": 18,
         "blog": "donations",
         "button_label": "View the blog",
         "post_limit": "3",
@@ -311,8 +338,8 @@
       "type": "photo-credit",
       "settings": {
         "text": "Top image: Photo: Kevin Kraut",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 16,
+        "padding_bottom": 48,
         "line_color": "#000000",
         "text_color": "#000000"
       }
@@ -321,6 +348,7 @@
   "order": [
     "page_styles",
     "breadcrumbs",
+    "make_a_gift_link",
     "hero_banner",
     "donation_intro",
     "fund_tabs",

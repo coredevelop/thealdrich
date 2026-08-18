@@ -23,7 +23,7 @@
           "settings": {
             "title": "Join our mailing list",
             "text_richtext": "",
-            "button_label": "I'm in",
+            "button_label": "I’m in",
             "mailchimp_action": "https://aldrichart.us11.list-manage.com/subscribe/post-json?u=ee247c786df390b919fc2b0cf&id=0a6583d106",
             "mailchimp_honeypot": "b_ee247c786df390b919fc2b0cf_0a6583d106"
           }

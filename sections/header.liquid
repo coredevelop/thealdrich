@@ -30,7 +30,7 @@
   }
 </style>
 
-<div class="aldrich-header"
+<div class="aldrich-header{% if request.page_type == 'index' %} aldrich-header--home{% endif %}"
   data-section-id="{{ section.id }}"
   data-section-type="header"
   data-aldrich-header>
@@ -186,10 +186,11 @@
     color: var(--aldrich-body);
     font-family: var(--aldrich-sans);
     line-height: 1;
+    font-weight: 400;
   }
 
   .aldrich-header a {
-    color: var(--aldrich-ink);
+    color: var(--aldrich-body);
     text-decoration: none;
   }
 
@@ -199,6 +200,8 @@
     padding: 0;
     list-style: none;
     font-family: var(--aldrich-mono);
+    color: var(--aldrich-body);
+    font-weight: 400;
   }
 
   .aldrich-utility__link--highlight {
@@ -228,6 +231,7 @@
 
   /* Search field, matching the main site's small Bootstrap control */
   .aldrich-search {
+    position: relative;
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -242,7 +246,7 @@
     width: 100%;
     max-width: 220px;
     height: calc(1.5em + 0.5rem + 2px);
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 2rem 0.25rem 0.5rem;
     font-family: var(--aldrich-mono);
     font-size: 0.875rem;
     line-height: 1.5;
@@ -274,15 +278,40 @@
     width: 2rem;
     height: 2rem;
     padding: 0;
-    color: var(--aldrich-ink);
+    color: var(--aldrich-body);
     background: none;
     border: 0;
     cursor: pointer;
   }
 
-  .aldrich-search__submit .icon {
-    width: 1.125rem;
-    height: 1.125rem;
+  .aldrich-search__submit .icon,
+  .aldrich-search__icon {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .aldrich-search__clear {
+    position: absolute;
+    right: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    color: #3f6fae;
+    background: transparent;
+    border: 0;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .aldrich-search__clear[hidden] { display: none; }
+
+  .aldrich-search__clear-icon {
+    width: 0.75rem;
+    height: 0.75rem;
   }
 
   /* Utility bar — mobile: stacked and centred inside the menu overlay */
@@ -396,6 +425,16 @@
       align-items: center;
       justify-content: center;
     }
+
+    /* The live site uses its compact wordmark and offsets it slightly right
+       so it stays visually centred against the left-aligned hamburger. */
+    .aldrich-header__logo-mark--small { display: block; }
+    .aldrich-header__logo-mark--large { display: none; }
+    .aldrich-header__logo-mark--small,
+    .aldrich-header__logo-image {
+      position: relative;
+      left: 24px;
+    }
   }
 
   @media (min-width: 768px) {
@@ -403,6 +442,10 @@
       align-items: flex-end;
       margin-top: 10px;
       padding-top: 0;
+    }
+
+    .aldrich-header {
+      padding-bottom: 8px;
     }
 
     .aldrich-header__logo-mark--small { display: none; }
@@ -450,34 +493,50 @@
     width: 40px;
     height: 4px;
     background-color: var(--aldrich-ink);
-    transition: transform 0.15s ease;
   }
 
   .aldrich-header__hamburger-inner {
-    top: 50%;
-    margin-top: -2px;
+    top: auto;
+    bottom: 0;
+    margin-top: 0;
+    transition-delay: 0.13s;
+    transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    transition-duration: 0.13s;
   }
 
   .aldrich-header__hamburger-inner::before {
     content: "";
     top: -10px;
+    transition: top 0.12s cubic-bezier(0.33333, 0.66667, 0.66667, 1) 0.2s,
+      transform 0.13s cubic-bezier(0.55, 0.055, 0.675, 0.19);
   }
 
   .aldrich-header__hamburger-inner::after {
     content: "";
-    bottom: -10px;
+    top: -20px;
+    bottom: auto;
+    transition: top 0.2s cubic-bezier(0.33333, 0.66667, 0.66667, 1) 0.2s,
+      opacity 0.1s linear;
   }
 
   .aldrich-header--menu-open .aldrich-header__hamburger-inner {
-    background-color: transparent;
+    transition-delay: 0.22s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(0, -10px, 0) rotate(-45deg);
   }
 
   .aldrich-header--menu-open .aldrich-header__hamburger-inner::before {
-    transform: translate3d(0, 10px, 0) rotate(45deg);
+    top: 0;
+    transition: top 0.1s cubic-bezier(0.33333, 0, 0.66667, 0.33333) 0.16s,
+      transform 0.13s cubic-bezier(0.215, 0.61, 0.355, 1) 0.25s;
+    transform: rotate(-90deg);
   }
 
   .aldrich-header--menu-open .aldrich-header__hamburger-inner::after {
-    transform: translate3d(0, -10px, 0) rotate(-45deg);
+    top: 0;
+    opacity: 0;
+    transition: top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333),
+      opacity 0.1s linear 0.22s;
   }
 
   @media (min-width: 768px) {
@@ -492,32 +551,54 @@
   }
 
   .aldrich-nav__item {
-    font-weight: 700;
+    font-family: var(--aldrich-nav);
+    font-weight: 400;
     letter-spacing: var(--aldrich-tracking);
   }
 
-  .aldrich-nav__link {
+  .aldrich-header .aldrich-nav__link {
     display: block;
     padding: 0.5rem 0 0;
     margin: 0;
     font: inherit;
-    color: rgba(0, 0, 0, 0.9);
+    color: rgba(0, 0, 0, 0.5);
     text-align: inherit;
     background: none;
     border: 0;
     cursor: pointer;
   }
 
+  /* Match Bootstrap's navbar-light states used on the main site. */
+  .aldrich-header .aldrich-nav__item--current > .aldrich-nav__link,
+  .aldrich-header .aldrich-nav__sublink.aldrich-nav__sublink--current {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  /* On the main site's homepage the entire primary navigation is dark. */
+  .aldrich-header--home .aldrich-nav__link {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .aldrich-header .aldrich-nav__link:hover,
+  .aldrich-header .aldrich-nav__link:focus-visible,
+  .aldrich-header .aldrich-nav__link[aria-expanded="true"],
+  .aldrich-header .aldrich-nav__sublink:hover,
+  .aldrich-header .aldrich-nav__sublink:focus-visible {
+    color: rgba(0, 0, 0, 0.7);
+  }
+
   .aldrich-nav__dropdown {
+    font-family: var(--aldrich-sans);
     font-weight: 400;
     letter-spacing: var(--aldrich-tracking);
     background: var(--aldrich-background);
   }
 
-  .aldrich-nav__sublink {
+  .aldrich-header .aldrich-nav__sublink {
     display: block;
     width: 100%;
-    color: var(--aldrich-body);
+    padding-bottom: 4px;
+    color: rgb(33, 37, 41);
     white-space: nowrap;
   }
 
@@ -579,7 +660,7 @@
       font-size: 20px;
     }
 
-    .aldrich-nav__link {
+    .aldrich-header .aldrich-nav__link {
       padding: 0.5rem 0 0 1em;
     }
 
@@ -604,11 +685,12 @@
     }
 
     .aldrich-nav__sublink {
-      padding: 10px 13px 0;
+      padding: 10px 13px 4px;
     }
 
-    .aldrich-nav__sublink:hover { font-weight: 700; }
+    .aldrich-nav__sublink:hover { font-weight: 400; }
   }
+
 {% endstylesheet %}
 
 {% javascript %}
@@ -674,6 +756,43 @@
         closeDropdowns(header);
         closeMenu(header);
       });
+    });
+
+    document.addEventListener('input', function (event) {
+      var input = event.target.closest ? event.target.closest('[data-aldrich-search-input]') : null;
+      if (!input) return;
+      var clear = input.parentNode.querySelector('[data-aldrich-search-clear]');
+      if (clear) clear.hidden = input.value.length === 0;
+    });
+
+    function updateSearchClearButtons(root) {
+      root.querySelectorAll('[data-aldrich-search-input]').forEach(function (input) {
+        var clear = input.parentNode.querySelector('[data-aldrich-search-clear]');
+        if (clear) clear.hidden = input.value.length === 0;
+      });
+    }
+
+    /* The search term can be restored by the browser before an input event is
+       emitted, so determine the initial clear-button state from the rendered
+       field value as well as from subsequent typing. */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        updateSearchClearButtons(document);
+      });
+    } else {
+      updateSearchClearButtons(document);
+    }
+
+    document.addEventListener('click', function (event) {
+      var clear = event.target.closest ? event.target.closest('[data-aldrich-search-clear]') : null;
+      if (!clear) return;
+      var form = clear.closest('.aldrich-search');
+      var input = form && form.querySelector('[data-aldrich-search-input]');
+      if (!input) return;
+      event.preventDefault();
+      input.value = '';
+      clear.hidden = true;
+      input.focus();
     });
 
     window.addEventListener('resize', function () {
@@ -808,7 +927,7 @@
           "type": "text",
           "id": "text",
           "label": "Text",
-          "default": "We're open today from 12 pm to 5 pm"
+          "default": "We’re open today from 12 pm to 5 pm"
         },
         {
           "type": "checkbox",

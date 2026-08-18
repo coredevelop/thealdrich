@@ -37,6 +37,8 @@
   data-section-id="{{ section.id }}"
   data-section-type="footer">
   <div class="aldrich-container">
+    <hr class="aldrich-rule aldrich-rule--thin aldrich-footer__rule aldrich-footer__rule--top">
+
     <div class="aldrich-footer__columns">
       {%- for block in section.blocks -%}
         {%- case block.type -%}
@@ -174,7 +176,7 @@
                     aria-live="polite"
                     data-aldrich-newsletter-message></div>
 
-                  <button type="submit" class="aldrich-button">{{ block.settings.button_label | default: "I'm in" | escape }}</button>
+                  <button type="submit" class="aldrich-button">{{ block.settings.button_label | default: "I’m in" | escape }}</button>
                 </form>
               {%- endif -%}
             </div>
@@ -355,19 +357,33 @@
     /* The main site ends its footer with a deep gap below the credit line. Kept
        on the footer itself so it survives the credit row being switched off. */
     padding-bottom: 100px;
+    border-top: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+
+  /* The theme wrapper can add a section divider before the footer. The main
+     site transitions directly into the footer background instead. */
+  .section__footer,
+  .footer {
+    border-top: 0 !important;
+    box-shadow: none;
   }
 
   .aldrich-footer a {
-    color: var(--aldrich-ink);
+    color: rgb(33, 37, 41);
+    font-weight: 400;
     text-decoration: none;
   }
 
   .aldrich-footer a:hover {
-    text-decoration: underline;
+    color: rgb(33, 37, 41);
+    text-decoration: none;
   }
 
   .aldrich-footer strong {
-    font-weight: 700;
+    font-family: var(--aldrich-nav);
+    font-weight: 400;
   }
 
   .aldrich-footer__heading {
@@ -375,18 +391,59 @@
     font-size: inherit;
     font-weight: inherit;
     line-height: inherit;
+    color: rgb(33, 37, 41);
+    font-weight: 400;
+  }
+
+  .aldrich-footer .aldrich-footer__col--social .aldrich-footer__heading,
+  .aldrich-footer .aldrich-footer__col--social .aldrich-footer__heading strong {
+    color: rgb(33, 37, 41);
+    font-family: var(--aldrich-nav);
+    font-weight: 400;
+  }
+
+  .aldrich-footer .aldrich-footer__col--social .aldrich-footer__stack a {
+    color: rgb(33, 37, 41);
+    font-weight: 400;
+  }
+
+  .aldrich-footer .aldrich-footer__col--newsletter .aldrich-footer__heading,
+  .aldrich-footer .aldrich-footer__col--newsletter .aldrich-footer__heading strong {
+    color: rgb(33, 37, 41);
+    font-family: var(--aldrich-nav);
+    font-weight: 400;
+  }
+
+  .aldrich-footer .aldrich-footer__col--newsletter .aldrich-form__group label {
+    font-weight: 400;
+    letter-spacing: 1.2px;
+  }
+
+  .aldrich-footer .aldrich-footer__inline a {
+    color: rgb(33, 37, 41);
+    font-weight: 400;
   }
 
   .aldrich-footer__address,
   .aldrich-footer__stack {
     margin: 0;
     font-style: normal;
+    color: rgb(33, 37, 41);
+    font-weight: 400;
   }
 
   .aldrich-footer__address p,
   .aldrich-footer__newsletter-text p,
   .aldrich-footer__credit p {
     margin: 0;
+  }
+
+  .aldrich-footer .aldrich-footer__address,
+  .aldrich-footer .aldrich-footer__address p,
+  .aldrich-footer .aldrich-footer__address strong,
+  .aldrich-footer .aldrich-footer__address a {
+    color: rgb(33, 37, 41);
+    font-weight: 400;
   }
 
   /* Column grid, mirroring the main site's centred Bootstrap row ----------- */
@@ -476,7 +533,7 @@
       margin-top: 0;
     }
 
-    .aldrich-footer__chevron svg { width: 50%; }
+    .aldrich-footer__chevron svg { width: 54%; }
   }
 
   /* Newsletter form ------------------------------------------------------- */
@@ -505,9 +562,10 @@
     margin-bottom: 0;
     font-family: var(--aldrich-mono);
     font-size: inherit;
+    font-weight: 400;
     line-height: inherit;
     text-transform: none;
-    letter-spacing: normal;
+    letter-spacing: 1.2px;
     color: inherit;
   }
 
@@ -566,7 +624,11 @@
   }
 
   .aldrich-form__message {
-    margin-bottom: 1rem;
+    max-width: 180px;
+    min-width: 150px;
+    margin-bottom: 0;
+    font-family: var(--aldrich-mono);
+    font-size: inherit;
     line-height: 1.6;
   }
 
@@ -576,7 +638,10 @@
 
   .aldrich-form__message--error {
     color: #9d0000;
+    letter-spacing: 1.2px;
   }
+
+  .aldrich-form__message-line { white-space: nowrap; }
 
   @media (min-width: 768px) {
     /* Labels inherit this; the inputs deliberately stay at 0.875rem, matching
@@ -602,8 +667,18 @@
 
   .aldrich-footer__rule { display: block; }
 
+  /* The mobile reference has a content divider above the address block as
+     well as the divider above the legal links. */
+  .aldrich-footer__rule--top { margin: 6px 0 49px; }
+
   @media (min-width: 576px) {
     .aldrich-footer__rule { display: none; }
+  }
+
+  @media (max-width: 575.98px) {
+    .aldrich-footer { padding-top: 66px; }
+    .aldrich-footer .aldrich-container { padding-right: 16px; padding-left: 16px; }
+    .aldrich-footer__chevron { margin-top: 0; }
   }
 
   .aldrich-footer__row {
@@ -656,6 +731,13 @@
   .aldrich-footer__credit a {
     text-decoration: underline;
   }
+
+  /* Keep every footer link un-underlined while it is interactive, including
+     the credit and validation-message links whose base styles are underlined. */
+  .aldrich-footer a:hover,
+  .aldrich-footer a:focus-visible {
+    text-decoration: none !important;
+  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -668,7 +750,19 @@
       if (!target) return;
       // Mailchimp's messages can contain markup. Strip the tags and set text
       // rather than innerHTML, so a third-party response can never inject nodes.
-      target.textContent = String(text).replace(/<[^>]*>/g, '').trim();
+      var message = String(text).replace(/<[^>]*>/g, '').trim();
+      target.replaceChildren();
+
+      // The reference keeps the final three words together on a second line.
+      // Construct the line break as DOM nodes rather than injecting HTML.
+      if (isError && message === 'Please enter a valid email address') {
+        var finalLine = document.createElement('span');
+        finalLine.className = 'aldrich-form__message-line';
+        finalLine.textContent = 'valid email address';
+        target.append(document.createTextNode('Please enter a'), document.createElement('br'), finalLine);
+      } else {
+        target.textContent = message;
+      }
       target.classList.toggle(ERROR_CLASS, !!isError);
     }
 
@@ -877,7 +971,7 @@
           "type": "text",
           "id": "button_label",
           "label": "Button label",
-          "default": "I'm in"
+          "default": "I’m in"
         },
         {
           "type": "text",

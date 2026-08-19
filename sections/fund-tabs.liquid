@@ -60,7 +60,7 @@
     <fund-tabs-{{ uid }}
       style="display: contents;"
       data-offset="{{ section.settings.scroll_offset }}"
-      data-scroll-spy="{% if template.suffix == 'donation' %}true{% else %}false{% endif %}"
+      data-scroll-spy="{% if template.suffix == 'donation' or template.suffix == 'membership' or template.suffix == 'memebership' %}true{% else %}false{% endif %}"
     >
       {%- for block in section.blocks -%}
         {%- assign target = block.settings.target | strip | downcase -%}

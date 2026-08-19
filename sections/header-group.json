@@ -35,6 +35,8 @@
           "type": "text",
           "settings": {
             "text": "We’re open today from 12 pm to 5 pm",
+            "closed_text": "We’re closed today but visit us soon!",
+            "dynamic_hours": true,
             "hide_when_tight": true
           }
         },

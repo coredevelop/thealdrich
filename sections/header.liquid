@@ -564,6 +564,13 @@
   }
 
 
+.aldrich-header .aldrich-nav__link:hover,
+.aldrich-header .aldrich-nav__link:focus-visible,
+.aldrich-header .aldrich-nav__link[aria-expanded="true"],
+.aldrich-header .aldrich-nav__sublink:hover,
+.aldrich-header .aldrich-nav__sublink:focus-visible {
+  color: #000000e6;
+}
 
   .aldrich-nav__dropdown {
     font-family: var(--aldrich-sans);
@@ -583,6 +590,11 @@
   .aldrich-header .aldrich-nav__sublink:hover,
   .aldrich-header .aldrich-nav__sublink:focus-visible {
     font-weight: 700;
+  }
+
+  .aldrich-header .aldrich-nav__sublink:active {
+    color: #fff;
+    background-color: #000;
   }
 
   .aldrich-nav__sublink--nested { padding-left: 26px; }
@@ -689,6 +701,9 @@
       var hourPart = parts.find(function (part) { return part.type === 'hour'; });
       return hourPart ? Number(hourPart.value) : 0;
     }
+
+    console.log("current hours: "+ getMuseumHour(new Date()));
+
 
     function updateMuseumHours() {
       var hour = getMuseumHour(new Date());

@@ -17,6 +17,14 @@
         "banner_min_height": 800
       }
     },
+    "mobile_footer_style": {
+      "type": "custom-liquid",
+      "settings": {
+        "full_width": true,
+        "section_padding": false,
+        "custom_liquid": "<style>@media (max-width: 767px) {body .aldrich-footer {border-top-width: 0;}} .apps {border-bottom-width: 0;}</style>"
+      }
+    },
     "breadcrumbs": {
       "type": "breadcrumbs",
       "settings": {
@@ -667,6 +675,7 @@
   },
   "order": [
     "membership_font",
+    "mobile_footer_style",
     "breadcrumbs",
     "hero_banner",
     "membership_intro",

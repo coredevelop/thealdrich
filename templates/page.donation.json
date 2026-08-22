@@ -36,7 +36,7 @@
       "settings": {
         "full_width": false,
         "section_padding": false,
-        "custom_liquid": "<style>#shopify-section-{{ section.id }} { margin-bottom: 10px; }</style><a class=\"donation-page__make-a-gift\" href=\"#donation-overview\">Make a Gift</a>"
+        "custom_liquid": "<style>#shopify-section-{{ section.id }} { margin-bottom: 10px; } @media (max-width: 767px) {body .aldrich-footer {border-top-width: 0;}}</style><a class=\"donation-page__make-a-gift\" href=\"#donation-overview\">Make a Gift</a>"
       }
     },
     "hero_banner": {

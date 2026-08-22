@@ -11,6 +11,10 @@
   "sections": {
     "breadcrumbs": {
       "type": "breadcrumbs",
+      "custom_css": [
+        ".breadcrumbs {padding-top: 10px;}",
+        ".breadcrumbs > .max-w-screen {border-top: 1px solid #000000; padding-top: 0.75rem;}"
+      ],
       "settings": {
         "show_breadcrumbs": "all",
         "show_social_icons": false
@@ -27,7 +31,7 @@
         "cowlendar_booking_app_section_NwpXC6": {
           "type": "shopify://apps/cowlendar-booking/blocks/app-section/6d8b8f6a-9b3c-42b8-b2e6-a758c38d45bf",
           "settings": {
-            "section_title": "Purchase tickets",
+            "section_title": "Purchase Tickets",
             "section_number": "services-list-1"
           }
         },
@@ -43,18 +47,23 @@
         "cowlendar_booking_app_section_NwpXC6",
         "cowlendar_booking_event_calendar_7ay7Y4"
       ],
-      "custom_css": [
-        ".cowlendar-section.services-list-1,.cowlendar-event-calendar-wrapper {font-family: \"Regular\", \"helvetica neue\", helvetica, arial, sans-serif; font-size: 1.25rem; letter-spacing: 0.075rem; line-height: 1.6;}",
-        ".cowlendar-section.services-list-1 h1,.cowlendar-event-calendar-wrapper h1,.cowlendar-section-wrapper h1 {font-family: \"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif; font-size: 1.25rem; letter-spacing: 0.075rem; line-height: 1.6;}"
-      ],
       "settings": {
         "full_width": false
+      }
+    },
+    "cowlendar_styles": {
+      "type": "custom-liquid",
+      "settings": {
+        "full_width": true,
+        "section_padding": false,
+        "custom_liquid": "<style>\n.cowlendar-section.services-list-1, .cowlendar-event-calendar-wrapper {\n    font-family: \"Regular\", \"helvetica neue\", helvetica, arial, sans-serif;\n    font-size: 1.25rem;\n    letter-spacing: 0.075rem;\n    line-height: 1.6;\n}\n.cowlendar-event-calendar-wrapper div{\n    font-family: \"Regular\", \"helvetica neue\", helvetica, arial, sans-serif;\n}\n\n.cowlendar-section.services-list-1 h1, .cowlendar-event-calendar-wrapper h1, .cowlendar-section-wrapper h1 {\n    font-family: \"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif;\n    font-size: 16px;\n    letter-spacing: 0.075rem;\n    line-height: 1.6;\n}\n\n.cowlendar-section.services-list-1 h3, .cowlendar-event-calendar-wrapper h3, .cowlendar-section-wrapper h3 {\n    font-family: \"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif;\n}\n\n.apps-section .apps {\n    border-bottom-width: 0;\n}\n\n@media (max-width: 767px) {\n    .apps-section .apps {\n        border-bottom-width: 0;\n    }\n\n    body .aldrich-footer {\n        border-top-width: 0;\n    }\n}</style>"
       }
     }
   },
   "order": [
     "breadcrumbs",
     "main",
-    "1783635242cb330148"
+    "1783635242cb330148",
+    "cowlendar_styles"
   ]
 }

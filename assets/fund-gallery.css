@@ -1,0 +1,140 @@
+html.fund-gallery-open,
+html.fund-gallery-open body {
+  overflow: hidden;
+}
+
+.fund-gallery {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.78);
+  color: #ffffff;
+}
+
+.fund-gallery::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.fund-gallery[open] {
+  display: block;
+}
+
+.fund-gallery__surface {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 52px 72px 58px;
+}
+
+.fund-gallery__figure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.fund-gallery__image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.fund-gallery__counter,
+.fund-gallery__close,
+.fund-gallery__previous,
+.fund-gallery__next,
+.fund-gallery__caption {
+  position: absolute;
+  z-index: 1;
+}
+
+.fund-gallery__counter {
+  top: 16px;
+  left: 16px;
+  font-size: 0.875rem;
+  letter-spacing: 0.075rem;
+}
+
+.fund-gallery__close,
+.fund-gallery__previous,
+.fund-gallery__next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.fund-gallery__close {
+  top: 12px;
+  right: 12px;
+}
+
+.fund-gallery__previous,
+.fund-gallery__next {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fund-gallery__previous {
+  left: 12px;
+}
+
+.fund-gallery__next {
+  right: 12px;
+}
+
+.fund-gallery__close:focus-visible,
+.fund-gallery__previous:focus-visible,
+.fund-gallery__next:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.fund-gallery__caption {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 42px;
+  margin: 0;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #ffffff;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  letter-spacing: 0.075rem;
+}
+
+@media screen and (max-width: 749px) {
+  .fund-gallery__surface {
+    padding: 52px 40px 58px;
+  }
+
+  .fund-gallery__previous {
+    left: 4px;
+  }
+
+  .fund-gallery__next {
+    right: 4px;
+  }
+}

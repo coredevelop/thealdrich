@@ -1,5 +1,12 @@
 {%- liquid 
   assign total_blocks = section.blocks.size
+  assign gallery_image_count = 0
+  for gallery_block in section.blocks
+    if gallery_block.settings.image != blank
+      assign gallery_image_count = gallery_image_count | plus: 1
+    endif
+  endfor
+  assign gallery_position = 0
   assign target_per_row = section.settings.images_per_row_range
   assign first_row_size = total_blocks | modulo: target_per_row
 
@@ -84,13 +91,24 @@
   [data-section-id="{{ section.id }}"] .gallery__link:focus-visible + .gallery__image-contain .gallery__image[data-bgimg] img {
     opacity: 0;
   }
-  
+  [data-section-id="{{ section.id }}"] button.gallery__link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: zoom-in;
+  }
 </style>
+
+{%- if section.settings.enable_image_gallery -%}
+  {{ 'fund-gallery.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'fund-gallery.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 <div class="gallery space-y-5 px-rail py-section border-b border-primary-section-border"
   data-section-id="{{ section.id }}"
   data-loading="lazy-interaction"
-  data-section-type="gallery">
+  data-section-type="gallery"
+  data-fund-gallery-root>
 
   {%- if section.settings.title != blank -%}
     <h3 id="{{ section.settings.title | handle }}" class="gallery__title text-center mx-auto max-w-screen text-2xl md:text-3xl">{{ section.settings.title | escape }}</h3>
@@ -143,9 +161,31 @@
             endif
           endcapture
         endif
+
+        if block.settings.image != blank
+          assign gallery_position = gallery_position | plus: 1
+        endif
+        assign gallery_viewer_image = block.settings.full_image | default: block.settings.image
       -%}
       <div id="GalleryItem-{{ block.id }}" class="{{ gallery_item_class }} group" {{ block.shopify_attributes }}>
-        {%- if block.settings.link != blank -%}
+        {%- if section.settings.enable_image_gallery and block.settings.image != blank -%}
+          <button
+            type="button"
+            class="gallery__link absolute inset-0 z-30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent"
+            aria-label="Open image {{ gallery_position }} of {{ gallery_image_count }}"
+            aria-haspopup="dialog"
+            aria-controls="FundGallery-{{ section.id }}"
+            data-fund-gallery-trigger
+            data-fund-gallery-group="{{ section.id }}"
+            data-fund-gallery-src="{{ gallery_viewer_image | image_url: width: 2400 }}"
+            data-fund-gallery-alt="{{ gallery_viewer_image.alt | escape }}"
+            data-fund-gallery-caption="{{ gallery_viewer_image.alt | default: block.settings.title | escape }}"
+            data-fund-gallery-width="{{ gallery_viewer_image.width }}"
+            data-fund-gallery-height="{{ gallery_viewer_image.height }}"
+          >
+            <span class="sr-only">Open image {{ gallery_position }} of {{ gallery_image_count }}</span>
+          </button>
+        {%- elsif block.settings.link != blank -%}
           <a href="{{ block.settings.link }}" class="gallery__link absolute inset-0 z-30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent">
             {%- if block.settings.title != blank -%}
               <span class="sr-only">{{ block.settings.title }}</span>
@@ -187,6 +227,27 @@
     {%- endfor -%}
   </div>
 
+  {%- if section.settings.enable_image_gallery -%}
+    <fund-gallery>
+      <dialog
+        id="FundGallery-{{ section.id }}"
+        class="fund-gallery"
+        aria-label="Membership image gallery"
+        data-fund-gallery-dialog
+      >
+        <div class="fund-gallery__surface" data-fund-gallery-surface>
+          <span class="fund-gallery__counter" aria-live="polite" data-fund-gallery-counter></span>
+          <button type="button" class="fund-gallery__close" aria-label="Close gallery" data-fund-gallery-close>&times;</button>
+          <button type="button" class="fund-gallery__previous" aria-label="Previous image" data-fund-gallery-previous>&larr;</button>
+          <figure class="fund-gallery__figure" data-fund-gallery-figure>
+            <img class="fund-gallery__image" alt="" width="1" height="1" data-fund-gallery-image>
+            <figcaption class="fund-gallery__caption" aria-live="polite" data-fund-gallery-caption></figcaption>
+          </figure>
+          <button type="button" class="fund-gallery__next" aria-label="Next image" data-fund-gallery-next>&rarr;</button>
+        </div>
+      </dialog>
+    </fund-gallery>
+  {%- endif -%}
 </div>
 
 {% schema %}
@@ -199,6 +260,12 @@
       "id": "title",
       "label": "t:sections.gallery.settings.title.label",
       "default": "Image Gallery"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_image_gallery",
+      "label": "Open images in gallery",
+      "default": false
     },
     {
       "type": "checkbox",
@@ -327,6 +394,12 @@
           "type": "image_picker",
           "id": "image",
           "label": "t:sections.gallery.blocks.image.settings.image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "full_image",
+          "label": "Full image",
+          "info": "Optional image used only in the full-screen viewer. Falls back to Image when blank."
         },
         {
           "type": "image_picker",

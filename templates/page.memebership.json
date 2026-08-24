@@ -351,6 +351,7 @@
       ],
       "settings": {
         "title": "",
+        "enable_image_gallery": true,
         "full_width": false,
         "section_padding": true,
         "gutter": true,
@@ -478,6 +479,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/7a1b8264-3e5b-483c-a873-71ed2cc48fe9.jpg",
+            "full_image": "shopify://shop_images/7a1b8264-3e5b-483c-a873-71ed2cc48fe9_1.jpg",
             "link": "",
             "title": "",
             "richtext": ""
@@ -599,6 +601,7 @@
       ],
       "settings": {
         "title": "",
+        "enable_image_gallery": true,
         "full_width": false,
         "section_padding": false,
         "gutter": true,

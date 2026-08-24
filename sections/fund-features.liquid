@@ -49,11 +49,23 @@
   }
 
   [data-section-id="{{ section.id }}"] .fund-feature__image-wrap {
+    display: block;
     width: 100%;
+    padding: 0;
+    border: 0;
     overflow: hidden;
     line-height: 0;
     background-color: {{ section.settings.image_placeholder_color }};
     border-radius: {{ section.settings.image_border_radius }}px;
+  }
+
+  [data-section-id="{{ section.id }}"] .fund-feature__gallery-trigger {
+    cursor: zoom-in;
+  }
+
+  [data-section-id="{{ section.id }}"] .fund-feature__gallery-trigger:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   [data-section-id="{{ section.id }}"] .fund-feature__image-wrap img,
@@ -83,12 +95,19 @@
       grid-template-columns: 1fr !important;
     }
   }
+
 </style>
+
+{%- if section.settings.enable_image_gallery -%}
+  {{ 'fund-gallery.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'fund-gallery.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 <div
   class="fund-features px-rail py-section border-b border-primary-section-border"
   data-section-id="{{ section.id }}"
   data-section-type="fund-features"
+  data-fund-gallery-root
 >
   <div class="fund-features__inner max-w-screen mx-auto">
     {%- if section.settings.title != blank -%}
@@ -127,29 +146,57 @@
               class="fund-feature__images"
               style="grid-template-columns: repeat({{ column_count }}, 1fr);"
             >
+              {%- assign gallery_position = 0 -%}
               {%- for i in (1..3) -%}
                 {%- liquid
                   case i
                     when 1
                       assign fund_image = block.settings.image_1
+                      assign fund_full_image = block.settings.full_image_1
                     when 2
                       assign fund_image = block.settings.image_2
+                      assign fund_full_image = block.settings.full_image_2
                     when 3
                       assign fund_image = block.settings.image_3
+                      assign fund_full_image = block.settings.full_image_3
                   endcase
+                  assign fund_viewer_image = fund_full_image | default: fund_image
                 -%}
                 {%- if fund_image != blank -%}
-                  <div class="fund-feature__image-wrap">
+                  {%- assign gallery_position = gallery_position | plus: 1 -%}
+                  {%- capture fund_image_markup -%}
                     {{
-                      fund_image
-                      | image_url: width: 1200
-                      | image_tag:
-                        widths: '400, 600, 800, 1200',
-                        sizes: img_sizes,
-                        loading: 'lazy',
-                        alt: fund_image.alt
-                    }}
-                  </div>
+                        fund_image
+                        | image_url: width: 1200
+                        | image_tag:
+                          widths: '400, 600, 800, 1200',
+                          sizes: img_sizes,
+                          loading: 'lazy',
+                          alt: fund_image.alt
+                      }}
+                  {%- endcapture -%}
+                  {%- if section.settings.enable_image_gallery -%}
+                    <button
+                      type="button"
+                      class="fund-feature__image-wrap fund-feature__gallery-trigger"
+                      aria-label="Open image {{ gallery_position }} of {{ image_count }} for {{ block.settings.heading | escape }}"
+                      aria-haspopup="dialog"
+                      aria-controls="FundGallery-{{ section.id }}"
+                      data-fund-gallery-trigger
+                      data-fund-gallery-group="{{ block.id }}"
+                      data-fund-gallery-src="{{ fund_viewer_image | image_url: width: 2400 }}"
+                      data-fund-gallery-alt="{{ fund_viewer_image.alt | escape }}"
+                      data-fund-gallery-caption="{{ fund_viewer_image.alt | default: block.settings.heading | escape }}"
+                      data-fund-gallery-width="{{ fund_viewer_image.width }}"
+                      data-fund-gallery-height="{{ fund_viewer_image.height }}"
+                    >
+                      {{ fund_image_markup }}
+                    </button>
+                  {%- else -%}
+                    <div class="fund-feature__image-wrap">
+                      {{ fund_image_markup }}
+                    </div>
+                  {%- endif -%}
                 {%- endif -%}
               {%- endfor -%}
             </div>
@@ -166,6 +213,28 @@
       {%- endfor -%}
     </div>
   </div>
+
+  {%- if section.settings.enable_image_gallery -%}
+    <fund-gallery>
+      <dialog
+        id="FundGallery-{{ section.id }}"
+        class="fund-gallery"
+        aria-label="Fund image gallery"
+        data-fund-gallery-dialog
+      >
+        <div class="fund-gallery__surface" data-fund-gallery-surface>
+          <span class="fund-gallery__counter" aria-live="polite" data-fund-gallery-counter></span>
+          <button type="button" class="fund-gallery__close" aria-label="Close gallery" data-fund-gallery-close>&times;</button>
+          <button type="button" class="fund-gallery__previous" aria-label="Previous image" data-fund-gallery-previous>&larr;</button>
+          <figure class="fund-gallery__figure" data-fund-gallery-figure>
+            <img class="fund-gallery__image" alt="" width="1" height="1" data-fund-gallery-image>
+            <figcaption class="fund-gallery__caption" aria-live="polite" data-fund-gallery-caption></figcaption>
+          </figure>
+          <button type="button" class="fund-gallery__next" aria-label="Next image" data-fund-gallery-next>&rarr;</button>
+        </div>
+      </dialog>
+    </fund-gallery>
+  {%- endif -%}
 </div>
 
 {% schema %}
@@ -210,6 +279,12 @@
     {
       "type": "header",
       "content": "Images"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_image_gallery",
+      "label": "Open images in gallery",
+      "default": false
     },
     {
       "type": "select",
@@ -286,13 +361,31 @@
         },
         {
           "type": "image_picker",
+          "id": "full_image_1",
+          "label": "Full image 1",
+          "info": "Optional image used only in the full-screen viewer for Image 1."
+        },
+        {
+          "type": "image_picker",
           "id": "image_2",
           "label": "Image 2"
         },
         {
           "type": "image_picker",
+          "id": "full_image_2",
+          "label": "Full image 2",
+          "info": "Optional image used only in the full-screen viewer for Image 2."
+        },
+        {
+          "type": "image_picker",
           "id": "image_3",
           "label": "Image 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "full_image_3",
+          "label": "Full image 3",
+          "info": "Optional image used only in the full-screen viewer for Image 3."
         },
         {
           "type": "header",

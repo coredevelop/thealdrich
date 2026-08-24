@@ -153,12 +153,15 @@
                     when 1
                       assign fund_image = block.settings.image_1
                       assign fund_full_image = block.settings.full_image_1
+                      assign fund_image_tooltip = block.settings.image_title_tooltip_1
                     when 2
                       assign fund_image = block.settings.image_2
                       assign fund_full_image = block.settings.full_image_2
+                      assign fund_image_tooltip = block.settings.image_title_tooltip_2
                     when 3
                       assign fund_image = block.settings.image_3
                       assign fund_full_image = block.settings.full_image_3
+                      assign fund_image_tooltip = block.settings.image_title_tooltip_3
                   endcase
                   assign fund_viewer_image = fund_full_image | default: fund_image
                 -%}
@@ -182,6 +185,7 @@
                       aria-label="Open image {{ gallery_position }} of {{ image_count }} for {{ block.settings.heading | escape }}"
                       aria-haspopup="dialog"
                       aria-controls="FundGallery-{{ section.id }}"
+                      {% if fund_image_tooltip != blank %}title="{{ fund_image_tooltip | escape }}" {% endif %}
                       data-fund-gallery-trigger
                       data-fund-gallery-group="{{ block.id }}"
                       data-fund-gallery-src="{{ fund_viewer_image | image_url: width: 2400 }}"
@@ -193,7 +197,10 @@
                       {{ fund_image_markup }}
                     </button>
                   {%- else -%}
-                    <div class="fund-feature__image-wrap">
+                    <div
+                      class="fund-feature__image-wrap"
+                      {% if fund_image_tooltip != blank %}title="{{ fund_image_tooltip | escape }}" {% endif %}
+                    >
                       {{ fund_image_markup }}
                     </div>
                   {%- endif -%}
@@ -366,6 +373,12 @@
           "info": "Optional image used only in the full-screen viewer for Image 1."
         },
         {
+          "type": "text",
+          "id": "image_title_tooltip_1",
+          "label": "Image Title Tooltip 1",
+          "info": "Optional text shown when a customer hovers over Image 1."
+        },
+        {
           "type": "image_picker",
           "id": "image_2",
           "label": "Image 2"
@@ -377,6 +390,12 @@
           "info": "Optional image used only in the full-screen viewer for Image 2."
         },
         {
+          "type": "text",
+          "id": "image_title_tooltip_2",
+          "label": "Image Title Tooltip 2",
+          "info": "Optional text shown when a customer hovers over Image 2."
+        },
+        {
           "type": "image_picker",
           "id": "image_3",
           "label": "Image 3"
@@ -386,6 +405,12 @@
           "id": "full_image_3",
           "label": "Full image 3",
           "info": "Optional image used only in the full-screen viewer for Image 3."
+        },
+        {
+          "type": "text",
+          "id": "image_title_tooltip_3",
+          "label": "Image Title Tooltip 3",
+          "info": "Optional text shown when a customer hovers over Image 3."
         },
         {
           "type": "header",

@@ -320,6 +320,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Purchase-a-Gift-Membership-1-Photo-Kaiya-McCormick.png",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -329,6 +330,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Purchase-a-Gift-Membership-2-Photo-Kaiya-McCormick.png",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -338,6 +340,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Purchase-a-Gift-Membership-3-Photo-Kaiya-McCormick.png",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -480,6 +483,7 @@
           "settings": {
             "image": "shopify://shop_images/7a1b8264-3e5b-483c-a873-71ed2cc48fe9.jpg",
             "full_image": "shopify://shop_images/7a1b8264-3e5b-483c-a873-71ed2cc48fe9_1.jpg",
+            "image_title_tooltip": "Sabeth and Aaron Albert",
             "link": "",
             "title": "",
             "richtext": ""
@@ -489,6 +493,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/419f0c3b-5bf3-49ae-87ce-7975bf0f7182.png",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -498,6 +503,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/f0a763db-428d-48f3-9f9c-af99f57de43b.png",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -507,6 +513,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Unknown.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -516,6 +523,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Unknown-11.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -525,6 +533,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Picture12.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -534,6 +543,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/ABC-at-the-Warhol.1_IMG_2498.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -543,6 +553,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Unknown-1.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -552,6 +563,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Unknown_2022-08-17-203908_hdxl.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -561,6 +573,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Murrays-at-Aldrich_1.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -570,6 +583,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Yilin-Jamison2.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""
@@ -579,6 +593,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/IMG_8502_2025-12-17-190835_apng_1.jpg",
+            "image_title_tooltip": "",
             "link": "",
             "title": "",
             "richtext": ""

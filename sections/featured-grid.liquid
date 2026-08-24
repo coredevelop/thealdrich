@@ -175,6 +175,7 @@
             aria-label="Open image {{ gallery_position }} of {{ gallery_image_count }}"
             aria-haspopup="dialog"
             aria-controls="FundGallery-{{ section.id }}"
+            {% if block.settings.image_title_tooltip != blank %}title="{{ block.settings.image_title_tooltip | escape }}" {% endif %}
             data-fund-gallery-trigger
             data-fund-gallery-group="{{ section.id }}"
             data-fund-gallery-src="{{ gallery_viewer_image | image_url: width: 2400 }}"
@@ -186,14 +187,21 @@
             <span class="sr-only">Open image {{ gallery_position }} of {{ gallery_image_count }}</span>
           </button>
         {%- elsif block.settings.link != blank -%}
-          <a href="{{ block.settings.link }}" class="gallery__link absolute inset-0 z-30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent">
+          <a
+            href="{{ block.settings.link }}"
+            class="gallery__link absolute inset-0 z-30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent"
+            {% if block.settings.image_title_tooltip != blank %}title="{{ block.settings.image_title_tooltip | escape }}" {% endif %}
+          >
             {%- if block.settings.title != blank -%}
               <span class="sr-only">{{ block.settings.title }}</span>
             {%- endif -%}
           </a>
         {%- endif -%}
 
-        <div class="gallery__image-contain overflow-hidden relative {{ aspect_classes }}">
+        <div
+          class="gallery__image-contain overflow-hidden relative {{ aspect_classes }}"
+          {% if block.settings.image_title_tooltip != blank %}title="{{ block.settings.image_title_tooltip | escape }}" {% endif %}
+        >
           {%- if block.settings.image != blank -%}
             {{ block.settings.image | image_url: width: 1920 | image_tag: 
               class: gallery_image_class,
@@ -400,6 +408,12 @@
           "id": "full_image",
           "label": "Full image",
           "info": "Optional image used only in the full-screen viewer. Falls back to Image when blank."
+        },
+        {
+          "type": "text",
+          "id": "image_title_tooltip",
+          "label": "Image Title Tooltip",
+          "info": "Optional text shown when a customer hovers over the image."
         },
         {
           "type": "image_picker",

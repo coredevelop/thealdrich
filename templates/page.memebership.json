@@ -273,7 +273,7 @@
         "digital_card_note": "Aldrich members receive environmentally-friendly digital membership cards.",
         "optout_label": "Click here to opt out of digital cards to receive physical cards in the mail",
         "matching_label": "I have submitted an Employer’s Matching Gift Form",
-        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org</p>",
+        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org<br/>If you prefer, please mail a check made payable to The Aldrich Contemporary Art Museum, 258 Main Street, Ridgefield, CT 06877. For further assistance, contact Holly Hart, Head of Membership and Events, at hhart@thealdrich.org, or 203.438.4519, extension 118.</p>",
         "submit_label": "Submit",
         "text_color": "#000000",
         "required_color": "#b00020",
@@ -290,7 +290,7 @@
             "eyebrow": "",
             "heading": "Digital Membership Card FAQ",
             "heading_tag": "h3",
-            "body": "<p>Having trouble with your digital membership card? <a href=\"#\">Click here to access our Digital Membership Card FAQ.</a></p>",
+            "body": "<p>Having trouble with your digital membership card? <a href=\"https://thealdrich.org/page/digital-membership-card-faq\">Click here to access our Digital Membership Card FAQ.</a></p>",
             "anchor_id": "digital-card-faq",
             "text_alignment": "left",
             "heading_size": 24,
@@ -308,7 +308,7 @@
             "eyebrow": "",
             "heading": "Gift Membership",
             "heading_tag": "h3",
-            "body": "<p>Share the excitement of The Aldrich Contemporary Art Museum with friends, family, and colleagues through the gift of Aldrich membership. This gift opens the door to the year's premier venue for cutting-edge visual art and educational programs. You and your friends can experience the benefits of Aldrich membership together, while supporting the Museum and helping to expand our community.</p><p>Please contact Holly Hart at <a href=\"mailto:hhart@thealdrich.org\">hhart@thealdrich.org</a> to purchase a gift membership.</p>",
+            "body": "<p>Share the excitement of The Aldrich Contemporary Art Museum with friends, family, and colleagues through the gift of an Aldrich membership. This gift opens the door to the area's premier venue for cutting-edge visual art and educational programs. You and your friends can experience the benefits of Aldrich membership together, while supporting the Museum and helping to expand our community.</p><p>Please contact Holly Hart at <a href=\"mailto:hhart@thealdrich.org\">hhart@thealdrich.org</a> to purchase a gift membership.</p>",
             "anchor_id": "gift-membership",
             "text_alignment": "left",
             "heading_size": 24,
@@ -430,8 +430,8 @@
         "button_style": "outline",
         "color_overlay_text": "#ffffff",
         "color_accent": "#ffffff",
-        "color_overlay": "#000000",
-        "color_overlay_alpha_range": 30
+        "color_overlay": "#ffffff",
+        "color_overlay_alpha_range": 0
       }
     },
     "membership_discounts_text": {
@@ -443,7 +443,7 @@
             "eyebrow": "",
             "heading": "",
             "heading_tag": "h2",
-            "body": "<p>The Aldrich's Member Discount program is a special benefit only for Aldrich members. Simply show your active Aldrich membership card (physical or digital) at these local businesses to receive your members-only discount or free item. Some supplies are limited and may need to be picked up at the Museum.</p>",
+            "body": "<p>The Aldrich’s Member Discount program is a special benefit only for Aldrich members. Simply show your active Aldrich membership card (physical or digital) at these local businesses to receive your members-only discount or free item. Some supplies are limited and may need to be picked up at the Museum. Restrictions apply.</p><p><strong>109 Cheese & Wine</strong><br/>109 Danbury Road<br/>Ridgefield, CT 06877<br/>203.438.5757</p><p>7 Old Barn Road<br/>Kent, CT, 06757<br/>860.592.0366</p><p>10% off on cheeses, sandwiches and wines at the Ridgefield and Kent location. Excludes: liquor, beer, smoked salmon, platter fees, Jeni’s ice cream, Blue Hill eggs and meats, not available in the months of November and December.</p><p><strong>Bailey’s Backyard<br/></strong>23 Bailey Avenue<br/>Ridgefield, CT 06877<br/>203.431.0796</p><p>10% off parties of 6 or less</p><p><strong>Bridgewater Chocolate<br/></strong>559 Federal Road<br/>Brookfield, CT 06804<br/>203.775.2286</p><p>227 Federal Road<br/>Brookfield, CT 06804<br/>203.648.9783</p><p>12 LaSalle Road<br/>West Hartford, CT 06107<br/>860.570.0707</p><p>Parker Harding Plaza<br/>165 Main Street<br/>Westport, CT 06880<br/>203.826.8777<br/></p><p>10% off in-store purchases at these participating stores</p><p><strong>Connecticut Muffin<br/></strong>108 Main Street<br/>New Canaan, CT 06840<br/>203.972.7557</p><p>20% off all orders</p><p><strong>Hayfields Market<br/></strong>1 Bloomer Road<br/>North Salem, NY 10560<br/>914.669.8275</p><p>50% discount on café items (excluding florals)</p><p><strong>Nod Hill Brewery</strong><br/>137 Ethan Allen Highway<br/>Ridgefield, CT 06877<br/>203.617.1191</p><p>One free drink coupon. Supplies are limited. Must be picked up at the Museum. One coupon for Artist/Educator/Student memberships, two coupons for all other memberships. Must be 21 years of age.</p><p><strong>Prospector Theater<br/></strong>25 Prospect Street<br/>Ridgefield, CT 06877<br/>203.438.0136</p><p>One free movie pass. Supplies are limited. Must be picked up at the Museum. One pass for Artist/Educator/Student memberships, two passes for all other memberships.</p><p><strong>Ross Artisanal Bakery & Cafe</strong><br/>109 Danbury Road<br/>Ridgefield, CT 06877<br/>203.438.4822</p><p>10% discount per order</p><p><strong>Tazza Café<br/></strong>408 Main Street<br/>Ridgefield, CT 06877<br/>203.403.3332</p><p>10% discount per order</p><p><a href=\"https://thealdrich.org/client-uploads/images-general/Aldrich-Member-Discount-Program.pdf\">Download a one sheet on the Aldrich Member Discount program.</a></p>",
             "anchor_id": "",
             "text_alignment": "left",
             "heading_size": 24,
@@ -700,7 +700,7 @@
       "settings": {
         "text": "Top image: Photo: Kaiya McCormick",
         "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_bottom": 52,
         "line_color": "#000000",
         "text_color": "#000000"
       }

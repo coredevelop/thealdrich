@@ -12,23 +12,55 @@
 
   [data-section-id="{{ section.id }}"] .membership-form__heading {
     margin: 0 0 24px;
-    font-weight: 600;
+    color: rgb(33, 37, 41);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 38.4px;
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__field {
     margin-bottom: 20px;
   }
+  [data-section-id="{{ section.id }}"] .membership-form__field input[type="text"] {
+    display: block;
+    width: 100%;
+    height: calc(1em + 0.75rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+  }
+  [data-section-id="{{ section.id }}"] .membership-form__field select {
+    display: block;
+    width: 100%;
+    height: calc(1em + 0.75rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+  }
 
   [data-section-id="{{ section.id }}"] .membership-form__label {
     display: block;
-    margin-bottom: 6px;
     font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.6;
     letter-spacing: 0.075rem;
     text-transform: none;
-    color: {{ section.settings.text_color }};
+    {% comment %}color: {{ section.settings.text_color }};{% endcomment %}
+    color: rgb(33, 37, 41);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 19.2px;
+    margin-bottom: 4px;
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__sublabel {
@@ -63,33 +95,68 @@
     display: flex;
     align-items: flex-start;
     margin-bottom: 6px;
+    font-family: ApercuPro, "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    line-height: 19.2px;
+    color: rgb(33, 37, 41);
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__checkbox-row input {
-    margin: 3px 10px 0 0;
-    width: 15px;
-    height: 15px;
+    margin: 0 8px 0 0;
+    margin-top: -2px;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
     flex-shrink: 0;
+    border-radius: 3px;
+    color: {{ section.settings.checkbox_accent_color }};
+    accent-color: {{ section.settings.checkbox_accent_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .membership-form__checkbox-row input:checked {
+    background-color: {{ section.settings.checkbox_accent_color }};
+    border-color: {{ section.settings.checkbox_accent_color }};
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__checkbox-row label {
-    font-size: 14px;
-    line-height: 1.4;
-    color: {{ section.settings.text_color }};
+    font-family: ApercuPro, "helvetica neue", helvetica, arial, sans-serif;
+    color: rgb(33, 37, 41);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    line-height: 19.2px;
+    text-transform: none;
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__note {
     margin: 20px 0;
-    font-size: 14px;
-    line-height: 1.6;
-    color: {{ section.settings.text_color }};
+    font-size: 12px;
+    font-family: ApercuPro, "helvetica neue", helvetica, arial, sans-serif;
+    color: rgb(33, 37, 41);
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    line-height: 19.2px;
+    text-transform: none;
+    min-width: 100%;
   }
 
+  #digital-card-faq a {
+    font-family: RegularBold, "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 20px;
+    font-weigh: 400;
+    letter-spacing: 1.2px;
+    line-height: 32px;
+  }
   [data-section-id="{{ section.id }}"] .membership-form__note-strong {
     font-family: "RegularBold", "helvetica neue", helvetica, arial, sans-serif;
-    font-weight: 600;
     letter-spacing: 0.075rem;
     margin-bottom: 12px;
+    color: rgb(33, 37, 41);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 19.2px;
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__error {
@@ -109,6 +176,17 @@
 
   [data-section-id="{{ section.id }}"] .membership-form__submit {
     margin-top: 8px;
+    border-radius: .25rem;
+    font-family: ApercuPro, "helvetica neue", helvetica, arial, sans-serif;
+    background-color: #000;
+    border-color: #000;
+    color: #fff !important;
+    text-decoration: none;
+    line-height: 1;
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-transform: none;
+    height: 34px;
   }
 
   [data-section-id="{{ section.id }}"] .membership-form__submit[aria-busy="true"] {
@@ -493,6 +571,12 @@
       "id": "required_color",
       "label": "Required asterisk",
       "default": "#b00020"
+    },
+    {
+      "type": "color",
+      "id": "checkbox_accent_color",
+      "label": "Checkbox accent",
+      "default": "#3b6fe0"
     },
     {
       "type": "color",

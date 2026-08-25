@@ -96,6 +96,7 @@
     class FundTabs{{ uid }} extends HTMLElement {
       connectedCallback() {
         this.offset = parseInt(this.dataset.offset, 10) || 0;
+        this.nav = this.closest('.fund-tabs__nav');
         this.links = Array.from(this.querySelectorAll('[data-tab-target]'));
         this.linkHandlers = this.links.map((link) => {
           const handler = (event) => this.handleClick(event, link);
@@ -106,8 +107,12 @@
         if (this.dataset.scrollSpy !== 'true') return;
 
         this.handleViewportChange = () => this.scheduleActiveUpdate();
+        this.handleResize = () => {
+          this.activeLink = null;
+          this.scheduleActiveUpdate();
+        };
         window.addEventListener('scroll', this.handleViewportChange, { passive: true });
-        window.addEventListener('resize', this.handleViewportChange);
+        window.addEventListener('resize', this.handleResize);
 
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', this.handleViewportChange, { once: true });
@@ -119,7 +124,7 @@
       disconnectedCallback() {
         if (this.handleViewportChange) {
           window.removeEventListener('scroll', this.handleViewportChange);
-          window.removeEventListener('resize', this.handleViewportChange);
+          window.removeEventListener('resize', this.handleResize);
           document.removeEventListener('DOMContentLoaded', this.handleViewportChange);
         }
         this.linkHandlers.forEach(({ link, handler }) => {
@@ -157,6 +162,8 @@
       }
 
       setActiveLink(activeLink) {
+        const activeChanged = this.activeLink !== activeLink;
+
         this.links.forEach((link) => {
           const isActive = link === activeLink;
           link.classList.toggle('is-active', isActive);
@@ -166,6 +173,28 @@
             link.removeAttribute('aria-current');
           }
         });
+
+        this.activeLink = activeLink;
+        if (activeChanged) this.keepActiveLinkVisible(activeLink);
+      }
+
+      keepActiveLinkVisible(activeLink) {
+        if (!this.nav || !window.matchMedia('(max-width: 749px)').matches) return;
+
+        const navRect = this.nav.getBoundingClientRect();
+        const linkRect = activeLink.getBoundingClientRect();
+        const edgePadding = 8;
+        let scrollDelta = 0;
+
+        if (linkRect.left < navRect.left + edgePadding) {
+          scrollDelta = linkRect.left - navRect.left - edgePadding;
+        } else if (linkRect.right > navRect.right - edgePadding) {
+          scrollDelta = linkRect.right - navRect.right + edgePadding;
+        }
+
+        if (scrollDelta !== 0) {
+          this.nav.scrollBy({ left: scrollDelta, behavior: 'smooth' });
+        }
       }
 
       handleClick(event, link) {

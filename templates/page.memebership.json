@@ -27,9 +27,24 @@
     },
     "breadcrumbs": {
       "type": "breadcrumbs",
+      "custom_css": [
+        ".breadcrumbs {padding-top: 10px;}",
+        ".breadcrumbs > .max-w-screen {border-top: 1px solid #000000; padding-top: 0.75rem;}"
+      ],
       "settings": {
         "show_breadcrumbs": "all",
         "show_social_icons": true
+      }
+    },
+    "join_as_member_link": {
+      "type": "custom-liquid",
+      "custom_css": [
+        ".membership-page__join-as-member {color: #000; font-family: \"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif; letter-spacing: 0.075rem;}"
+      ],
+      "settings": {
+        "full_width": false,
+        "section_padding": false,
+        "custom_liquid": "<style>#shopify-section-{{ section.id }} { margin-bottom: 10px; }</style><a class=\"membership-page__join-as-member\" href=\"#membership-overview\">Join as a Member</a>"
       }
     },
     "hero_banner": {
@@ -62,7 +77,7 @@
             "eyebrow": "Support",
             "heading": "Join as a Member",
             "heading_tag": "h2",
-            "body": "<p>Aldrich members provide essential support to our mission while enjoying special access to exhibitions and programs, discounts on purchases at the Museum Store, and free admission to reciprocal partner museums.</p>",
+            "body": "<p>Aldrich members provide essential support to our mission while enjoying special access to artists at exclusive exhibition previews, discounts on programs and in the Museum Store, and free admission to reciprocal museum partners.</p>",
             "anchor_id": "membership-overview",
             "text_alignment": "left",
             "heading_size": 24,
@@ -695,6 +710,7 @@
     "membership_font",
     "mobile_footer_style",
     "breadcrumbs",
+    "join_as_member_link",
     "hero_banner",
     "membership_intro",
     "membership_tabs",

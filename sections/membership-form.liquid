@@ -301,6 +301,19 @@
         {%- endfor -%}
       </div>
 
+      {%- comment -%} Note {%- endcomment -%}
+      <div class="membership-form__field">
+        <label class="membership-form__label" for="membership-note-{{ section.id }}">
+          {{ section.settings.note_label | escape }}
+        </label>
+        <input
+          type="text"
+          id="membership-note-{{ section.id }}"
+          class="membership-form__input"
+          data-property="Note"
+        >
+      </div>
+
       {%- comment -%} Digital card note + opt out {%- endcomment -%}
       <div class="membership-form__note">
         {%- if section.settings.digital_card_note != blank -%}
@@ -525,6 +538,12 @@
       "label": "Relationship options",
       "info": "Comma-separated list of checkbox options.",
       "default": "Spouse, Family, Friend, Other"
+    },
+    {
+      "type": "text",
+      "id": "note_label",
+      "label": "Note label",
+      "default": "Note"
     },
     {
       "type": "text",

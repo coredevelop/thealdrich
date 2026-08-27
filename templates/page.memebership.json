@@ -33,7 +33,7 @@
       ],
       "settings": {
         "show_breadcrumbs": "all",
-        "show_social_icons": true
+        "show_social_icons": false
       }
     },
     "join_as_member_link": {
@@ -270,6 +270,7 @@
         "second_member_sublabel": "excluding Artist/Educator/Student",
         "relationship_label": "Relationship",
         "relationship_options": "Spouse, Family, Friend, Other",
+        "note_label": "Note",
         "digital_card_note": "Aldrich members receive environmentally-friendly digital membership cards.",
         "optout_label": "Click here to opt out of digital cards to receive physical cards in the mail",
         "matching_label": "I have submitted an Employer’s Matching Gift Form",
@@ -277,6 +278,7 @@
         "submit_label": "Submit",
         "text_color": "#000000",
         "required_color": "#b00020",
+        "checkbox_accent_color": "#3b6fe0",
         "input_border_color": "#000000",
         "input_border_radius": 0
       }

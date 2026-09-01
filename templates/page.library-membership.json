@@ -9,11 +9,23 @@
  */
 {
   "sections": {
+    "page_styles": {
+      "type": "page-styles",
+      "settings": {
+        "font_stack": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "heading_font_stack": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif",
+        "banner_min_height": 800
+      }
+    },
     "breadcrumbs": {
       "type": "breadcrumbs",
+      "custom_css": [
+        ".breadcrumbs {padding-top: 10px;}",
+        ".breadcrumbs > .max-w-screen {border-top: 1px solid #000000; padding-top: 0.75rem;}"
+      ],
       "settings": {
         "show_breadcrumbs": "all",
-        "show_social_icons": true
+        "show_social_icons": false
       }
     },
     "main": {
@@ -61,20 +73,12 @@
         "contact_name_label": "Contact First and Last Name",
         "card1_label": "Card 1 Name",
         "card2_label": "Card 2 Name",
-        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org</p>",
+        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org<br/><br/>If you prefer, please mail a check made payable to The Aldrich Contemporary Art Museum, 258 Main Street, Ridgefield, CT 06877. For further assistance, contact Holly Hart, Head of Membership and Events, at <a href=\"mailto:hhart@thealdrich.org\" target=\"_blank\">hhart@thealdrich.org</a>, or 203.438.4519, extension 118.</p>",
         "submit_label": "Submit",
         "text_color": "#000000",
         "required_color": "#b00020",
         "input_border_color": "#000000",
         "input_border_radius": 0
-      }
-    },
-    "page_styles": {
-      "type": "page-styles",
-      "settings": {
-        "font_stack": "\"Regular\", \"helvetica neue\", helvetica, arial, sans-serif",
-        "heading_font_stack": "\"RegularBold\", \"helvetica neue\", helvetica, arial, sans-serif",
-        "banner_min_height": 800
       }
     }
   },

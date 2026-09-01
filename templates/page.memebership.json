@@ -676,6 +676,28 @@
       "name": "text",
       "settings": {}
     },
+    "featured_blog_U8y6TM": {
+      "type": "featured-blog",
+      "name": "t:sections.blog_posts.presets.name",
+      "settings": {
+        "title": "Related Events",
+        "title_tag": "h2",
+        "enable_card": true,
+        "category_label": "",
+        "card_background": "#FFE100",
+        "card_text_color": "#0d1b16",
+        "card_padding": 20,
+        "blog": "events",
+        "button_label": "View the blog",
+        "post_limit": "3",
+        "align_text": "left",
+        "image_ratio": "letterbox",
+        "show_image_first": true,
+        "show_dates": true,
+        "show_excerpts": true,
+        "show_read_more": false
+      }
+    },
     "related_news": {
       "type": "featured-blog",
       "settings": {
@@ -726,6 +748,7 @@
     "membership_profiles_heading",
     "profiles_grid",
     "membership_profiles_links",
+    "featured_blog_U8y6TM",
     "related_news",
     "photo_credit"
   ]

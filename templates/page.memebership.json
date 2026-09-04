@@ -693,7 +693,8 @@
         "align_text": "left",
         "image_ratio": "letterbox",
         "show_image_first": true,
-        "show_dates": true,
+        "show_dates": false,
+        "show_event_datetime": true,
         "show_excerpts": true,
         "show_read_more": false
       }

@@ -43,6 +43,14 @@
     --text-align-section: {{ section.settings.align_text }};
   }
 
+  [data-section-id="{{ section.id }}"] .article-grid__event-datetime {
+    font-family: "ApercuPro", "helvetica neue", helvetica, arial, sans-serif;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 0.3125rem;
+  }
+
   {%- if section.settings.enable_card -%}
     [data-section-id="{{ section.id }}"] .blog-featured__item {
       background-color: {{ section.settings.card_background }};
@@ -117,6 +125,14 @@
           <div class="article-grid__meta">
             {%- if section.settings.category_label != blank -%}
               <div class="article-grid__category">{{ section.settings.category_label }}</div>
+            {%- endif -%}
+            {%- if section.settings.show_event_datetime -%}
+              {%- assign event_datetime = article.metafields.custom.date_time_event.value -%}
+              {%- if event_datetime != blank -%}
+                <div class="article-grid__event-datetime text-xs uppercase font-navigation text-primary-text-90">
+                  {{ event_datetime | escape }}
+                </div>
+              {%- endif -%}
             {%- endif -%}
             <h3 class="article-grid__title text-lg md:text-xl">
               <a href="{{ article.url }}">{{ article.title }}</a>
@@ -358,6 +374,13 @@
       "id": "show_dates",
       "label": "t:sections.blog_posts.settings.show_dates.label",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_event_datetime",
+      "label": "Show Date Time Event metafield",
+      "info": "Displays article metafield custom.date_time_event above the article title.",
+      "default": false
     },
     {
       "type": "checkbox",

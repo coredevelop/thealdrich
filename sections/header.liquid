@@ -7,7 +7,6 @@
   assign base_url = base_url | append: '~' | replace: '/~', '' | replace: '~', ''
 
   assign menu = linklists[section.settings.main_linklist]
-  assign shop_menu = linklists[section.settings.shop_linklist]
 -%}
 
 <style>
@@ -92,7 +91,7 @@
             {%- if section.settings.menu_source == 'menu' and menu != blank -%}
               {%- render 'aldrich-nav-menu', menu: menu, id_prefix: 'AldrichNav' -%}
             {%- else -%}
-              {%- render 'aldrich-nav-default', base_url: base_url, shop_menu: shop_menu -%}
+              {%- render 'aldrich-nav-default', base_url: base_url -%}
             {%- endif -%}
           </ul>
         </nav>
@@ -856,7 +855,7 @@
       "type": "select",
       "id": "menu_source",
       "label": "Navigation source",
-      "info": "\"Match thealdrich.org\" reproduces the museum navigation and turns Shop into a dropdown of the store menu below. \"Shopify menu\" uses a single menu you manage in Navigation.",
+      "info": "\"Match thealdrich.org\" reproduces the museum navigation with direct Shop and Tickets links. \"Shopify menu\" uses a single menu you manage in Navigation.",
       "options": [
         {
           "value": "aldrich",
@@ -875,13 +874,6 @@
       "label": "Main site URL",
       "info": "Full URL of the main site, without a trailing slash. Used to build the museum navigation links.",
       "default": "https://thealdrich.org"
-    },
-    {
-      "type": "link_list",
-      "id": "shop_linklist",
-      "label": "Shop dropdown menu",
-      "info": "Fills the Shop dropdown when the navigation matches thealdrich.org.",
-      "default": "main-menu"
     },
     {
       "type": "link_list",

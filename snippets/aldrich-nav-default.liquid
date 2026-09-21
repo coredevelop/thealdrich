@@ -2,17 +2,14 @@
   Renders the museum navigation exactly as it appears on thealdrich.org, as a
   list of `<li>` elements for the Aldrich header nav.
 
-  The museum links point at the main site. The "Shop" item is a dropdown built
-  from a Shopify menu, so the store's own category URLs stay correct and stay
-  editable in the Shopify admin.
+  The museum links point at the main site. Shop and Tickets point directly to
+  their destinations on the current Shopify storefront.
 
   @param {string} base_url - Root URL of the main museum site, no trailing slash
-  @param {linklist} [shop_menu] - Menu whose links fill the "Shop" dropdown
 
   @example
   {% render 'aldrich-nav-default',
-    base_url: 'https://thealdrich.org',
-    shop_menu: linklists.main-menu
+    base_url: 'https://thealdrich.org'
   %}
 {% enddoc %}
 
@@ -74,30 +71,13 @@
   </div>
 </li>
 
-{%- comment -%}
-  "Shop" is the current site, so it becomes a dropdown of the store's own
-  categories. Falls back to a plain link when no menu is set.
-{%- endcomment -%}
-{%- if shop_menu != blank and shop_menu.links.size > 0 -%}
-  <li class="aldrich-nav__item aldrich-nav__item--parent aldrich-nav__item--current">
-    <button type="button"
-      class="aldrich-nav__link aldrich-nav__link--parent"
-      aria-expanded="false"
-      aria-controls="AldrichNavShop"
-      data-aldrich-dropdown>{{ 'sections.aldrich_header.nav_shop' | t }}</button>
-    <div class="aldrich-nav__dropdown aldrich-nav__dropdown--right" id="AldrichNavShop" hidden>
-      {%- for link in shop_menu.links -%}
-        <a class="aldrich-nav__sublink{% if link.active %} aldrich-nav__sublink--current{% endif %}"
-          href="{{ link.url }}"
-          {% if link.active %}aria-current="page"{% endif %}>{{ link.title | escape }}</a>
-      {%- endfor -%}
-    </div>
-  </li>
-{%- else -%}
-  <li class="aldrich-nav__item aldrich-nav__item--current">
-    <a class="aldrich-nav__link" href="{{ routes.root_url }}">{{ 'sections.aldrich_header.nav_shop' | t }}</a>
-  </li>
-{%- endif -%}
+<li class="aldrich-nav__item aldrich-nav__item--current">
+  <a class="aldrich-nav__link" href="{{ routes.root_url }}">{{ 'sections.aldrich_header.nav_shop' | t }}</a>
+</li>
+
+<li class="aldrich-nav__item">
+  <a class="aldrich-nav__link" href="{{ routes.root_url }}pages/service-list-page">{{ 'sections.aldrich_header.nav_tickets' | t }}</a>
+</li>
 
 <li class="aldrich-nav__item">
   <a class="aldrich-nav__link" href="{{ base_url }}/news">{{ 'sections.aldrich_header.nav_news' | t }}</a>

@@ -150,9 +150,9 @@
         }
       },
       "block_order": [
+        "t4",
         "t1",
         "t2",
-        "t4",
         "t5",
         "t6",
         "t7",
@@ -739,8 +739,8 @@
     "hero_banner",
     "membership_intro",
     "membership_tabs",
-    "membership_levels_content",
     "membership_form_wqH76C",
+    "membership_levels_content",
     "membership_faq_gift",
     "gift_images",
     "membership_discounts_heading",

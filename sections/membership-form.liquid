@@ -231,23 +231,56 @@
                   {%- assign price_formatted = variant.price | money_without_currency -%}
                   {%- assign option_label = product.title | append: ' (' | append: price_formatted | append: ')' -%}
                 {%- endif -%}
-                {%- comment -%} Subscription/membership products require a selling plan to be purchased. {%- endcomment -%}
-                {%- assign selling_plan_id = '' -%}
-                {%- if variant.selling_plan_allocations.size > 0 -%}
-                  {%- assign selling_plan_id = variant.selling_plan_allocations.first.selling_plan.id -%}
-                {%- elsif product.selling_plan_groups.size > 0 -%}
-                  {%- assign selling_plan_id = product.selling_plan_groups.first.selling_plans.first.id -%}
-                {%- endif -%}
+                {%- assign configured_recurring_plan_id = block.settings.recurring_selling_plan_id | strip -%}
+                {%- assign configured_non_recurring_plan_id = block.settings.non_recurring_selling_plan_id | strip -%}
+                {%- assign recurring_selling_plan_id = '' -%}
+                {%- assign non_recurring_selling_plan_id = '' -%}
+                {%- for allocation in variant.selling_plan_allocations -%}
+                  {%- assign allocation_plan_id = allocation.selling_plan.id | append: '' -%}
+                  {%- if allocation_plan_id == configured_recurring_plan_id -%}
+                    {%- assign recurring_selling_plan_id = allocation_plan_id -%}
+                  {%- endif -%}
+                  {%- if allocation_plan_id == configured_non_recurring_plan_id -%}
+                    {%- assign non_recurring_selling_plan_id = allocation_plan_id -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- capture selling_plan_allocations_debug -%}
+                  [
+                    {%- for allocation in variant.selling_plan_allocations -%}
+                      {
+                        "id": {{ allocation.selling_plan.id | json }},
+                        "name": {{ allocation.selling_plan.name | json }},
+                        "groupId": {{ allocation.selling_plan_group_id | json }}
+                      }{% unless forloop.last %},{% endunless %}
+                    {%- endfor -%}
+                  ]
+                {%- endcapture -%}
                 <option
                   value="{{ variant.id }}"
                   data-title="{{ product.title | escape }}"
-                  data-selling-plan="{{ selling_plan_id }}"
+                  data-variant="{{ variant.id }}"
+                  data-recurring-selling-plan="{{ recurring_selling_plan_id }}"
+                  data-non-recurring-selling-plan="{{ non_recurring_selling_plan_id }}"
+                  data-selling-plan-allocations="{{ selling_plan_allocations_debug | escape }}"
                   {{ block.shopify_attributes }}
                 >{{ option_label | escape }}</option>
               {%- endif -%}
             {%- endif -%}
           {%- endfor -%}
         </select>
+      </div>
+
+      {%- comment -%} Automatic renewal {%- endcomment -%}
+      <div class="membership-form__field">
+        <div class="membership-form__checkbox-row">
+          <input
+            type="checkbox"
+            id="membership-auto-renewal-{{ section.id }}"
+            data-auto-renewal
+            checked
+          >
+          <label for="membership-auto-renewal-{{ section.id }}">{{ section.settings.auto_renewal_label | escape }}</label>
+        </div>
       </div>
 
       {%- comment -%} First member name {%- endcomment -%}
@@ -361,6 +394,7 @@
     class MembershipForm{{ uid }} extends HTMLElement {
       connectedCallback() {
         this.levelSelect = this.querySelector('[data-membership-level]');
+        this.autoRenewalInput = this.querySelector('[data-auto-renewal]');
         this.submitButton = this.querySelector('[data-submit]');
         debugger;
         this.errorEl = this.querySelector('[data-error]');
@@ -369,6 +403,32 @@
         if (this.submitButton) {
           this.submitButton.addEventListener('click', () => this.handleSubmit());
         }
+
+        if (this.levelSelect) {
+          this.levelSelect.addEventListener('change', () => this.debugSellingPlanAllocations());
+        }
+      }
+
+      debugSellingPlanAllocations() {
+        const selectedOption = this.levelSelect && this.levelSelect.selectedIndex >= 0
+          ? this.levelSelect.options[this.levelSelect.selectedIndex]
+          : null;
+        if (!selectedOption || !selectedOption.value) return;
+
+        let allocations = [];
+        try {
+          allocations = JSON.parse(selectedOption.dataset.sellingPlanAllocations || '[]');
+        } catch (error) {
+          console.error('Membership selling-plan allocation debug data is invalid.', error);
+        }
+
+        console.group(`Membership selling plans: ${selectedOption.dataset.title || selectedOption.text}`);
+        console.log('Variant ID:', selectedOption.dataset.variant);
+        console.log('Configured recurring ID:', selectedOption.dataset.recurringSellingPlan || '(no match)');
+        console.log('Configured non-recurring ID:', selectedOption.dataset.nonRecurringSellingPlan || '(no match)');
+        console.table(allocations);
+        console.groupEnd();
+        debugger;
       }
 
       showError(message) {
@@ -401,6 +461,8 @@
           properties['Relationship'] = relationships.join(', ');
         }
 
+        properties['Auto Renewal'] = !this.autoRenewalInput || this.autoRenewalInput.checked ? 'Yes' : 'No';
+
         return properties;
       }
 
@@ -408,14 +470,37 @@
         debugger;
         this.clearError();
 
-        const variantId = this.levelSelect ? this.levelSelect.value : '';
-        if (!variantId) {
+        const selectedOption = this.levelSelect && this.levelSelect.selectedIndex >= 0
+          ? this.levelSelect.options[this.levelSelect.selectedIndex]
+          : null;
+        if (!selectedOption || !selectedOption.value) {
           this.showError('Please select a membership level.');
           return;
         }
 
-        const selectedOption = this.levelSelect.options[this.levelSelect.selectedIndex];
-        const sellingPlan = selectedOption ? selectedOption.dataset.sellingPlan : '';
+        const autoRenewal = !this.autoRenewalInput || this.autoRenewalInput.checked;
+        const variantId = selectedOption.dataset.variant;
+        const recurringSellingPlan = selectedOption.dataset.recurringSellingPlan;
+        const nonRecurringSellingPlan = selectedOption.dataset.nonRecurringSellingPlan;
+
+        if (recurringSellingPlan && recurringSellingPlan === nonRecurringSellingPlan) {
+          this.showError('Auto-renewal and non-recurring must use different selling plans for this membership level.');
+          return;
+        }
+
+        const sellingPlan = autoRenewal ? recurringSellingPlan : nonRecurringSellingPlan;
+
+        if (!variantId) {
+          this.showError('The selected membership level is not available.');
+          return;
+        }
+
+        if (!sellingPlan) {
+          this.showError(autoRenewal
+            ? 'The auto-renewal plan is not configured for this membership level.'
+            : 'The non-recurring plan is not configured for this membership level.');
+          return;
+        }
 
         const firstNameInput = this.querySelector('[data-property="First Member Name"]');
         if (firstNameInput && !firstNameInput.value.trim()) {
@@ -427,11 +512,9 @@
         const item = {
           id: Number(variantId),
           quantity: 1,
-          properties: this.collectProperties()
+          properties: this.collectProperties(),
+          selling_plan: Number(sellingPlan)
         };
-        if (sellingPlan) {
-          item.selling_plan = Number(sellingPlan);
-        }
 
         const body = { items: [item] };
 
@@ -507,6 +590,12 @@
       "id": "level_placeholder",
       "label": "Membership level placeholder",
       "default": "Select a membership level"
+    },
+    {
+      "type": "text",
+      "id": "auto_renewal_label",
+      "label": "Auto renewal checkbox label",
+      "default": "Auto renewal"
     },
     {
       "type": "text",
@@ -623,7 +712,19 @@
           "type": "product",
           "id": "product",
           "label": "Membership product",
-          "info": "The product added to cart when this level is selected. Uses its first available variant."
+          "info": "The product used for both renewal choices. Uses its first available variant."
+        },
+        {
+          "type": "text",
+          "id": "recurring_selling_plan_id",
+          "label": "Auto-renewal selling plan ID",
+          "info": "Exact Appstle/Shopify selling plan ID used when Auto renewal is checked."
+        },
+        {
+          "type": "text",
+          "id": "non_recurring_selling_plan_id",
+          "label": "Not recurring selling plan ID",
+          "info": "Exact Appstle/Shopify selling plan ID used when Auto renewal is unchecked."
         },
         {
           "type": "text",

@@ -46,20 +46,14 @@
           "type": "membership_level",
           "settings": {
             "product": "library-membership-150",
-            "label_override": ""
-          }
-        },
-        "membership_level_E4Pp3w": {
-          "type": "membership_level",
-          "settings": {
-            "product": "",
+            "recurring_selling_plan_id": "708434329967",
+            "non_recurring_selling_plan_id": "708136632687",
             "label_override": ""
           }
         }
       },
       "block_order": [
-        "membership_level_KdYU7p",
-        "membership_level_E4Pp3w"
+        "membership_level_KdYU7p"
       ],
       "name": "Library membership form",
       "settings": {
@@ -69,14 +63,16 @@
         "benefits": "<p><strong>Library Benefits include:</strong></p><p>• Two all-access membership cards which allows free gallery admission for up to four (4) adults per card to The Aldrich Contemporary Art Museum. Card must be presented for admission. Children under 13 always enter free.</p><p>*If an event is taking place and advertised as being “free with the price of admission,” pass-holders can enter that event at no additional charge. Please note that the cards cannot be used in combination with any other offers or for admission to members-only events that require a non-member to pay a fee. Cards are valid at The Aldrich Contemporary Art Museum only, may not be used for admission to reciprocal partner museums.</p>",
         "after_submit": "cart",
         "type_label": "Membership Type",
+        "auto_renewal_label": "Auto renewal",
         "library_name_label": "Library Name",
         "contact_name_label": "Contact First and Last Name",
         "card1_label": "Card 1 Name",
         "card2_label": "Card 2 Name",
-        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org<br/><br/>If you prefer, please mail a check made payable to The Aldrich Contemporary Art Museum, 258 Main Street, Ridgefield, CT 06877. For further assistance, contact Holly Hart, Head of Membership and Events, at <a href=\"mailto:hhart@thealdrich.org\" target=\"_blank\">hhart@thealdrich.org</a>, or 203.438.4519, extension 118.</p>",
+        "footer_note": "<p>Questions? Contact us at 203.438.4519 or email development@thealdrich.org<br/><br/>If you prefer, please mail a check made payable to The Aldrich Contemporary Art Museum, 258 Main Street, Ridgefield, CT 06877. For further assistance, contact Holly Hart, Head of Membership and Events, at&nbsp;<a href=\"mailto:hhart@thealdrich.org\" target=\"_blank\">hhart@thealdrich.org</a>, or 203.438.4519, extension 118.</p>",
         "submit_label": "Submit",
         "text_color": "#000000",
         "required_color": "#b00020",
+        "checkbox_accent_color": "#3b6fe0",
         "input_border_color": "#000000",
         "input_border_radius": 0
       }

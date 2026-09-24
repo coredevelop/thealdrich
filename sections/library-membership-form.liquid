@@ -111,6 +111,45 @@
     border-color: {{ section.settings.text_color }};
   }
 
+  [data-section-id="{{ section.id }}"] .library-form__checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    font-family: ApercuPro, "helvetica neue", helvetica, arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    line-height: 19.2px;
+    color: rgb(33, 37, 41);
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__checkbox-row input {
+    margin: 0 8px 0 0;
+    margin-top: 2px;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border-radius: 3px;
+    color: {{ section.settings.checkbox_accent_color }};
+    accent-color: {{ section.settings.checkbox_accent_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__checkbox-row input:checked {
+    background-color: {{ section.settings.checkbox_accent_color }};
+    border-color: {{ section.settings.checkbox_accent_color }};
+  }
+
+  [data-section-id="{{ section.id }}"] .library-form__checkbox-row label {
+    font-family: ApercuPro, "helvetica neue", helvetica, arial, sans-serif;
+    color: rgb(33, 37, 41);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    line-height: 19.2px;
+    text-transform: none;
+  }
+
   [data-section-id="{{ section.id }}"] .library-form__note {
     margin: 20px 0;
     font-size: 12px;
@@ -195,23 +234,44 @@
                   {%- assign price_formatted = variant.price | money_without_currency -%}
                   {%- assign option_label = product.title | append: ' (' | append: price_formatted | append: ')' -%}
                 {%- endif -%}
-                {%- comment -%} Subscription/membership products require a selling plan to be purchased. {%- endcomment -%}
-                {%- assign selling_plan_id = '' -%}
-                {%- if variant.selling_plan_allocations.size > 0 -%}
-                  {%- assign selling_plan_id = variant.selling_plan_allocations.first.selling_plan.id -%}
-                {%- elsif product.selling_plan_groups.size > 0 -%}
-                  {%- assign selling_plan_id = product.selling_plan_groups.first.selling_plans.first.id -%}
-                {%- endif -%}
+                {%- assign configured_recurring_plan_id = block.settings.recurring_selling_plan_id | strip -%}
+                {%- assign configured_non_recurring_plan_id = block.settings.non_recurring_selling_plan_id | strip -%}
+                {%- assign recurring_selling_plan_id = '' -%}
+                {%- assign non_recurring_selling_plan_id = '' -%}
+                {%- for allocation in variant.selling_plan_allocations -%}
+                  {%- assign allocation_plan_id = allocation.selling_plan.id | append: '' -%}
+                  {%- if allocation_plan_id == configured_recurring_plan_id -%}
+                    {%- assign recurring_selling_plan_id = allocation_plan_id -%}
+                  {%- endif -%}
+                  {%- if allocation_plan_id == configured_non_recurring_plan_id -%}
+                    {%- assign non_recurring_selling_plan_id = allocation_plan_id -%}
+                  {%- endif -%}
+                {%- endfor -%}
                 <option
                   value="{{ variant.id }}"
                   data-title="{{ product.title | escape }}"
-                  data-selling-plan="{{ selling_plan_id }}"
+                  data-variant="{{ variant.id }}"
+                  data-recurring-selling-plan="{{ recurring_selling_plan_id }}"
+                  data-non-recurring-selling-plan="{{ non_recurring_selling_plan_id }}"
                   {{ block.shopify_attributes }}
                 >{{ option_label | escape }}</option>
               {%- endif -%}
             {%- endif -%}
           {%- endfor -%}
         </select>
+      </div>
+
+      {%- comment -%} Automatic renewal {%- endcomment -%}
+      <div class="library-form__field">
+        <div class="library-form__checkbox-row">
+          <input
+            type="checkbox"
+            id="library-auto-renewal-{{ section.id }}"
+            data-auto-renewal
+            checked
+          >
+          <label for="library-auto-renewal-{{ section.id }}">{{ section.settings.auto_renewal_label | escape }}</label>
+        </div>
       </div>
 
       {%- comment -%} Library name {%- endcomment -%}
@@ -292,6 +352,7 @@
     class LibraryMembershipForm{{ uid }} extends HTMLElement {
       connectedCallback() {
         this.levelSelect = this.querySelector('[data-membership-level]');
+        this.autoRenewalInput = this.querySelector('[data-auto-renewal]');
         this.submitButton = this.querySelector('[data-submit]');
         this.errorEl = this.querySelector('[data-error]');
         this.redirect = this.dataset.redirect === 'checkout' ? '/checkout' : '/cart';
@@ -323,6 +384,7 @@
             properties[name] = input.value.trim();
           }
         });
+        properties['Auto Renewal'] = !this.autoRenewalInput || this.autoRenewalInput.checked ? 'Yes' : 'No';
         return properties;
       }
 
@@ -337,9 +399,35 @@
       async handleSubmit() {
         this.clearError();
 
-        const variantId = this.levelSelect ? this.levelSelect.value : '';
-        if (!variantId) {
+        const selectedOption = this.levelSelect && this.levelSelect.selectedIndex >= 0
+          ? this.levelSelect.options[this.levelSelect.selectedIndex]
+          : null;
+        if (!selectedOption || !selectedOption.value) {
           this.showError('Please select a membership type.');
+          return;
+        }
+
+        const autoRenewal = !this.autoRenewalInput || this.autoRenewalInput.checked;
+        const variantId = selectedOption.dataset.variant;
+        const recurringSellingPlan = selectedOption.dataset.recurringSellingPlan;
+        const nonRecurringSellingPlan = selectedOption.dataset.nonRecurringSellingPlan;
+
+        if (recurringSellingPlan && recurringSellingPlan === nonRecurringSellingPlan) {
+          this.showError('Auto-renewal and non-recurring must use different selling plans for this membership type.');
+          return;
+        }
+
+        const sellingPlan = autoRenewal ? recurringSellingPlan : nonRecurringSellingPlan;
+
+        if (!variantId) {
+          this.showError('The selected membership type is not available.');
+          return;
+        }
+
+        if (!sellingPlan) {
+          this.showError(autoRenewal
+            ? 'The auto-renewal plan is not configured for this membership type.'
+            : 'The non-recurring plan is not configured for this membership type.');
           return;
         }
 
@@ -350,17 +438,12 @@
           return;
         }
 
-        const selectedOption = this.levelSelect.options[this.levelSelect.selectedIndex];
-        const sellingPlan = selectedOption ? selectedOption.dataset.sellingPlan : '';
-
         const item = {
           id: Number(variantId),
           quantity: 1,
-          properties: this.collectProperties()
+          properties: this.collectProperties(),
+          selling_plan: Number(sellingPlan)
         };
-        if (sellingPlan) {
-          item.selling_plan = Number(sellingPlan);
-        }
 
         this.submitButton.setAttribute('aria-busy', 'true');
 
@@ -446,6 +529,12 @@
     },
     {
       "type": "text",
+      "id": "auto_renewal_label",
+      "label": "Auto renewal checkbox label",
+      "default": "Auto renewal"
+    },
+    {
+      "type": "text",
       "id": "library_name_label",
       "label": "Library name label",
       "default": "Library Name"
@@ -498,6 +587,12 @@
     },
     {
       "type": "color",
+      "id": "checkbox_accent_color",
+      "label": "Checkbox accent",
+      "default": "#3b6fe0"
+    },
+    {
+      "type": "color",
       "id": "input_border_color",
       "label": "Input border",
       "default": "#000000"
@@ -522,7 +617,19 @@
           "type": "product",
           "id": "product",
           "label": "Membership product",
-          "info": "The product added to cart when this type is selected. Uses its first available variant."
+          "info": "The product used for both renewal choices. Uses its first available variant."
+        },
+        {
+          "type": "text",
+          "id": "recurring_selling_plan_id",
+          "label": "Auto-renewal selling plan ID",
+          "info": "Exact Appstle/Shopify selling plan ID used when Auto renewal is checked."
+        },
+        {
+          "type": "text",
+          "id": "non_recurring_selling_plan_id",
+          "label": "Not recurring selling plan ID",
+          "info": "Exact Appstle/Shopify selling plan ID used when Auto renewal is unchecked."
         },
         {
           "type": "text",
